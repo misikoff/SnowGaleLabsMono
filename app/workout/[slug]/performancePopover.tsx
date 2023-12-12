@@ -1,0 +1,74 @@
+'use client'
+
+import { useState } from 'react'
+
+import { MinusIcon, PlusIcon } from 'lucide-react'
+
+import { Button } from 'components/ui/button'
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  // SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from 'components/ui/sheet'
+
+export default function PerformanceButton({
+  children,
+  set = 0,
+}: {
+  children: any
+  set?: any
+}) {
+  const [value, setValue] = useState(0)
+
+  const adjustment = 5
+  function decrement() {
+    let newValue = value - adjustment
+    newValue = Math.max(newValue, 0)
+    setValue(newValue)
+  }
+  function increment() {
+    let newValue = value + adjustment
+    newValue = Math.max(newValue, 0)
+    setValue(newValue)
+  }
+  return (
+    <Sheet>
+      <SheetTrigger>{children}</SheetTrigger>
+      <SheetContent side='bottom'>
+        <SheetHeader>
+          <SheetTitle>Performance</SheetTitle>
+          {/* <SheetDescription>
+          This action cannot be undone. This will permanently
+          delete your account and remove your data from our
+          servers.
+        </SheetDescription> */}
+        </SheetHeader>
+        <div className='flex flex-col'>
+          <div className='flex justify-between'>
+            <MinusIcon onClick={decrement} />
+            {value}
+            <PlusIcon onClick={increment} />
+          </div>
+        </div>
+        <div>weight</div>
+        <div>Difficulty</div>
+        <div className='flex w-full gap-x-4'>
+          <SheetClose className='w-full'>
+            <Button className='justify-self-end w-full uppercase font-mono text-gray-400'>
+              Clear
+            </Button>
+          </SheetClose>
+          <SheetClose className='w-full'>
+            <Button className='justify-self-end w-full uppercase font-mono text-white bg-green-400'>
+              Done
+            </Button>
+          </SheetClose>
+        </div>
+      </SheetContent>
+    </Sheet>
+  )
+}

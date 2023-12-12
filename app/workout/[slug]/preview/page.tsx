@@ -9,13 +9,14 @@ import {
   PencilIcon,
   ArrowRightLeftIcon,
   PlusIcon,
+  ArrowRightIcon,
 } from 'lucide-react'
 
 import { Button } from 'components/ui/button'
 
-import InfoPopoverExercise from './infoPopoverExercise'
-import PerformanceButton from './performancePopover'
-import SwapButton from './swapPopover'
+import InfoPopoverExercise from '../infoPopoverExercise'
+import PerformanceButton from '../performancePopover'
+import SwapButton from '../swapPopover'
 
 const user = {
   preferredUnits: 'lbs',
@@ -23,6 +24,7 @@ const user = {
 
 const workout = {
   name: 'Workout 1',
+  id: '1',
   exercises: [
     {
       name: 'Squat',
@@ -129,21 +131,26 @@ function getSetType(set: any) {
   }
 }
 
-async function getData() {
-  const sql = neon(process.env.DATABASE_URL!)
+// async function getData() {
+//   const sql = neon(process.env.DATABASE_URL!)
 
-  const response = await sql`SELECT * FROM playing_with_neon;`
-  console.log(response)
-  return response
-}
+//   const response = await sql`SELECT * FROM playing_with_neon;`
+//   console.log(response)
+//   return response
+// }
 
 export default async function Home() {
-  const data = await getData()
-  console.log({ woo: data })
+  // const data = await getData()
+  // console.log({ woo: data })
   return (
     <div>
       <div>{workout.name}</div>
-
+      <Link
+        href={`/workout/${workout.id}/check-in`}
+        className='flex gap-3 bg-green-400 rounded-md'
+      >
+        Start Training <ArrowRightIcon />
+      </Link>
       <div className='flex flex-col gap-y-4'>
         {workout.exercises.map((exercise, index) => (
           <div className='bg-gray-800 rounded-xl p-4' key={index}>

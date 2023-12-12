@@ -7,6 +7,7 @@ import { Disclosure } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { clsx } from 'clsx'
 import { motion } from 'framer-motion'
+import { ChevronLeft } from 'lucide-react'
 
 import Logo from 'public/icon.png'
 
@@ -23,6 +24,19 @@ export default function Navbar({ className = '' }) {
   navigation.forEach((n) => {
     n.current = pathname.startsWith(n.href)
   })
+
+  const enableBack = pathname.split('/').length > 2
+  let backRoute = pathname.split('/').slice(0, -1).join('/')
+  // handle workout pages
+  if (pathname.startsWith('/workout')) {
+    if (pathname.endsWith('/preview')) {
+      backRoute = '/dashboard'
+    } else if (pathname.endsWith('/check-in')) {
+      backRoute = pathname.split('/').slice(0, -1).join('/') + '/preview'
+    } else {
+      backRoute = pathname + '/check-in'
+    }
+  }
 
   function hoverBar(path: string, startsWith = false) {
     const shouldShowBar = startsWith
@@ -64,23 +78,30 @@ export default function Navbar({ className = '' }) {
                 <div className='flex h-16 justify-between'>
                   <div className='flex'>
                     <div className='flex items-center'>
-                      <Link href='/' className='group flex flex-shrink-0'>
-                        <div className='flex space-x-2'>
-                          <Image
-                            className='block h-8 w-auto'
-                            src={Logo}
-                            alt='snowball'
-                            height={32}
-                            width={32}
-                          />
-                          <div>
-                            <span className='text-lg font-bold text-gray-600 transition-colors duration-200 group-hover:text-blue-500'>
-                              centurion
-                            </span>
-                            {hoverBar('/')}
+                      {enableBack ? (
+                        <Link href={backRoute}>
+                          <ChevronLeft />
+                        </Link>
+                      ) : (
+                        <Link href='/' className='group flex flex-shrink-0'>
+                          <div className='flex space-x-2'>
+                            <Image
+                              className='block h-8 w-auto'
+                              src={Logo}
+                              alt='snowball'
+                              height={32}
+                              width={32}
+                            />
+
+                            <div>
+                              <span className='text-lg font-bold text-gray-600 transition-colors duration-200 group-hover:text-blue-500'>
+                                centurion
+                              </span>
+                              {hoverBar('/')}
+                            </div>
                           </div>
-                        </div>
-                      </Link>
+                        </Link>
+                      )}
                     </div>
                     <div className='hidden items-center sm:-my-px sm:ml-6 sm:flex sm:space-x-8 md:flex'>
                       {navigation.map((item) => (

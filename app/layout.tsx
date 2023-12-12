@@ -15,9 +15,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang='en'>
-      <body className='flex min-h-screen flex-col bg-white'>
+      <body className='flex min-h-screen overflow-x-hidden flex-col bg-white'>
         <Navbar />
-        <main className='flex-grow p-4 mb-24 mt-24'>{children}</main>
+        <main className='left-0 right-0 flex-grow py-4 mb-24 mt-24'>
+          {children}
+        </main>
         <Footer className='fixed h-24 bg-blue-200 bottom-0 w-full left-0 right-0 rounded-t-xl shadow dark:bg-gray-800' />
       </body>
     </html>

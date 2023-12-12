@@ -1,8 +1,8 @@
 const nextConfig = {
   pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
-  experimental: {
-    serverActions: true,
-  },
+  // serverActions: {
+  //   bodySizeLimit: '500kb',
+  // },
 }
 
 module.exports = nextConfig
