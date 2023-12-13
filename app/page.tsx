@@ -1,5 +1,6 @@
 import { neon } from '@neondatabase/serverless'
 
+import Block from 'components/block'
 import Button from 'components/button'
 import { Calendar } from 'components/ui/calendar'
 async function getData() {
@@ -15,7 +16,7 @@ export default async function Home() {
   console.log({ woo: data })
   return (
     <div>
-      <span className='block pb-4'>Home Page</span>
+      {/* <span className='block pb-4'>Home Page</span>
       <a
         className='underline hover:text-blue-400'
         href='https://github.com/misikoff/next-starter-template'
@@ -67,7 +68,8 @@ export default async function Home() {
       <div>hello</div>
       <div>hello</div>
 
-      <div>hello</div>
+      <div>hello</div> */}
+      <Block className='m-8' />
     </div>
   )
 }

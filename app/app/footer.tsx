@@ -7,10 +7,10 @@ import { motion } from 'framer-motion'
 import { AxeIcon, CogIcon, DnaIcon, GemIcon } from 'lucide-react'
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: AxeIcon, current: false },
-  { name: 'Workout', href: '/workout', icon: GemIcon, current: false },
-  { name: 'History', href: '/history', icon: DnaIcon, current: false },
-  { name: 'Tools', href: '/tools', icon: CogIcon, current: false },
+  { name: 'Dashboard', href: '/app/dashboard', icon: AxeIcon, current: false },
+  { name: 'Workout', href: '/app/workout', icon: GemIcon, current: false },
+  { name: 'History', href: '/app//history', icon: DnaIcon, current: false },
+  { name: 'Tools', href: '/app//tools', icon: CogIcon, current: false },
 ]
 
 export default function Footer({ className = '' }: { className?: string }) {

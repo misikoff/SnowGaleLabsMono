@@ -1,4 +1,3 @@
-import Footer from 'components/footer'
 import Navbar from 'components/navbar'
 
 import '../assets/globals.css'
@@ -20,7 +19,6 @@ export default function RootLayout({
         <main className='left-0 right-0 flex-grow py-4 mb-24 mt-24'>
           {children}
         </main>
-        <Footer className='fixed h-24 bg-blue-200 bottom-0 w-full left-0 right-0 rounded-t-xl shadow dark:bg-gray-800' />
       </body>
     </html>
   )
