@@ -1,7 +1,6 @@
 'use client'
 
-import { use, useState } from 'react'
-import { MouseEvent } from 'react'
+import { useState } from 'react'
 
 import clsx from 'clsx'
 import {
@@ -13,7 +12,6 @@ import {
 import {
   BirdIcon,
   CarIcon,
-  CircleDashed,
   CrosshairIcon,
   LucideIcon,
   TruckIcon,
@@ -52,8 +50,22 @@ const basePoints: Point[] = [
   },
   {
     icon: BirdIcon,
+    left: 360,
+    top: 50,
+    done: false,
+    doneClasses: 'text-red-600',
+  },
+  {
+    icon: BirdIcon,
     left: 200,
     top: 100,
+    done: false,
+    doneClasses: 'text-red-600',
+  },
+  {
+    icon: BirdIcon,
+    left: 50,
+    top: 360,
     done: false,
     doneClasses: 'text-red-600',
   },
@@ -64,43 +76,56 @@ const basePoints: Point[] = [
     done: false,
     doneClasses: 'text-red-600',
   },
+  {
+    icon: BirdIcon,
+    left: 360,
+    top: 360,
+    done: false,
+    doneClasses: 'text-red-600',
+  },
 ]
 
 export default function Block({ className = '' }) {
   const [done, setDone] = useState(false)
   const [points, setPoints] = useState<Point[]>(basePoints)
   const [currentIndex, setCurrentIndex] = useState(1) // useState<Point>(points[1])
+  const [delay, setDelay] = useState(0)
+
   const onClick = () => {
     setPoints(basePoints.map((point) => ({ ...point, done: false })))
     setCurrentIndex(0)
     setDone(false)
 
     const nextPoint = points[0]
-    const ydiff = Math.abs(nextPoint.top - 0)
-    const xdiff = Math.abs(nextPoint.left - 384 / 2)
-    let nextDegrees = Math.atan2(ydiff, xdiff) * (180 / Math.PI)
-    const dir = nextPoint.left - 384 / 2 > 0 ? 1 : -1
-    degrees.set(135 + dir * (nextDegrees + 90))
+    setDegrees(nextPoint)
   }
-  // let mouseX = useMotionValue(0)
-  // let mouseY = useMotionValue(0)
+
+  const setDegrees = (point: Point) => {
+    const ydiff = Math.abs(point.top - 0)
+    const xdiff = Math.abs(point.left - 384 / 2)
+    let nextDegrees = Math.atan2(ydiff, xdiff) * (180 / Math.PI)
+    const dir = point.left - 384 / 2 > 0 ? 1 : -1
+    let time = 0
+    let res = 0
+    if (dir < 1) {
+      res = 45 - nextDegrees
+    } else {
+      res = nextDegrees - 135
+    }
+
+    // 1 rev per second
+    time = 3 * (Math.abs(degrees.current - res) / 360)
+    console.log({ time })
+    animate(degrees, res, {
+      duration: time,
+    })
+    console.log('current', degrees.current)
+    console.log('nextDegrees', res)
+
+    setDelay(time)
+  }
 
   let degrees = useMotionValue(0)
-
-  // function handleMouseMove({ currentTarget, clientX, clientY }: MouseEvent) {
-  //   let { left, top } = currentTarget.getBoundingClientRect()
-  //   console.log('mouse moved')
-  //   mouseX.set((clientX - left) % 360)
-  //   mouseY.set(clientY - top)
-  //   console.log(mouseX.current)
-  // }
-
-  // function handleMouseMove({ currentTarget, clientX, clientY }: MouseEvent) {
-  //   console.log('mouse moved')
-  //   mouseX.set((clientX - left) % 360)
-  //   mouseY.set(clientY - top)
-  //   console.log(mouseX.current)
-  // }
 
   return (
     <div className='flex mt-96 flex-col justify-center items-center mx-auto'>
@@ -115,8 +140,8 @@ export default function Block({ className = '' }) {
           degrees.set(-Number(e.target.value) + 90)
           console.log(e.target.value)
         }}
-      />
-      <span className='z-10'> degrees:{degrees.current}</span> */}
+      /> */}
+      {/* <span className='z-10'> degrees:{degrees.current}</span> */}
 
       <button className='p-8 bg-blue-400 w-24 text-white' onClick={onClick}>
         click me
@@ -140,29 +165,8 @@ export default function Block({ className = '' }) {
         <motion.div
           className='pointer-events-none absolute -inset-px rotate-[180deg] rounded-xl x:opacity-0 transition duration-300 translate-y-1/2 group-hover:opacity-100 scale-[200%]'
           style={{
-            // background: useMotionTemplate`linear-gradient(${mouseX}deg, #000000 1%, #2989d8 50%, #207cca 51%, #000000 100%)`,
-            // background: useMotionTemplate`linear-gradient(${mouseX}deg, rgba(0,0,0,0) 1%, rgba(0,0,130,0.8) 50%, rgba(0,0,0,0) 100%)`,
-
-            // background: useMotionTemplate`
-            // radial-gradient(
-            //   circle farthest-corner at ${mouseX}px ${mouseY}px,
-            //   rgba(255, 255, 233, 0.85),
-            //   transparent 80%
-            // )
-            // `,
-
             background: 'radial-gradient(farthest-side at bottom, blue, #0000)',
-            mask: useMotionTemplate`conic-gradient(from ${degrees}deg at bottom, #0000 0deg, #0008 45deg, #0000 90deg)`,
-            // mask: useMotionTemplate`conic-gradient(from ${mouseX}deg at bottom, #0000, #000 181deg 180deg, #0000 271deg)`,
-
-            // background: useMotionTemplate`
-            // radial-gradient(
-            //   farthest-side at top,
-            //   rgba(255, 255, 233, 0.85),
-            //   transparent 80%
-            // )
-            // `,
-            // mask: useMotionTemplate`conic-gradient(from ${mouseX}deg at top,#0000, #000 1deg 90deg, #0000 91deg);`,
+            mask: useMotionTemplate`conic-gradient(from ${degrees}deg at bottom, #0000 0deg, #0004 45deg, #0000 90deg)`,
           }}
         />
 
@@ -189,7 +193,7 @@ export default function Block({ className = '' }) {
             left: `${points[currentIndex].left}px`,
             top: `${points[currentIndex].top}px`,
           }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: delay }}
           className='absolute -translate-x-1/2 -translate-y-1/2'
           onAnimationComplete={() => {
             console.log('animation completed')
@@ -206,15 +210,7 @@ export default function Block({ className = '' }) {
               if (currentIndex < points.length - 1) {
                 setCurrentIndex(currentIndex + 1)
                 const nextPoint = points[currentIndex + 1]
-                const ydiff = Math.abs(nextPoint.top - 0)
-                const xdiff = Math.abs(nextPoint.left - 384 / 2)
-                let nextDegrees = Math.atan2(ydiff, xdiff) * (180 / Math.PI)
-                const dir = nextPoint.left - 384 / 2 > 0 ? 1 : -1
-
-                animate(degrees, 135 + dir * (nextDegrees + 90), {
-                  duration: 0.5,
-                })
-                // degrees.set(135 + dir * (nextDegrees + 90))
+                setDegrees(nextPoint)
               } else {
                 setDone(true)
               }
