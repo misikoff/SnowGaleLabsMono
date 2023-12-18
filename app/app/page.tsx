@@ -1,3 +1,4 @@
+import { currentUser } from '@clerk/nextjs'
 import { neon } from '@neondatabase/serverless'
 
 async function getData() {
@@ -9,7 +10,17 @@ async function getData() {
 }
 
 export default async function Home() {
+  const user = await currentUser()
+  console.log({ user })
+
   const data = await getData()
   console.log({ woo: data })
-  return <div />
+  return (
+    <div>
+      {data.map((d: any) => (
+        <div key={d.id}>{d.name}</div>
+      ))}
+      id: {user?.id}
+    </div>
+  )
 }

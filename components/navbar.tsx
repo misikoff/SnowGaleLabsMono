@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { UserButton } from '@clerk/clerk-react'
 import { Disclosure } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { clsx } from 'clsx'
@@ -11,13 +12,13 @@ import { ChevronLeft } from 'lucide-react'
 
 import Logo from 'public/icon.png'
 
-const navigation = [
-  { name: 'Articles', href: '/articles', current: false },
-  { name: 'Sandboxes', href: '/sandboxes', current: false },
-  { name: 'Games', href: '/games', current: false },
-  { name: 'Packages', href: '/packages', current: false },
-  { name: 'Words', href: '/words', current: false },
-]
+type NavigationItem = {
+  name: string
+  href: string
+  current: boolean
+}
+
+const navigation: NavigationItem[] = []
 
 export default function Navbar({ className = '' }) {
   const pathname = usePathname() || '/'
@@ -104,6 +105,7 @@ export default function Navbar({ className = '' }) {
                       )}
                     </div>
                     <div className='hidden items-center sm:-my-px sm:ml-6 sm:flex sm:space-x-8 md:flex'>
+                      <UserButton afterSignOutUrl='/' />
                       {navigation.map((item) => (
                         <div className='group' key={item.name}>
                           <Link

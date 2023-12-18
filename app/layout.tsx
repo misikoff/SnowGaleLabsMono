@@ -1,3 +1,5 @@
+import { ClerkProvider } from '@clerk/nextjs'
+
 import Navbar from 'components/navbar'
 
 import '../assets/globals.css'
@@ -13,13 +15,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang='en'>
-      <body className='flex min-h-screen overflow-x-hidden flex-col bg-white'>
-        <Navbar />
-        <main className='left-0 right-0 flex-grow py-4 mb-24 mt-24'>
-          {children}
-        </main>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang='en'>
+        <body className='flex min-h-screen overflow-x-hidden flex-col bg-white'>
+          <Navbar />
+          <main className='left-0 right-0 flex-grow py-4 mb-24 mt-24'>
+            {children}
+          </main>
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }
