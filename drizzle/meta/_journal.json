@@ -1,0 +1,27 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1702919335425,
+      "tag": "0000_sour_gabe_jones",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1702919441221,
+      "tag": "0001_flippant_enchantress",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1702919852092,
+      "tag": "0002_sticky_makkari",
+      "breakpoints": true
+    }
+  ]
+}
