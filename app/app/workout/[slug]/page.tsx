@@ -129,17 +129,7 @@ function getSetType(set: any) {
   }
 }
 
-async function getData() {
-  const sql = neon(process.env.DATABASE_URL!)
-
-  const response = await sql`SELECT * FROM playing_with_neon;`
-  console.log(response)
-  return response
-}
-
 export default async function Home() {
-  const data = await getData()
-  console.log({ woo: data })
   return (
     <div>
       <div>{workout.name}</div>

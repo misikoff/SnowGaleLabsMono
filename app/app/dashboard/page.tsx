@@ -1,61 +1,70 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+
 import Link from 'next/link'
-// import { neon } from '@neondatabase/serverless'
 import clsx from 'clsx'
 import { ChevronLeft, ChevronRight, InfoIcon } from 'lucide-react'
+
+import { Session } from 'db/test/schema'
 
 import InfoPopoverProgram from './infoPopoverProgram'
 import InfoPopoverReadiness from './infoPopoverReadiness'
 import ProgramChart from './programChart'
 import ReadinessChart from './readinessChart'
+import { getSessionsForProgram } from '../actions'
 
-const workouts = [
-  {
-    id: 1,
-    slug: 'wow',
-    name: 'Workout 1',
-    scheduledDate: '2021-01-01',
-    completed: true,
-  },
-  {
-    id: 2,
-    slug: 'wow2',
-    name: 'Workout 2',
-    scheduledDate: '2021-01-02',
-    completed: false,
-  },
-  {
-    id: 3,
-    slug: 'wow2',
-    name: 'Workout 2',
-    scheduledDate: '2021-01-02',
-    completed: false,
-  },
-  {
-    id: 4,
-    slug: 'wow2',
-    name: 'Workout 2',
-    scheduledDate: '2021-01-02',
-    completed: false,
-  },
-  {
-    id: 5,
-    slug: 'wow2',
-    name: 'Workout 2',
-    scheduledDate: '2021-01-02',
-    completed: false,
-  },
-]
-// async function getData() {
-//   const sql = neon(process.env.DATABASE_URL!)
-
-//   const response = await sql`SELECT * FROM playing_with_neon;`
-//   console.log(response)
-//   return response
-// }
+// const workouts = [
+//   {
+//     id: 1,
+//     slug: 'wow',
+//     name: 'Workout 1',
+//     scheduledDate: '2021-01-01',
+//     completed: true,
+//   },
+//   {
+//     id: 2,
+//     slug: 'wow2',
+//     name: 'Workout 2',
+//     scheduledDate: '2021-01-02',
+//     completed: false,
+//   },
+//   {
+//     id: 3,
+//     slug: 'wow2',
+//     name: 'Workout 2',
+//     scheduledDate: '2021-01-02',
+//     completed: false,
+//   },
+//   {
+//     id: 4,
+//     slug: 'wow2',
+//     name: 'Workout 2',
+//     scheduledDate: '2021-01-02',
+//     completed: false,
+//   },
+//   {
+//     id: 5,
+//     slug: 'wow2',
+//     name: 'Workout 2',
+//     scheduledDate: '2021-01-02',
+//     completed: false,
+//   },
+// ]
 
 export default function Home() {
-  // const data = await getData()
-  // console.log({ woo: data })
+  // const workouts = await getSessionsForProgram(1)
+  const [sessions, setSessions] = useState<Session[]>([])
+
+  useEffect(() => {
+    async function fetchData() {
+      const sessions = await getSessionsForProgram(
+        'f22082ac-1f3a-4f25-8639-ea5fa105e084',
+      )
+      setSessions(sessions)
+    }
+    fetchData()
+  }, [])
 
   return (
     <div>
@@ -100,16 +109,16 @@ export default function Home() {
         </div>
         <div className='text-2xl'>Week 2</div>
         <div className='flex flex-col items-center'>
-          {workouts.map((workout) => (
+          {sessions.map((session) => (
             <Link
-              key={workout.id}
-              href={`/workout/{workout.id}/preview`}
+              key={session.id}
+              href={`/app/workout/${session.id}/preview`}
               className={clsx(
                 'group-hover:text-gray-700 w-full flex justify-between  text-xl items-center transition-colors duration-150',
-                workout.completed ? 'text-gray-600' : 'text-gray-800',
+                // workout.completed ? 'text-gray-600' : 'text-gray-800',
               )}
             >
-              <div>{workout.name}</div>
+              <div>{session.name}</div>
               <ChevronRight />
             </Link>
           ))}

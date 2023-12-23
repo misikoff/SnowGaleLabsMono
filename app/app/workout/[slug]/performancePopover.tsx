@@ -17,12 +17,12 @@ import {
 
 export default function PerformanceButton({
   children,
-  set = 0,
+  weight = 0,
 }: {
   children: any
-  set?: any
+  weight?: any
 }) {
-  const [value, setValue] = useState(0)
+  const [value, setValue] = useState(weight)
 
   const adjustment = 5
   function decrement() {
