@@ -77,20 +77,6 @@ export async function getSetsForSession(sessionId: Session['id']) {
     return x
   })
 
-  // const result = rows.reduce<Record<number, { user: User; pets: Pet[] }>>(
-  //   (acc, row) => {
-  //     const user = row.user
-  //     const pet = row.pet
-  //     if (!acc[user.id]) {
-  //       acc[user.id] = { user, pets: [] }
-  //     }
-  //     if (pet) {
-  //       acc[user.id].pets.push(pet)
-  //     }
-  //     return acc
-  //   },
-  //   {},
-  // )
   return result2
 }
 

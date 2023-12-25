@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import { MinusIcon, PlusIcon } from 'lucide-react'
 
+import AnimatedNumber from 'components/animatedNumber'
 import { Button } from 'components/ui/button'
 import {
   Sheet,
@@ -35,6 +36,7 @@ export default function PerformanceButton({
     newValue = Math.max(newValue, 0)
     setValue(newValue)
   }
+
   return (
     <Sheet>
       <SheetTrigger>{children}</SheetTrigger>
@@ -50,7 +52,10 @@ export default function PerformanceButton({
         <div className='flex flex-col'>
           <div className='flex justify-between'>
             <MinusIcon onClick={decrement} />
-            {value}
+
+            {/* {value} */}
+            <AnimatedNumber value={value} />
+
             <PlusIcon onClick={increment} />
           </div>
         </div>
