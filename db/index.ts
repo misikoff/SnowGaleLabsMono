@@ -8,8 +8,7 @@ neonConfig.fetchConnectionCache = true
 const schema = {
   ...schemas,
 }
-const sql = neon(process.env.DRIZZLE_DATABASE_URL!) // neon(process.env.DRIZZLE_DATABASE_URL!)
+const sql = neon(process.env.DATABASE_URL!) // neon(process.env.DRIZZLE_DATABASE_URL!)
 const db = drizzle(sql, { schema })
 
 export { db }
-// const result = await db.select().from(...);

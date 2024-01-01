@@ -1,0 +1,1 @@
+ALTER TABLE "setGroups" ADD COLUMN "user_id" integer;
