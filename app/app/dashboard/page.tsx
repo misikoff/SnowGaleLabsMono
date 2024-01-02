@@ -14,53 +14,12 @@ import ProgramChart from './programChart'
 import ReadinessChart from './readinessChart'
 import { getSessionsForProgram } from '../actions'
 
-// const workouts = [
-//   {
-//     id: 1,
-//     slug: 'wow',
-//     name: 'Workout 1',
-//     scheduledDate: '2021-01-01',
-//     completed: true,
-//   },
-//   {
-//     id: 2,
-//     slug: 'wow2',
-//     name: 'Workout 2',
-//     scheduledDate: '2021-01-02',
-//     completed: false,
-//   },
-//   {
-//     id: 3,
-//     slug: 'wow2',
-//     name: 'Workout 2',
-//     scheduledDate: '2021-01-02',
-//     completed: false,
-//   },
-//   {
-//     id: 4,
-//     slug: 'wow2',
-//     name: 'Workout 2',
-//     scheduledDate: '2021-01-02',
-//     completed: false,
-//   },
-//   {
-//     id: 5,
-//     slug: 'wow2',
-//     name: 'Workout 2',
-//     scheduledDate: '2021-01-02',
-//     completed: false,
-//   },
-// ]
-
 export default function Home() {
-  // const workouts = await getSessionsForProgram(1)
   const [sessions, setSessions] = useState<Session[]>([])
 
   useEffect(() => {
     async function fetchData() {
-      const sessions = await getSessionsForProgram(
-        'f22082ac-1f3a-4f25-8639-ea5fa105e084',
-      )
+      const sessions = await getSessionsForProgram(1)
       setSessions(sessions)
     }
     fetchData()

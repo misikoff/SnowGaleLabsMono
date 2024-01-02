@@ -29,17 +29,17 @@ export async function getUsers() {
 
 export async function getSessionsForProgram(programId: Program['id']) {
   noStore()
-  return (await db
+  return await db
     .select()
     .from(sessions)
-    .where(eq(sessions.programId, programId))) as Session[]
+    .where(eq(sessions.programId, programId))
 }
 
 export async function getSession(id: Session['id']) {
   noStore()
   return (
     await db.select().from(sessions).where(eq(sessions.id, id)).limit(1)
-  )[0] as Session
+  )[0]
 }
 
 export async function getSetsForSession(sessionId: Session['id']) {
@@ -47,7 +47,7 @@ export async function getSetsForSession(sessionId: Session['id']) {
   const rows = await db
     .select()
     .from(setGroups)
-    .where(eq(setGroups.sessionId, 'a3075d03-a1e1-4b61-b1fd-025e643c7613'))
+    .where(eq(setGroups.sessionId, sessionId))
     .leftJoin(sets, eq(setGroups.id, sets.setGroupId))
 
   console.log(rows)

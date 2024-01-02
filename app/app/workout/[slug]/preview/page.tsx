@@ -15,8 +15,7 @@ import {
 
 import { Button } from 'components/ui/button'
 import { getExercises, getSession, getSetsForSession } from 'app/app/actions'
-import { Session, SetGroup, Exercise } from 'db/test/schema'
-import { Set } from 'db/test/schema'
+import { Session, SetGroup, Exercise, Set } from 'db/test/schema'
 
 import InfoPopoverExercise from '../infoPopoverExercise'
 import PerformanceButton from '../performancePopover'
@@ -148,28 +147,28 @@ export default function Home({
 
   useEffect(() => {
     async function fetchData() {
-      const session = await getSession(params.slug)
+      const session = await getSession(parseInt(params.slug))
       setSession(session)
     }
     fetchData()
   }, [params.slug])
 
-  useEffect(() => {
-    async function fetchData() {
-      const exercises = await getExercises()
-      setExercises(exercises)
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     const exercises = await getExercises()
+  //     setExercises(exercises)
 
-      const data = await getSetsForSession(params.slug)
-      setGroupsOfSets(data)
-      console.log({ data })
-    }
-    fetchData()
-  }, [params.slug])
+  //     const data = await getSetsForSession(parseInt(params.slug))
+  //     setGroupsOfSets(data)
+  //     console.log({ data })
+  //   }
+  //   fetchData()
+  // }, [params.slug])
 
-  const getExerciseName = (id: SetGroup['exerciseId']) => {
-    console.log({ id })
-    return exercises.find((exercise) => exercise.id === id)?.name
-  }
+  // const getExerciseName = (id: SetGroup['exerciseId']) => {
+  //   console.log({ id })
+  //   return exercises.find((exercise) => exercise.id === id)?.name
+  // }
 
   return (
     <div>

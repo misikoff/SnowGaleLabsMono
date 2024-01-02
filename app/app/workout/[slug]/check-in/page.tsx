@@ -172,7 +172,7 @@ export default function Home() {
         ))}
       </div>
       <Link
-        href={`/workout/${workout.id}`}
+        href={`/app/workout/${workout.id}`}
         className='flex gap-3 bg-green-400 rounded-md'
       >
         Start Workout <ArrowRightIcon />
