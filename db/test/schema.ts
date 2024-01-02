@@ -84,7 +84,7 @@ export const sessions = pgTable(
   // },
 )
 
-export const sessionsRelations = relations(sessions, ({ one }) => ({
+export const sessionsRelations = relations(sessions, ({ one, many }) => ({
   user: one(users, {
     fields: [sessions.userId],
     references: [users.id],
@@ -93,6 +93,7 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
     fields: [sessions.programId],
     references: [programs.id],
   }),
+  setGroups: many(setGroups),
 }))
 
 export const setGroups = pgTable(
@@ -113,7 +114,7 @@ export const setGroups = pgTable(
   // },
 )
 
-export const setGroupsRelation = relations(setGroups, ({ one }) => ({
+export const setGroupsRelation = relations(setGroups, ({ one, many }) => ({
   user: one(users, {
     fields: [setGroups.userId],
     references: [users.id],
@@ -130,6 +131,7 @@ export const setGroupsRelation = relations(setGroups, ({ one }) => ({
     fields: [setGroups.exerciseId],
     references: [exercises.id],
   }),
+  sets: many(sets),
 }))
 
 // export const setGroupsRelation = relations(setGroups, ({ many }) => ({

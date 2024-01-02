@@ -23,29 +23,29 @@ const user = {
 type question = {
   text: string
   response: number
-  reponseDescription: string[]
+  responseDescription: string[]
 }
 
 const generalQuestions: question[] = [
   {
     text: 'How did you sleep last night?',
     response: 3,
-    reponseDescription: ['blah', 'blah2', 'blah3', 'blah4', 'blah5'],
+    responseDescription: ['blah', 'blah2', 'blah3', 'blah4', 'blah5'],
   },
   {
     text: 'How would you characterize your mood/motivation to train?',
     response: 3,
-    reponseDescription: ['blah', 'blah2', 'blah3', 'blah4', 'blah5'],
+    responseDescription: ['blah', 'blah2', 'blah3', 'blah4', 'blah5'],
   },
   {
     text: 'How would you rate your diet in the last 24 hours?',
     response: 3,
-    reponseDescription: ['blah', 'blah2', 'blah3', 'blah4', 'blah5'],
+    responseDescription: ['blah', 'blah2', 'blah3', 'blah4', 'blah5'],
   },
   {
     text: 'Do you feel strong and well recovered today?',
     response: 3,
-    reponseDescription: ['blah', 'blah2', 'blah3', 'blah4', 'blah5'],
+    responseDescription: ['blah', 'blah2', 'blah3', 'blah4', 'blah5'],
   },
 ]
 
@@ -53,7 +53,7 @@ const bodyQuestions: question[] = [
   {
     text: 'Pecs / Shoulders / Triceps',
     response: 3,
-    reponseDescription: [
+    responseDescription: [
       'Feeling tired and not very strong',
       'Feeling a little tired/weak',
       'Feeling normal',
@@ -167,7 +167,7 @@ export default function Home() {
                 </div>
               ))}
             </RadioGroup>
-            <div>{question.reponseDescription[3]}</div>
+            <div>{question.responseDescription[3]}</div>
           </div>
         ))}
       </div>

@@ -1,7 +1,7 @@
 'use server'
 
 import { unstable_noStore as noStore } from 'next/cache'
-import { eq, lt, gte, ne } from 'drizzle-orm'
+import { eq, lt, gte, ne, asc } from 'drizzle-orm'
 
 import { db } from 'db'
 import {
@@ -37,9 +37,20 @@ export async function getSessionsForProgram(programId: Program['id']) {
 
 export async function getSession(id: Session['id']) {
   noStore()
-  return (
-    await db.select().from(sessions).where(eq(sessions.id, id)).limit(1)
-  )[0]
+
+  // return (
+  //   await db.select().from(sessions).where(eq(sessions.id, id)).limit(1)
+  // )[0]
+  return await db.query.sessions.findFirst({
+    where: eq(sessions.id, id),
+
+    with: {
+      setGroups: {
+        with: { sets: { orderBy: [asc(sets.order)] }, exercise: true },
+        orderBy: [asc(setGroups.order)],
+      },
+    },
+  })
 }
 
 export async function getSetsForSession(sessionId: Session['id']) {

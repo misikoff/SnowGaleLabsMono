@@ -2,26 +2,13 @@
 
 import { useEffect, useState } from 'react'
 
-import {
-  InfoIcon,
-  MinusIcon,
-  PenIcon,
-  PencilIcon,
-  ArrowRightLeftIcon,
-  PlusIcon,
-} from 'lucide-react'
+import SetGroupBlock from 'components/workout/setGroupBlock'
+import { getSession } from 'app/app/actions'
+import { Exercise, Set } from 'db/test/schema'
 
-import { Button } from 'components/ui/button'
-import { getExercises, getSession, getSetsForSession } from 'app/app/actions'
-import { Session, SetGroup, Exercise, Set } from 'db/test/schema'
-
-import InfoPopoverExercise from './infoPopoverExercise'
-import PerformanceButton from './performancePopover'
-import SwapButton from './swapPopover'
-
-const user = {
-  preferredUnits: 'lbs',
-}
+// const user = {
+//   preferredUnits: 'lbs',
+// }
 
 // const workout = {
 //   name: 'Workout 1',
@@ -109,103 +96,28 @@ const user = {
 //   ],
 // }
 
-function getSetType(set: any) {
-  if (set.prescribedRepsLow && set.prescribedRepsHigh) {
-    if (set.prescribedRepsLow === set.prescribedRepsHigh) {
-      return `${set.prescribedRepsLow} reps`
-    } else {
-      return `not same ${set.prescribedRepsLow} - ${set.prescribedRepsHigh}`
-    }
-  } else if (set.prescribedWeightLow && set.prescribedWeightHigh) {
-    if (set.prescribedWeightLow === set.prescribedWeightHigh) {
-      return `${set.prescribedWeightLow}lbs`
-    } else {
-      return `${set.prescribedWeightLow} - ${set.prescribedWeightHigh}lbs`
-    }
-  } else if (set.prescribedDifficultyLow && set.prescribedDifficultyHigh) {
-    if (set.prescribedDifficultyLow === set.prescribedDifficultyHigh) {
-      return `${set.prescribedDifficultyLow} RPE`
-    } else {
-      return `${set.prescribedDifficultyLow} - ${set.prescribedDifficultyHigh} RPE`
-    }
-  }
-}
-
-export default function Home({
-  // children,
-  params,
-}: {
-  // children: React.ReactNode
-  params: { slug: string }
-}) {
-  const [session, setSession] = useState<Session>()
-  const [groupsOfSets, setGroupsOfSets] = useState<any>([])
-  const [exercises, setExercises] = useState<Exercise[]>([])
+export default function Home({ params }: { params: { slug: string } }) {
+  const [session, setSession] = useState<any>()
 
   useEffect(() => {
     async function fetchData() {
       const session = await getSession(parseInt(params.slug))
       setSession(session)
+      console.log({ session })
     }
     fetchData()
   }, [params.slug])
-
-  useEffect(() => {
-    async function fetchData() {
-      const exercises = await getExercises()
-      setExercises(exercises)
-
-      const data = await getSetsForSession(parseInt(params.slug))
-      setGroupsOfSets(data)
-      console.log({ data })
-    }
-    fetchData()
-  }, [params.slug])
-
-  const getExerciseName = (id: SetGroup['exerciseId']) => {
-    console.log({ id })
-    return exercises.find((exercise) => exercise.id === id)?.name
-  }
 
   return (
     <div>
       <div>{session?.name}</div>
       <div className='flex flex-col gap-y-4'>
-        {session &&
-          session.exercises.map((exercise, index) => (
-            <div className='bg-gray-800 rounded-xl p-4' key={index}>
-              <div className='flex justify-between'>
-                <div className='text-2xl text-white'>{exercise.name}</div>
-                <div className='flex gap-x-3'>
-                  <InfoPopoverExercise>
-                    <InfoIcon className='w-6 h-6 text-gray-400' />
-                  </InfoPopoverExercise>
-                  <SwapButton>
-                    <ArrowRightLeftIcon className='w-6 h-6 text-gray-400' />
-                  </SwapButton>
-                </div>
-              </div>
-              <div className='ml-1 mt-2 flex flex-col gap-y-2'>
-                {exercise.sets.map((set, index) => (
-                  <div key={'s' + index}>
-                    <div className='flex items-center gap-x-2 text-white'>
-                      <span className='flex h-8 w-8 flex-shrink-0 items-center text-blue-400 justify-center rounded-full border-2 bg-black border-black'>
-                        <span className='text-indigo-600'>{index + 1}</span>
-                      </span>
-                      {getSetType(set)}
-                      <div className='flex-grow' />
-
-                      <PerformanceButton>
-                        <Button className='justify-self-end rounded-full text-blue-400'>
-                          Performance
-                        </Button>
-                      </PerformanceButton>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+        {session?.setGroups.map(
+          (
+            g: { exercise: Exercise; sets: Set[]; id: number },
+            index: number,
+          ) => <SetGroupBlock key={index} setGroup={g} />,
+        )}
       </div>
     </div>
   )
