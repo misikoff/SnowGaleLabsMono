@@ -2104,10 +2104,10 @@ drizzle-kit@^0.20.9:
     semver "^7.5.4"
     zod "^3.20.2"
 
-drizzle-orm@^0.29.2:
-  version "0.29.2"
-  resolved "https://registry.yarnpkg.com/drizzle-orm/-/drizzle-orm-0.29.2.tgz#0127e04172335fbab9748917222179405f9302b2"
-  integrity sha512-BhwCwuSQqUoLVc7wtgIkuWexY127Z9+yDbuXU7QWZbMC2XE48jecvAThW9apQaDoaxQmwQ+ObyPfPb4zL4Bgsw==
+drizzle-orm@^0.29.3:
+  version "0.29.3"
+  resolved "https://registry.yarnpkg.com/drizzle-orm/-/drizzle-orm-0.29.3.tgz#a9b9beb235bbdf9100e62432390cadbee95345cf"
+  integrity sha512-uSE027csliGSGYD0pqtM+SAQATMREb3eSM/U8s6r+Y0RFwTKwftnwwSkqx3oS65UBgqDOM0gMTl5UGNpt6lW0A==
 
 eastasianwidth@^0.2.0:
   version "0.2.0"
