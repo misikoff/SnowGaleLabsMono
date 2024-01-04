@@ -2,7 +2,7 @@ import clsx from 'clsx'
 import { InfoIcon, ArrowRightLeftIcon } from 'lucide-react'
 
 import { Button } from 'components/ui/button'
-import { Exercise, Set } from 'db/test/schema'
+import { Exercise, Set, exercises } from 'db/test/schema'
 
 import InfoPopoverExercise from './infoPopoverExercise'
 import PerformanceButton from './performancePopover'
@@ -20,7 +20,7 @@ export default function SetGroupBlock({
       <div className='flex justify-between'>
         <div className='text-2xl text-white'>{setGroup.exercise.name}</div>
         <div className='flex gap-x-3'>
-          <InfoPopoverExercise>
+          <InfoPopoverExercise exercise={setGroup.exercise}>
             <InfoIcon className='w-6 h-6 text-gray-400' />
           </InfoPopoverExercise>
           <SwapButton>
@@ -38,7 +38,11 @@ export default function SetGroupBlock({
               {set.prescribedWeight} x {set.prescribedReps}
               {/* {getSetType(set)} */}
               <div className='flex-grow' />
-              <PerformanceButton weight={set.prescribedWeight}>
+              <PerformanceButton
+                weight={set.prescribedWeight}
+                reps={set.prescribedReps}
+                difficulty={set.prescribedRIR}
+              >
                 <Button className='justify-self-end rounded-full text-blue-400'>
                   Performance
                 </Button>

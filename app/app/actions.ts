@@ -95,3 +95,31 @@ export async function getExercises() {
   noStore()
   return (await db.select().from(exercises)) as Exercise[]
 }
+
+export async function deleteAllExercises() {
+  noStore()
+  await db.delete(exercises) //.where(ne(exercises.id, 0))
+}
+
+export async function createExercise({
+  id,
+  name,
+  equipment,
+}: {
+  id: number
+  name: string
+  equipment:
+    | 'barbell'
+    | 'dumbbell'
+    | 'cable'
+    | 'machine'
+    | 'bodyweight'
+    | 'band'
+    | 'other'
+}) {
+  console.log('adding exercise ', id)
+  noStore()
+
+  await db.insert(exercises).values({ id, name, equipmentType: equipment })
+  // ...
+}

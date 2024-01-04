@@ -19,22 +19,52 @@ import {
 export default function PerformanceButton({
   children,
   weight = 0,
+  reps = 0,
+  difficulty = 0,
 }: {
   children: any
   weight?: any
+  reps?: any
+  difficulty?: any
 }) {
-  const [value, setValue] = useState(weight)
+  const [weightValue, setWeightValue] = useState(weight)
+  const [repValue, setRepValue] = useState(reps)
+  const [difficultyValue, setDifficultyValue] = useState(difficulty)
 
-  const adjustment = 5
-  function decrement() {
-    let newValue = value - adjustment
+  const weightAdjustment = 5
+  function decrementWeight() {
+    let newValue = weightValue - weightAdjustment
     newValue = Math.max(newValue, 0)
-    setValue(newValue)
+    setWeightValue(newValue)
   }
-  function increment() {
-    let newValue = value + adjustment
+  function incrementWeight() {
+    let newValue = weightValue + weightAdjustment
     newValue = Math.max(newValue, 0)
-    setValue(newValue)
+    setWeightValue(newValue)
+  }
+
+  const repAdjustment = 1
+  function decrementRep() {
+    let newValue = repValue - repAdjustment
+    newValue = Math.max(newValue, 0)
+    setRepValue(newValue)
+  }
+  function incrementRep() {
+    let newValue = repValue + repAdjustment
+    newValue = Math.max(newValue, 0)
+    setRepValue(newValue)
+  }
+
+  const difficultyAdjustment = 1
+  function decrementDifficulty() {
+    let newValue = difficultyValue - difficultyAdjustment
+    newValue = Math.max(newValue, 0)
+    setDifficultyValue(newValue)
+  }
+  function incrementDifficulty() {
+    let newValue = difficultyValue + difficultyAdjustment
+    newValue = Math.max(newValue, 0)
+    setDifficultyValue(newValue)
   }
 
   return (
@@ -51,16 +81,35 @@ export default function PerformanceButton({
         </SheetHeader>
         <div className='flex flex-col'>
           <div className='flex justify-between'>
-            <MinusIcon onClick={decrement} />
+            <MinusIcon onClick={decrementWeight} />
 
             {/* {value} */}
-            <AnimatedNumber value={value} />
+            <AnimatedNumber value={weightValue} />
 
-            <PlusIcon onClick={increment} />
+            <PlusIcon onClick={incrementWeight} />
           </div>
         </div>
-        <div>weight</div>
-        <div>Difficulty</div>
+        <div className='text-center'>weight</div>
+
+        <div className='flex justify-between'>
+          <MinusIcon onClick={decrementRep} />
+
+          {/* {value} */}
+          <AnimatedNumber value={repValue} />
+
+          <PlusIcon onClick={incrementRep} />
+        </div>
+        <div className='text-center'>reps</div>
+
+        <div className='flex justify-between'>
+          <MinusIcon onClick={decrementDifficulty} />
+
+          {/* {value} */}
+          <AnimatedNumber value={difficultyValue} />
+
+          <PlusIcon onClick={incrementDifficulty} />
+        </div>
+        <div className='text-center'>Difficulty</div>
         <div className='flex w-full gap-x-4'>
           <SheetClose className='w-full'>
             <Button className='justify-self-end w-full uppercase font-mono text-gray-400'>
