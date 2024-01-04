@@ -1,0 +1,1 @@
+ALTER TABLE "exercise_preferences" ADD COLUMN "rep_range" "rep_style";

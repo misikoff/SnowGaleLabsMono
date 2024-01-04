@@ -1,0 +1,1 @@
+ALTER TABLE "exercise_preferences" DROP COLUMN IF EXISTS "rep_range";

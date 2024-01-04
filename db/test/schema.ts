@@ -6,7 +6,25 @@ import {
   serial,
   varchar,
   integer,
+  pgEnum,
+  boolean,
 } from 'drizzle-orm/pg-core'
+
+export const repStyleEnum = pgEnum('rep_style', ['high', 'medium', 'low'])
+export const weightUnitsEnum = pgEnum('weight_units', ['lbs', 'kg'])
+export const distanceUnitsEnum = pgEnum('distance_units', ['yards', 'meters'])
+
+// export const exerciseType = pgEnum('exercise_type', ['compound', 'isolation'])
+
+export const equipmentEnum = pgEnum('equipment', [
+  'barbell',
+  'dumbbell',
+  'cable',
+  'machine',
+  'bodyweight',
+  'band',
+  'other',
+])
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -20,6 +38,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   sessions: many(sessions),
   setGroups: many(setGroups),
   sets: many(sets),
+  exercisePreferences: many(exercisePreferences),
 }))
 
 export const exercises = pgTable(
@@ -28,6 +47,17 @@ export const exercises = pgTable(
     id: serial('id').primaryKey(),
     name: varchar('name', { length: 256 }),
     description: varchar('description', { length: 256 }),
+    equipmentType: equipmentEnum('equipment_type'),
+    defaultRepRange: repStyleEnum('default_rep_range').default('medium'),
+    defaultWeightIncrement: real('default_weight_increment').default(5),
+    defaultWeightUnits: weightUnitsEnum('default_weight_units').default('lbs'),
+    useWeight: boolean('use_weight').default(true),
+    useDistance: boolean('use_Distance').default(false),
+    defaultDistanceIncrement: real('default_distance_increment').default(5),
+    defaultDistanceUnits: distanceUnitsEnum('default_distance_units').default(
+      'yards',
+    ),
+
     // only for the user who created it
     userId: integer('user_id'),
   },
@@ -44,6 +74,32 @@ export const exercisesRelations = relations(exercises, ({ one }) => ({
     references: [users.id],
   }),
 }))
+
+export const exercisePreferences = pgTable('exercise_preferences', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id'),
+  exerciseId: integer('excercise_id'),
+  notes: varchar('notes', { length: 256 }),
+  repRange: repStyleEnum('rep_range'),
+  weightIncrement: real('weight_increment'),
+  weightUnits: weightUnitsEnum('weight_units'),
+  distanceIncrement: real('distance_increment'),
+  distanceUnits: distanceUnitsEnum('distance_units'),
+})
+
+export const exercisePreferencesRelations = relations(
+  exercisePreferences,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [exercisePreferences.userId],
+      references: [users.id],
+    }),
+    exercise: one(exercises, {
+      fields: [exercisePreferences.exerciseId],
+      references: [exercises.id],
+    }),
+  }),
+)
 
 // // create a table or Programs with a name and a description and a user column for the user who created it
 export const programs = pgTable(
@@ -133,10 +189,6 @@ export const setGroupsRelation = relations(setGroups, ({ one, many }) => ({
   }),
   sets: many(sets),
 }))
-
-// export const setGroupsRelation = relations(setGroups, ({ many }) => ({
-//   sets: many(sets),
-// }));
 
 export const sets = pgTable(
   'sets',
