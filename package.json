@@ -43,7 +43,7 @@
     "@types/react": "^18.2.46",
     "autoprefixer": "^10.4.16",
     "commitlint": "^18.4.4",
-    "drizzle-kit": "^0.20.9",
+    "drizzle-kit": "^0.20.10",
     "eslint": "^8.56.0",
     "eslint-config-next": "^14.0.4",
     "eslint-config-prettier": "^9.1.0",
