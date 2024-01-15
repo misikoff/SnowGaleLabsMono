@@ -2088,10 +2088,10 @@ dreamopt@~0.8.0:
   dependencies:
     wordwrap ">=0.0.2"
 
-drizzle-kit@^0.20.10:
-  version "0.20.10"
-  resolved "https://registry.yarnpkg.com/drizzle-kit/-/drizzle-kit-0.20.10.tgz#28591490d309d0f4bafb9f5def5713bf1ed1fad4"
-  integrity sha512-GoBmfAWrZiX2ZHMGlVg7w34bnJw1gbQIzhGr1cROK6+0eikhFNSR4a4G8jtD3FO5JZKbbWHuNA5YFDJu6Us0Tw==
+drizzle-kit@^0.20.12:
+  version "0.20.12"
+  resolved "https://registry.yarnpkg.com/drizzle-kit/-/drizzle-kit-0.20.12.tgz#edd05a4ef73a3a5f71325d0c17fb3722a01a09a2"
+  integrity sha512-JWJposyEO6QvGIdvj0CmnJK5sMWW9j5HPiGnRIKvYNaAfZEHbmWlemxV2np7g2FZzSvuzwpa9EGmO20PaPeUmA==
   dependencies:
     "@drizzle-team/studio" "^0.0.37"
     "@esbuild-kit/esm-loader" "^2.5.5"
