@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^18.4.4",
-    "@types/react": "^18.2.47",
+    "@types/react": "^18.2.48",
     "autoprefixer": "^10.4.16",
     "commitlint": "^18.4.4",
     "drizzle-kit": "^0.20.12",
