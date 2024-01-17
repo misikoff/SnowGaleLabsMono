@@ -266,10 +266,10 @@
   dependencies:
     chalk "^4.1.0"
 
-"@drizzle-team/studio@^0.0.37":
-  version "0.0.37"
-  resolved "https://registry.yarnpkg.com/@drizzle-team/studio/-/studio-0.0.37.tgz#f86b18954592c2457286e094ac946e6b1469bc31"
-  integrity sha512-LZyAPGJBX43jsrVZh7+w1Jig/BC6PJx63ReHUYK+GRQYNY9UJNlPXmn1uC/LMRX+A7JwYM4Sr4Fg/hnJSqlfgA==
+"@drizzle-team/studio@^0.0.39":
+  version "0.0.39"
+  resolved "https://registry.yarnpkg.com/@drizzle-team/studio/-/studio-0.0.39.tgz#70e9155503f7343e8f1917d316f93e64c23760e1"
+  integrity sha512-c5Hkm7MmQC2n5qAsKShjQrHoqlfGslB8+qWzsGGZ+2dHMRTNG60UuzalF0h0rvBax5uzPXuGkYLGaQ+TUX3yMw==
   dependencies:
     superjson "^2.2.1"
 
@@ -2088,12 +2088,12 @@ dreamopt@~0.8.0:
   dependencies:
     wordwrap ">=0.0.2"
 
-drizzle-kit@^0.20.12:
-  version "0.20.12"
-  resolved "https://registry.yarnpkg.com/drizzle-kit/-/drizzle-kit-0.20.12.tgz#edd05a4ef73a3a5f71325d0c17fb3722a01a09a2"
-  integrity sha512-JWJposyEO6QvGIdvj0CmnJK5sMWW9j5HPiGnRIKvYNaAfZEHbmWlemxV2np7g2FZzSvuzwpa9EGmO20PaPeUmA==
+drizzle-kit@^0.20.13:
+  version "0.20.13"
+  resolved "https://registry.yarnpkg.com/drizzle-kit/-/drizzle-kit-0.20.13.tgz#6aa45a3b445ecfd05becb7bb679a54a3194f4fe4"
+  integrity sha512-j9oZSQXNWG+KBJm0Sg3S/zJpncHGKnpqNfFuM4NUxUMGTcihDHhP9SW6Jncqwb5vsP1Xm0a8JLm3PZUIspC/oA==
   dependencies:
-    "@drizzle-team/studio" "^0.0.37"
+    "@drizzle-team/studio" "^0.0.39"
     "@esbuild-kit/esm-loader" "^2.5.5"
     camelcase "^7.0.1"
     chalk "^5.2.0"
