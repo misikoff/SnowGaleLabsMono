@@ -27,7 +27,7 @@
     "dotenv": "^16.3.1",
     "drizzle-orm": "^0.29.3",
     "framer-motion": "^10.18.0",
-    "lucide-react": "^0.311.0",
+    "lucide-react": "^0.312.0",
     "next": "^14.0.4",
     "next-auth": "^4.24.5",
     "pg": "^8.11.3",
