@@ -666,10 +666,10 @@
   resolved "https://registry.yarnpkg.com/@kurkle/color/-/color-0.3.2.tgz#5acd38242e8bde4f9986e7913c8fdf49d3aa199f"
   integrity sha512-fuscdXJ9G1qb7W8VdHi+IwRqij3lBkosAm4ydQtEmbY58OzHXqQhvlxqEkoz0yssNVn38bcpRWgA9PP+OGoisw==
 
-"@neondatabase/serverless@^0.8.0":
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/@neondatabase/serverless/-/serverless-0.8.0.tgz#c609ac049b0cce63f568cc46ad065507291b6b8f"
-  integrity sha512-S1SOn41lnOLpVviusErxWg1vx3ZuZ9VYt5b3/zl3H1p/dXBPVKDqkFdQMpECiTP/Oz92lqSQEAVrf1PW6502YA==
+"@neondatabase/serverless@^0.8.1":
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/@neondatabase/serverless/-/serverless-0.8.1.tgz#3fbfbf184af9145daf29a1048871c82877d1ee0d"
+  integrity sha512-nxZfTLbGqvDrw0W9WnQxzoPn4KC6SLjkvK4grdf6eWVMQSc24X+8udz9inZWOGu8f0O3wJAq586fCZ32r22lwg==
   dependencies:
     "@types/pg" "8.6.6"
 
