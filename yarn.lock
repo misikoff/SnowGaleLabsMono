@@ -3631,10 +3631,10 @@ lru-queue@^0.1.0:
   dependencies:
     es5-ext "~0.10.2"
 
-lucide-react@^0.343.0:
-  version "0.343.0"
-  resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.343.0.tgz#2fa2345cc831f1442e475b8ee2ab571b928f496d"
-  integrity sha512-zDjzr5OlS86DJZNSy5igMx18T423LfEyZ6lxo82KpjCi8m5DPddl/OPLRDHyfs/TqZPh7C1ySPw4D6matfm6bQ==
+lucide-react@^0.357.0:
+  version "0.357.0"
+  resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.357.0.tgz#6ec33ddb6754a2bd80e32cb7aa22fea7f0be5f10"
+  integrity sha512-ILK6Ye6BMFyXyIHqG8FwMit1XKrj4KocLLLW4fDAAwsFjt6gSL9U6e3sZlbARIOqv0oP5XzLVacHEcb2SxuWkw==
 
 map-obj@^1.0.0:
   version "1.0.1"
