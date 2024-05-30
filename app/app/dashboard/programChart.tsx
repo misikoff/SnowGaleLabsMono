@@ -105,7 +105,7 @@ export const data = {
 export default function ProgramChart({ className }: { className?: string }) {
   return (
     <div className={className}>
-      <Line options={options} data={data} />
+      {/* <Line options={options} data={data} /> */}
     </div>
   )
 }

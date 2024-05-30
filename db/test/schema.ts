@@ -117,11 +117,33 @@ export const programs = pgTable(
   // },
 )
 
-export const programsRelations = relations(programs, ({ one }) => ({
+export const programsRelations = relations(programs, ({ one, many }) => ({
   user: one(users, {
     fields: [programs.userId],
     references: [users.id],
   }),
+  microcycles: many(microcycles),
+}))
+
+export const microcycles = pgTable('microcycles', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 256 }),
+  order: integer('order'),
+  userId: integer('user_id'),
+  programId: integer('program_id'),
+})
+
+export const microcyclesRelations = relations(microcycles, ({ one, many }) => ({
+  user: one(users, {
+    fields: [microcycles.userId],
+    references: [users.id],
+  }),
+  program: one(programs, {
+    fields: [microcycles.programId],
+    references: [programs.id],
+  }),
+  sessions: many(sessions),
+  many: many(setGroups),
 }))
 
 export const sessions = pgTable(
@@ -130,6 +152,7 @@ export const sessions = pgTable(
     id: serial('id').primaryKey(),
     name: varchar('name', { length: 256 }),
     userId: integer('user_id'),
+    microcycleId: integer('microcycle_id'),
     programId: integer('program_id'),
     order: integer('order'),
   },
@@ -141,6 +164,7 @@ export const sessions = pgTable(
 )
 
 export const sessionsRelations = relations(sessions, ({ one, many }) => ({
+  setGroups: many(setGroups),
   user: one(users, {
     fields: [sessions.userId],
     references: [users.id],
@@ -149,7 +173,10 @@ export const sessionsRelations = relations(sessions, ({ one, many }) => ({
     fields: [sessions.programId],
     references: [programs.id],
   }),
-  setGroups: many(setGroups),
+  microcycle: one(microcycles, {
+    fields: [sessions.microcycleId],
+    references: [microcycles.id],
+  }),
 }))
 
 export const setGroups = pgTable(
@@ -158,6 +185,7 @@ export const setGroups = pgTable(
     id: serial('id').primaryKey(),
     userId: integer('user_id'),
     sessionId: integer('session_id'),
+    microcycleId: integer('microcycle_id'),
     programId: integer('program_id'),
     // assuming a set group is a single exercise -- does not handle supersets
     exerciseId: integer('excercise_id'),
@@ -171,6 +199,10 @@ export const setGroups = pgTable(
 )
 
 export const setGroupsRelation = relations(setGroups, ({ one, many }) => ({
+  exercise: one(exercises, {
+    fields: [setGroups.exerciseId],
+    references: [exercises.id],
+  }),
   user: one(users, {
     fields: [setGroups.userId],
     references: [users.id],
@@ -179,13 +211,13 @@ export const setGroupsRelation = relations(setGroups, ({ one, many }) => ({
     fields: [setGroups.sessionId],
     references: [sessions.id],
   }),
+  microcycle: one(microcycles, {
+    fields: [setGroups.microcycleId],
+    references: [microcycles.id],
+  }),
   program: one(programs, {
     fields: [setGroups.programId],
     references: [programs.id],
-  }),
-  exercise: one(exercises, {
-    fields: [setGroups.exerciseId],
-    references: [exercises.id],
   }),
   sets: many(sets),
 }))
@@ -194,11 +226,14 @@ export const sets = pgTable(
   'sets',
   {
     id: serial('id').primaryKey(),
+    // relations
     userId: integer('user_id'),
     sessionId: integer('session_id'),
+    microcycleId: integer('microcycle_id'),
     programId: integer('program_id'),
     exerciseId: integer('excercise_id'),
     setGroupId: integer('set_group_id'),
+    // attributes
     prescribedReps: integer('prescribed_reps').default(0),
     prescribedRPE: real('prescribed_RPE').default(0),
     prescribedRIR: real('prescribed_RIR').default(0),
@@ -225,6 +260,10 @@ export const setsRelation = relations(sets, ({ one }) => ({
     fields: [sets.sessionId],
     references: [sessions.id],
   }),
+  microcycle: one(microcycles, {
+    fields: [sets.microcycleId],
+    references: [microcycles.id],
+  }),
   program: one(programs, {
     fields: [sets.programId],
     references: [programs.id],
@@ -242,6 +281,7 @@ export const setsRelation = relations(sets, ({ one }) => ({
 export type User = typeof users.$inferSelect
 export type Exercise = typeof exercises.$inferSelect
 export type Program = typeof programs.$inferSelect
+export type Microcycle = typeof microcycles.$inferSelect
 export type Session = typeof sessions.$inferSelect
 export type SetGroup = typeof setGroups.$inferSelect
 export type Set = typeof sets.$inferSelect

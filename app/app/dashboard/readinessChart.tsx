@@ -74,7 +74,7 @@ const data = {
 export default function ReadinessChart({ className }: { className?: string }) {
   return (
     <div className={clsx('max-w-screen overflow-hidden', className)}>
-      <Line options={options} data={data} className='-mx-1' />
+      {/* <Line options={options} data={data} className='-mx-1' /> */}
     </div>
   )
 }

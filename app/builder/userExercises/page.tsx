@@ -12,10 +12,11 @@ import {
   getUsers,
 } from 'app/app/actions'
 import { exercisesArray } from 'db/seedData'
+import { User } from 'db/test/schema'
 
 export default function Home() {
   const [userName, setUserName] = useState('')
-  const [users, setUsers] = useState([])
+  const [users, setUsers] = useState<User[]>([])
 
   useEffect(() => {
     console.log({ users })
@@ -33,7 +34,7 @@ export default function Home() {
       {userName}
       <Button
         onClick={async () => {
-          await createUser(userName)
+          await createUser({ name: userName })
           setUserName('')
           setUsers((await getUsers()) as any)
         }}

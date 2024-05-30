@@ -2,69 +2,85 @@
 
 import { useEffect, useState } from 'react'
 
+import Link from 'next/link'
+
 import { Button } from 'components/ui/button'
 import { Input } from 'components/ui/input'
 import { Label } from 'components/ui/label'
-import {
-  createExercise,
-  createUser,
-  deleteAllExercises,
-  getUsers,
-} from 'app/app/actions'
-import { exercisesArray } from 'db/seedData'
+import { Textarea } from 'components/ui/textarea'
+import { createProgram, getPrograms, getUsers } from 'app/app/actions'
+import { Program } from 'db/test/schema'
 
 export default function Home() {
-  const [userName, setUserName] = useState('')
-  const [users, setUsers] = useState([])
+  const [programName, setProgramName] = useState('')
+  const [programDescription, setProgramDescription] = useState('')
+
+  const [programs, setPrograms] = useState<Program[]>([])
+
+  // useEffect(() => {
+  //   console.log({ programs })
+  // }, [programs])
 
   useEffect(() => {
-    console.log({ users })
-  }, [users])
+    async function setData() {
+      setPrograms(await getPrograms())
+    }
+    setData()
+  }, [])
+
   return (
     <div>
-      <div>Users</div>
-      <Label>name</Label>
-      <Input
-        type='name'
-        placeholder='name'
-        onChange={(e) => setUserName(e.target.value)}
-        value={userName}
-      />
-      {userName}
-      <Button
-        onClick={async () => {
-          await createUser(userName)
-          setUserName('')
-          setUsers((await getUsers()) as any)
-        }}
-      >
-        create user
-      </Button>
+      <div>
+        <Label>Program Name</Label>
+        <Input
+          // type='name'
+          // placeholder='name'
+          onChange={(e) => setProgramName(e.target.value)}
+          value={programName}
+        />
+      </div>
 
-      {users.map((u) => (
-        <div key={u.name}>{u.name}</div>
-      ))}
+      <div>
+        <Label>Description</Label>
+        <Textarea
+          // type='name'
+          // placeholder='name'
+          onChange={(e) => setProgramDescription(e.target.value)}
+          value={programDescription}
+        />
+      </div>
 
       <Button
         onClick={async () => {
-          await deleteAllExercises()
-          alert('deleted all exercises')
-        }}
-      >
-        delete all exercises
-      </Button>
-
-      <Button
-        onClick={async () => {
-          exercisesArray.forEach(async ({ id, name, equipment }) => {
-            await createExercise({ id, name, equipment: equipment as any })
+          await createProgram({
+            name: programName,
+            description: programDescription,
           })
-
-          alert('created all exercises')
+          setProgramName('')
+          setProgramDescription('')
+          setPrograms(await getPrograms())
         }}
       >
-        add all exercises
+        create program
       </Button>
+
+      {programs.length > 0 && (
+        <>
+          <div className='mt-16 text-xl'> Programs</div>
+
+          <div className='flex flex-col'>
+            {programs.map((program) => (
+              <Link
+                key={program.id}
+                href={`/builder/programs/${program.id}`}
+                className='hover:text-blue-400'
+              >
+                {program.name}
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   )
 }

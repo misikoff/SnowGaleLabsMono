@@ -27,7 +27,7 @@ export default function Home() {
       {userName}
       <Button
         onClick={async () => {
-          await createUser(userName)
+          await createUser({ name: userName })
           setUserName('')
           setUsers((await getUsers()) as any)
         }}
@@ -35,7 +35,7 @@ export default function Home() {
         create user
       </Button>
 
-      {users.map((u) => (
+      {users.map((u: any) => (
         <div key={u.name}>{u.name}</div>
       ))}
     </div>

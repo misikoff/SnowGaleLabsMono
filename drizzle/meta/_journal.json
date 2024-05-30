@@ -323,6 +323,20 @@
       "when": 1704374798931,
       "tag": "0045_premium_maverick",
       "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "5",
+      "when": 1705195502343,
+      "tag": "0046_steep_randall",
+      "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "5",
+      "when": 1705524290798,
+      "tag": "0047_nasty_ink",
+      "breakpoints": true
     }
   ]
 }
