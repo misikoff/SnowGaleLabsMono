@@ -41,54 +41,55 @@
   dependencies:
     regenerator-runtime "^0.14.0"
 
-"@clerk/backend@1.3.2":
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/@clerk/backend/-/backend-1.3.2.tgz#37021e9e056a39c52fb8815a62f73d58418345d2"
-  integrity sha512-PT/CejuGK0b7+iKFc59myFcYCEpTmqCjSjw7jG0G3fhBo8LWn+Pfv5f7udndrYI+RFP0Jbcv+2nnW6etHXErGA==
+"@clerk/backend@1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@clerk/backend/-/backend-1.6.0.tgz#00a6d1545ea05a2833aa3739b6de3f8871f9c1fb"
+  integrity sha512-MsUR+70/dSdHCOykBvtmUuU4opHYpNnFKNIzZcNgDyYhEA0HSxnJXaeLdZ+LKwxdR88fgzbeAOlD5A2l+cx48w==
   dependencies:
-    "@clerk/shared" "2.3.3"
-    "@clerk/types" "4.8.0"
+    "@clerk/shared" "2.4.4"
+    "@clerk/types" "4.12.0"
     cookie "0.5.0"
     snakecase-keys "5.4.4"
     tslib "2.4.1"
 
-"@clerk/clerk-react@5.2.8":
-  version "5.2.8"
-  resolved "https://registry.yarnpkg.com/@clerk/clerk-react/-/clerk-react-5.2.8.tgz#30be2f625accb76b842ffd56f92e457d01b75a05"
-  integrity sha512-OMwlqhbJlSNHHON6ybB5HebtUKp25B4I2j9v4hwLsU392r14a14SoYlwNPTNAit/oQrcaz9YtAlKED3CSN/4yQ==
+"@clerk/clerk-react@5.3.2":
+  version "5.3.2"
+  resolved "https://registry.yarnpkg.com/@clerk/clerk-react/-/clerk-react-5.3.2.tgz#89e7027ccbd59892d7eef118a0178d0fb409994d"
+  integrity sha512-ZXV48wUut8+Mg3qAkL8TrZjS0O+1M2ctgGCL40YAp8u5xR3/WplhO75PtDmChfwgiZCuPI8Gu34VYaFBqdy1eQ==
   dependencies:
-    "@clerk/shared" "2.3.3"
-    "@clerk/types" "4.8.0"
+    "@clerk/shared" "2.4.4"
+    "@clerk/types" "4.12.0"
     tslib "2.4.1"
 
-"@clerk/nextjs@^5.1.3":
-  version "5.2.4"
-  resolved "https://registry.yarnpkg.com/@clerk/nextjs/-/nextjs-5.2.4.tgz#a8ae784c56a69433c2ce4c7a6475e6e414ce1f60"
-  integrity sha512-QqDcI4/fxZ+o5hFGi+HTGxp4LqLClooo/GW4hJJOAsCfpKs0uSyTbvgAG+aRhoUol5szJBfbPthqcgylQSfCGw==
+"@clerk/nextjs@^5.2.13":
+  version "5.2.13"
+  resolved "https://registry.yarnpkg.com/@clerk/nextjs/-/nextjs-5.2.13.tgz#2ff7c2b7cbdf9dbdc00f1095e9f706e8b0b49e31"
+  integrity sha512-a/X75XCWg9pYZGNQY/t8MhuNE93CExd3PvY6wQs4+GZVJe3dNdKc35JSYVU8B3lHlCp+u+8C3A7O/3mS3jcuYg==
   dependencies:
-    "@clerk/backend" "1.3.2"
-    "@clerk/clerk-react" "5.2.8"
-    "@clerk/shared" "2.3.3"
-    "@clerk/types" "4.8.0"
+    "@clerk/backend" "1.6.0"
+    "@clerk/clerk-react" "5.3.2"
+    "@clerk/shared" "2.4.4"
+    "@clerk/types" "4.12.0"
     crypto-js "4.2.0"
     path-to-regexp "6.2.2"
+    server-only "0.0.1"
     tslib "2.4.1"
 
-"@clerk/shared@2.3.3":
-  version "2.3.3"
-  resolved "https://registry.yarnpkg.com/@clerk/shared/-/shared-2.3.3.tgz#460017507becdbaa15c0d13e3400615c3eb01fa5"
-  integrity sha512-shUmoHQNkaiQer2KS++RKXwgA1tqLAXdwFed/AmoHHqkF2jeBDYcJe14LDLveSqt2gzp6IAFcaz2IAZlWxENsw==
+"@clerk/shared@2.4.4":
+  version "2.4.4"
+  resolved "https://registry.yarnpkg.com/@clerk/shared/-/shared-2.4.4.tgz#6b0570c127a2d59e94abd6cf73c7d826b334445e"
+  integrity sha512-DcyuVFoBzPC9ZIdLN8P0fIv+ACfWMc19hD9Jye4vXyM0HNh18X/2KUg8IPAaNBUusT5/RyBVtxK2g3MHR+x/0Q==
   dependencies:
-    "@clerk/types" "4.8.0"
+    "@clerk/types" "4.12.0"
     glob-to-regexp "0.4.1"
     js-cookie "3.0.5"
     std-env "^3.7.0"
     swr "^2.2.0"
 
-"@clerk/types@4.8.0":
-  version "4.8.0"
-  resolved "https://registry.yarnpkg.com/@clerk/types/-/types-4.8.0.tgz#5e800f90a328de127fef7d5e24bec51e3e879dd0"
-  integrity sha512-UjirfALJOWeuRSz+SvTujexlvIXvMC1VzvYlcNmSF0E9wcAcPJnzboLM+SlNTG7p1JMlL4bd0dipsFyWTJsq5A==
+"@clerk/types@4.12.0":
+  version "4.12.0"
+  resolved "https://registry.yarnpkg.com/@clerk/types/-/types-4.12.0.tgz#e294b31782495d33e433b0ae1b14ec433b422182"
+  integrity sha512-y5P36XMWRphFPwcC8NxptAvPbeH6MZcicULn4x7c1K6gHyGwoieGywwPHAdrc5c/aKGIVp8Zlg93iQi7Vj0qJg==
   dependencies:
     csstype "3.1.1"
 
@@ -4389,6 +4390,11 @@ semver@^7.6.0:
   version "7.6.2"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.6.2.tgz#1e3b34759f896e8f14d6134732ce798aeb0c6e13"
   integrity sha512-FNAIBWCx9qcRhoHcgcJ0gvU7SN1lYU2ZXuSfl04bSC5OpvDHFyJCjdNHomPXxjQlCBU67YW64PzY7/VIEH7F2w==
+
+server-only@0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/server-only/-/server-only-0.0.1.tgz#0f366bb6afb618c37c9255a314535dc412cd1c9e"
+  integrity sha512-qepMx2JxAa5jjfzxG79yPPq+8BuFToHd1hm7kI+Z4zAq1ftQiP7HcxMhDDItrbtwVeLg/cY2JnKnrcFkmiswNA==
 
 set-function-length@^1.2.1:
   version "1.2.2"
