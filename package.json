@@ -1,10 +1,12 @@
 {
   "private": true,
   "scripts": {
-    "drizzle:generate": "drizzle-kit generate --config drizzle.config.ts",
-    "drizzle:generate:users": "drizzle-kit generate --config drizzle.config.user.ts",
-    "drizzle:push": "drizzle-kit push --config drizzle.config.ts",
-    "drizzle:push:users": "drizzle-kit push --config drizzle.config.user.ts",
+    "db:generate": "drizzle-kit generate --config drizzle.config.ts",
+    "db:generate:users": "drizzle-kit generate --config drizzle.config.users.ts",
+    "db:generate:all": "drizzle-kit generate --config drizzle.config.ts && drizzle-kit generate --config drizzle.config.users.ts",
+    "db:push": "drizzle-kit push --config drizzle.config.ts",
+    "db:push:users": "drizzle-kit push --config drizzle.config.users.ts",
+    "db:push:all": "drizzle-kit push --config drizzle.config.ts && drizzle-kit push --config drizzle.config.users.ts",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

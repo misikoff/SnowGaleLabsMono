@@ -15,6 +15,13 @@
       "when": 1722965209154,
       "tag": "0001_brief_lord_hawal",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1722976466626,
+      "tag": "0002_mighty_sprite",
+      "breakpoints": true
     }
   ]
 }
