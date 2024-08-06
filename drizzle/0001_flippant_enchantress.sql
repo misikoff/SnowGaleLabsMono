@@ -1,1 +1,0 @@
-ALTER TABLE "playing_with_neon" ADD COLUMN "x" varchar(256);

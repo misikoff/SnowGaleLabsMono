@@ -1,5 +1,4 @@
 import Link from 'next/link'
-// import { neon } from '@neondatabase/serverless'
 import clsx from 'clsx'
 import { ChevronLeft, ChevronRight, InfoIcon } from 'lucide-react'
 
