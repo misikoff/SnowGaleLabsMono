@@ -3,7 +3,7 @@ import { drizzle } from 'drizzle-orm/libsql'
 
 import * as schema from 'db/users/schema'
 
-interface Env {
+export interface Env {
   url: string
   TURSO_DB_AUTH_TOKEN?: string
 }

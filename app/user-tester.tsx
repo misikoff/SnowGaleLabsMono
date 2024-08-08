@@ -1,5 +1,7 @@
 'use client'
 
+import { createUser } from './app/actions'
+
 async function test() {
   console.log('test')
   const res = await fetch('/api/createUser', {
@@ -13,5 +15,16 @@ async function test() {
 }
 
 export default function TestButton() {
-  return <button onClick={test}>Test</button>
+  return (
+    <>
+      <button onClick={test}>Test</button>
+      <button
+        onClick={async () => {
+          await createUser({ name: 'testUser' })
+        }}
+      >
+        create user
+      </button>
+    </>
+  )
 }
