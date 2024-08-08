@@ -1,5 +1,7 @@
 // import { db } from '../db'
 
+import TestButton from './user-tester'
+
 export default async function Home() {
   // const user = await db.query.users.findFirst({
   //   with: {
@@ -16,6 +18,7 @@ export default async function Home() {
     <div className='flex flex-col w-full items-center'>
       <div>Centurion</div>
       <div>Open Source Exercise</div>
+      <TestButton />
     </div>
   )
 }

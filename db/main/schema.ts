@@ -1,10 +1,10 @@
 import { sql } from 'drizzle-orm'
 import {
-  index,
+  // index,
   integer,
   sqliteTable,
   text,
-  uniqueIndex,
+  // uniqueIndex,
 } from 'drizzle-orm/sqlite-core'
 
 // export const organizations = sqliteTable(
@@ -29,12 +29,13 @@ import {
 // )
 
 export const users = sqliteTable('users', {
-  id: text('id').primaryKey(),
+  id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name'),
   clerkId: integer('clerk_id'),
   dbUrl: text('db_url'),
   createdAt: integer('created_at').default(sql`(cast(unixepoch() as int))`),
   updatedAt: integer('updated_at').default(sql`(cast(unixepoch() as int))`),
+  // test: text('test'),
 })
 
 export type User = typeof users.$inferSelect

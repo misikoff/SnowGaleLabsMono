@@ -16,12 +16,10 @@ export const distanceUnitsEnum = ['yards', 'meters'] as readonly [
   string,
   ...string[],
 ]
-
 export const exerciseType = ['compound', 'isolation'] as readonly [
   string,
   ...string[],
 ]
-
 export const equipmentEnum = [
   'barbell',
   'dumbbell',
@@ -35,7 +33,7 @@ export const equipmentEnum = [
 export const exercises = sqliteTable(
   'exercises',
   {
-    id: text('id').primaryKey(),
+    id: integer('id').primaryKey({ autoIncrement: true }),
     name: text('name', { length: 256 }),
     description: text('description', { length: 256 }),
     equipmentType: text('equipment_type', { enum: equipmentEnum }),
@@ -61,8 +59,8 @@ export const exercises = sqliteTable(
 )
 
 export const exercisePreferences = sqliteTable('exercise_preferences', {
-  id: text('id').primaryKey(),
-  exerciseId: integer('excercise_id'),
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  exerciseId: integer('excercise_id').references(() => exercises.id),
   notes: text('notes', { length: 256 }),
   repRange: text('rep_range', { enum: repStyleEnum }),
   weightIncrement: real('weight_increment'),
@@ -85,7 +83,7 @@ export const exercisePreferencesRelations = relations(
 export const programs = sqliteTable(
   'programs',
   {
-    id: text('id').primaryKey(),
+    id: integer('id').primaryKey({ autoIncrement: true }),
     name: text('name', { length: 256 }),
     description: text('description', { length: 256 }),
   },
@@ -101,10 +99,10 @@ export const programsRelations = relations(programs, ({ one, many }) => ({
 }))
 
 export const microcycles = sqliteTable('microcycles', {
-  id: text('id').primaryKey(),
+  id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name', { length: 256 }),
   order: integer('order'),
-  programId: integer('program_id'),
+  programId: integer('program_id').references(() => programs.id),
 })
 
 export const microcyclesRelations = relations(microcycles, ({ one, many }) => ({
@@ -119,10 +117,10 @@ export const microcyclesRelations = relations(microcycles, ({ one, many }) => ({
 export const sessions = sqliteTable(
   'sessions',
   {
-    id: text('id').primaryKey(),
+    id: integer('id').primaryKey({ autoIncrement: true }),
     name: text('name', { length: 256 }),
-    microcycleId: integer('microcycle_id'),
-    programId: integer('program_id'),
+    microcycleId: integer('microcycle_id').references(() => microcycles.id),
+    programId: integer('program_id').references(() => programs.id),
     order: integer('order'),
   },
   // (exercises) => {
@@ -147,9 +145,9 @@ export const sessionsRelations = relations(sessions, ({ one, many }) => ({
 export const setGroups = sqliteTable(
   'setGroups',
   {
-    id: text('id').primaryKey(),
-    sessionId: integer('session_id'),
-    microcycleId: integer('microcycle_id'),
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    sessionId: integer('session_id').references(() => sessions.id),
+    microcycleId: integer('microcycle_id').references(() => microcycles.id),
     programId: integer('program_id'),
     // assuming a set group is a single exercise -- does not handle supersets
     exerciseId: integer('excercise_id'),
@@ -185,13 +183,13 @@ export const setGroupsRelation = relations(setGroups, ({ one, many }) => ({
 export const sets = sqliteTable(
   'sets',
   {
-    id: text('id').primaryKey(),
+    id: integer('id').primaryKey({ autoIncrement: true }),
     // relations
-    sessionId: integer('session_id'),
-    microcycleId: integer('microcycle_id'),
-    programId: integer('program_id'),
-    exerciseId: integer('excercise_id'),
-    setGroupId: integer('set_group_id'),
+    sessionId: integer('session_id').references(() => sessions.id),
+    microcycleId: integer('microcycle_id').references(() => microcycles.id),
+    programId: integer('program_id').references(() => programs.id),
+    exerciseId: integer('excercise_id').references(() => exercises.id),
+    setGroupId: integer('set_group_id').references(() => setGroups.id),
     // attributes
     prescribedReps: integer('prescribed_reps').default(0),
     prescribedRPE: real('prescribed_RPE').default(0),
