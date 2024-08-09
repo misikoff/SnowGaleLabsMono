@@ -1,6 +1,6 @@
 'use client'
 
-import { createUser } from './app/actions'
+import { createUser, getPrograms } from './app/actions'
 
 async function test() {
   console.log('test')
@@ -24,6 +24,14 @@ export default function TestButton() {
         }}
       >
         create user
+      </button>
+      <button
+        onClick={async () => {
+          const programs = await getPrograms()
+          console.log({ programs })
+        }}
+      >
+        get programs for user
       </button>
     </>
   )
