@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "f7cc71d9-b00f-4895-9c27-0c9f26b6acc4",
-  "prevId": "d0b79736-dd2c-429b-8635-0234961b6982",
+  "id": "c7f75071-5b22-4eea-9472-369576330e67",
+  "prevId": "f7cc71d9-b00f-4895-9c27-0c9f26b6acc4",
   "tables": {
     "users": {
       "name": "users",
@@ -50,6 +50,13 @@
           "notNull": false,
           "autoincrement": false,
           "default": "(cast(unixepoch() as int))"
+        },
+        "test1": {
+          "name": "test1",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},

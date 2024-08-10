@@ -31,11 +31,10 @@ import {
 export const users = sqliteTable('users', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name'),
-  clerkId: integer('clerk_id'),
+  clerkId: text('clerk_id'),
   dbUrl: text('db_url'),
   createdAt: integer('created_at').default(sql`(cast(unixepoch() as int))`),
   updatedAt: integer('updated_at').default(sql`(cast(unixepoch() as int))`),
-  // test: text('test'),
 })
 
 export type User = typeof users.$inferSelect

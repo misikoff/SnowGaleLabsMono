@@ -1,6 +1,7 @@
 'use server'
 
 import { unstable_noStore as noStore } from 'next/cache'
+import { currentUser } from '@clerk/nextjs/server'
 import { createClient } from '@tursodatabase/api'
 import { eq, asc } from 'drizzle-orm'
 
@@ -26,10 +27,12 @@ import {
 // const userEnv = { url: 'user-yqviba-misikoff.turso.io' } as Env
 
 async function getUserClient() {
+  const clerkUser = await currentUser()
+  console.log({ clerkUser })
   const user = await mainClient().query.users.findFirst({
     // hardcoding for now
     // this should be based on the user's session with clerk
-    where: eq(users.name, 'yqviba'),
+    where: eq(users.clerkId, clerkUser?.id || ''),
   })
   return userClient({ url: user?.dbUrl as string })
 }
@@ -47,9 +50,12 @@ export async function createUser({ name }: { name: User['name'] }) {
   })
 
   //make the user name a random string
-  const user = Math.random().toString(36).substring(7)
-
-  const database = await turso.databases.create(`user-${user}`, {
+  // const user = Math.random().toString(36).substring(7)
+  const clerkUser = await currentUser()
+  // TODO: consider hashing this to make it all lowercase instead
+  const newDatabaseName = `user-${clerkUser?.id.replace('user_', '').toLowerCase() || ''}`
+  console.log({ newDatabaseName })
+  const database = await turso.databases.create(newDatabaseName, {
     group: group as string,
     schema: userSchema as string,
   })
@@ -59,8 +65,15 @@ export async function createUser({ name }: { name: User['name'] }) {
   // store the user in the main database
   await mainClient()
     .insert(users)
-    .values({ name: user, dbUrl: database.hostname })
-  // ...
+    .values({
+      name: clerkUser?.fullName,
+      clerkId: clerkUser?.id || '',
+      dbUrl: database.hostname,
+    })
+
+  // need to handle database creation working and main client insert failing
+  // maybe delete created database
+  // maybe change order of operations
 }
 
 export async function getUsers() {
