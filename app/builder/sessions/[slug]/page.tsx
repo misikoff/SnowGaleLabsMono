@@ -20,7 +20,7 @@ import {
   getExercises,
   getSessionWithSetGroups,
 } from 'app/app/actions'
-import { Exercise } from 'db/test/schema'
+import { Exercise } from 'db/users/schema'
 
 // https://stackoverflow.com/questions/59774572/how-to-get-the-return-type-of-async-function-in-typescript
 type AsyncReturnType<T extends (...args: any) => Promise<any>> = T extends (
@@ -87,7 +87,6 @@ export default function Home({ params }: { params: { slug: string } }) {
               await createSetGroup({
                 order: getNextOrder(),
                 programId: session.programId || undefined,
-                userId: session.userId || undefined,
                 microcycleId: session.microcycleId || undefined,
                 sessionId: session.id || undefined,
                 exerciseId: exerciseId || undefined,

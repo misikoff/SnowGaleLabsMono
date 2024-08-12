@@ -1,1 +1,0 @@
-ALTER TABLE "exercises" ADD COLUMN "equipment_type" "equipment";

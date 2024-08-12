@@ -1,4 +1,4 @@
-import { Set } from 'db/test/schema'
+import { Set } from 'db/users/schema'
 
 function getSetType(set: Set) {
   // if (set.prescribedRepsLow && set.prescribedRepsHigh) {

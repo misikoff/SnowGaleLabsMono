@@ -1,1 +1,0 @@
-ALTER TABLE "exercises" ALTER COLUMN "default_rep_range" SET DEFAULT 'medium';

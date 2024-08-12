@@ -1,7 +1,6 @@
 import { ReactElement, useState } from 'react'
 
 import Link from 'next/link'
-import { neon } from '@neondatabase/serverless'
 import {
   InfoIcon,
   MinusIcon,

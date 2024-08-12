@@ -49,7 +49,6 @@ export default function Home({ params }: { params: { slug: string } }) {
               console.log('button clicked')
               await createMicrocycle({
                 programId: program.id,
-                userId: 1,
                 order: getNextOrder(),
               })
               setProgram(await getProgramWithMicrocycles(parseInt(params.slug)))
