@@ -1,25 +1,18 @@
 import { relations, sql } from 'drizzle-orm'
-import {
-  integer,
-  sqliteTable,
-  text,
-  // uniqueIndex,
-  real,
-} from 'drizzle-orm/sqlite-core'
+import { integer, sqliteTable, text, real } from 'drizzle-orm/sqlite-core'
 
-export const repStyleEnum = ['high', 'medium', 'low'] as readonly [
-  string,
-  ...string[],
-]
-export const weightUnitsEnum = ['lbs', 'kg'] as readonly [string, ...string[]]
-export const distanceUnitsEnum = ['yards', 'meters'] as readonly [
-  string,
-  ...string[],
-]
-export const exerciseType = ['compound', 'isolation'] as readonly [
-  string,
-  ...string[],
-]
+export const repStyleEnum = ['high', 'medium', 'low'] as const
+export type RepStyle = (typeof repStyleEnum)[number]
+
+export const weightUnitsEnum = ['lbs', 'kg'] as const
+export type WeightUnits = (typeof weightUnitsEnum)[number]
+
+export const distanceUnitsEnum = ['yards', 'meters'] as const
+export type DistanceUnits = (typeof distanceUnitsEnum)[number]
+
+export const exerciseType = ['compound', 'isolation'] as const
+export type ExerciseType = (typeof exerciseType)[number]
+
 export const equipmentEnum = [
   'barbell',
   'dumbbell',
@@ -28,7 +21,8 @@ export const equipmentEnum = [
   'bodyweight',
   'band',
   'other',
-] as readonly [string, ...string[]]
+] as const
+export type EquipmentType = (typeof equipmentEnum)[number]
 
 export const exercises = sqliteTable(
   'exercises',

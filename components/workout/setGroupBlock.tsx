@@ -2,7 +2,7 @@ import clsx from 'clsx'
 import { InfoIcon, ArrowRightLeftIcon } from 'lucide-react'
 
 import { Button } from 'components/ui/button'
-import { Exercise, Set, exercises } from 'db/test/schema'
+import { Exercise, Set, exercises } from 'db/users/schema'
 
 import InfoPopoverExercise from './infoPopoverExercise'
 import PerformanceButton from './performancePopover'

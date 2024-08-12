@@ -6,35 +6,14 @@ const group = process.env.TURSO_GROUP
 import { createClient } from '@tursodatabase/api'
 
 export async function POST(req: Request) {
+  // get id from request body
+  const { id } = await req.json()
   console.log('in create user')
   console.log({ org, token })
 
-  // const fetchReq = await fetch(
-  //   `https://api.turso.tech/v1/organizations/${org}/databases`,
-  //   {
-  //     method: 'POST',
-  //     headers: {
-  //       Authorization: `Bearer ${token}`,
-  //       'Content-Type': 'application/json',
-  //     },
-  //     // body: '{\n      "name": "child-db",\n      "group": "default",\n      "schema": "parent-db"\n  }',
-  //     body: JSON.stringify({
-  //       // name: 'user-wow',
-  //       // group: 'default',
-  //       // schema: 'user-template',
-
-  //       name: `${process.env.APP_NAME}-${organization.username}`,
-  //       group: `${process.env.APP_GROUP}`,
-  //       location: `${process.env.APP_PRIMARY_LOCATION}`,
-  //     }),
-  //   },
-  // )
-
-  // console.log({ fetchReq })
-
   const turso = createClient({
-    org: org as string, // Your personal account or organization slug
-    token: token as string, // Your personal access token
+    org: org as string,
+    token: token as string,
   })
 
   const database = await turso.databases.create('child-db-2', {

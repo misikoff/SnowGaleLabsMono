@@ -6,13 +6,14 @@ import { Button } from 'components/ui/button'
 import { Input } from 'components/ui/input'
 import { Label } from 'components/ui/label'
 import {
-  createExercise,
+  createSchemaExercise,
   createUser,
-  deleteAllExercises,
+  deleteAllSchemaExercises,
   getUsers,
 } from 'app/app/actions'
+import { User } from 'db/main/schema'
 import { exercisesArray } from 'db/seedData'
-import { User } from 'db/test/schema'
+import { EquipmentType } from 'db/users/schema'
 
 export default function Home() {
   const [userName, setUserName] = useState('')
@@ -48,8 +49,8 @@ export default function Home() {
 
       <Button
         onClick={async () => {
-          await deleteAllExercises()
-          alert('deleted all exercises')
+          await deleteAllSchemaExercises()
+          alert('deleted all schema exercises')
         }}
       >
         delete all exercises
@@ -58,13 +59,17 @@ export default function Home() {
       <Button
         onClick={async () => {
           exercisesArray.forEach(async ({ id, name, equipment }) => {
-            await createExercise({ id, name, equipment: equipment as any })
+            await createSchemaExercise({
+              id,
+              name,
+              equipment: equipment as EquipmentType,
+            })
           })
 
           alert('created all exercises')
         }}
       >
-        add all exercises
+        add all exercises to schema / user template
       </Button>
     </div>
   )

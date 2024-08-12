@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 import SetGroupBlock from 'components/workout/setGroupBlock'
 import { getSession } from 'app/app/actions'
-import { Exercise, Set } from 'db/test/schema'
+import { Exercise, Set } from 'db/users/schema'
 
 // const user = {
 //   preferredUnits: 'lbs',

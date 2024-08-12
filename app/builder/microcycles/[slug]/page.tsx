@@ -50,7 +50,6 @@ export default function Home({ params }: { params: { slug: string } }) {
               await createSession({
                 order: getNextOrder(),
                 programId: microcycle.programId || undefined,
-                userId: microcycle.userId || undefined,
                 microcycleId: microcycle.id,
               })
               setMicrocycle(
