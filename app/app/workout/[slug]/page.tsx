@@ -6,6 +6,8 @@ import SetGroupBlock from 'components/workout/setGroupBlock'
 import { getSession } from 'app/app/actions'
 import { Exercise, Set } from 'db/users/schema'
 
+import AddExerciseButton from './addExerciseButton'
+
 // const user = {
 //   preferredUnits: 'lbs',
 // }
@@ -111,6 +113,8 @@ export default function Home({ params }: { params: { slug: string } }) {
   return (
     <div>
       <div>{session?.name}</div>
+      <div>{session?.id}</div>
+
       <div className='flex flex-col gap-y-4'>
         {session?.setGroups.map(
           (
@@ -119,6 +123,9 @@ export default function Home({ params }: { params: { slug: string } }) {
           ) => <SetGroupBlock key={index} setGroup={g} />,
         )}
       </div>
+
+      {/* unless session is locked */}
+      <AddExerciseButton session={session} />
     </div>
   )
 }

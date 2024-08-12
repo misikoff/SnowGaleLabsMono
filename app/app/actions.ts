@@ -155,19 +155,28 @@ export async function getMicrocycleWithSessions(
 }
 
 export async function createSession({
+  name,
   order,
   programId,
   microcycleId,
-  name,
 }: {
-  order: number
+  name?: Session['name']
+  order?: Session['order']
   programId?: Program['id']
   microcycleId?: Microcycle['id']
-  name?: string
 }) {
   noStore()
   const client = await getUserClient()
-  await client.insert(sessions).values({ name, programId, microcycleId, order })
+  const session = await client
+    .insert(sessions)
+    .values({ name, order, programId, microcycleId })
+    // .returning()
+    .returning({ insertedId: sessions.id })
+  console.log({ session })
+  if (session.length > 0) {
+    return session[0].insertedId
+  }
+  return null
 }
 
 export async function deleteSession(id: Session['id']) {
@@ -210,7 +219,7 @@ export async function createSetGroup({
   sessionId,
   exerciseId,
 }: {
-  order: number
+  order?: SetGroup['order']
   programId?: Program['id']
   microcycleId?: Microcycle['id']
   sessionId?: Session['id']
@@ -262,6 +271,12 @@ export async function deleteSet(id: Set['id']) {
   noStore()
   const client = await getUserClient()
   return await client.delete(sets).where(eq(sets.id, id))
+}
+
+export async function getSessions() {
+  noStore()
+  const client = await getUserClient()
+  return await client.select().from(sessions)
 }
 
 export async function getSessionsForProgram(programId: Program['id']) {
@@ -334,7 +349,8 @@ export async function getExercises(force = false) {
   if (force) {
     noStore()
   }
-  return (await (await getUserClient()).select().from(exercises)) as Exercise[]
+  const client = await getUserClient()
+  return (await client.select().from(exercises)) as Exercise[]
 }
 
 export async function deleteAllExercises() {
