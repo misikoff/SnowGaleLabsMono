@@ -2,13 +2,19 @@
 
 import { Button } from 'components/ui/button'
 import PickExerciseDrawer from 'components/workout/pickExerciseDrawer'
-import { Session } from 'db/users/schema'
+import { Session, SetGroupWithExerciseAndSets } from 'db/users/schema'
 
-export default function AddExerciseButton({ session }: { session: Session }) {
+export default function AddExerciseButton({
+  session,
+  onSubmit,
+}: {
+  session: Session
+  onSubmit?: (setGroup: SetGroupWithExerciseAndSets) => void
+}) {
   return (
     <>
       {session && (
-        <PickExerciseDrawer sessionId={session.id}>
+        <PickExerciseDrawer sessionId={session.id} onSubmit={onSubmit}>
           <Button>Add Exercise</Button>
         </PickExerciseDrawer>
       )}

@@ -13,14 +13,16 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from 'components/ui/drawer'
-import { createSetGroup, getExercises } from 'app/app/actions'
-import { Exercise, Session } from 'db/users/schema'
+import { createSet, createSetGroup, getExercises } from 'app/app/actions'
+import { Exercise, Session, SetGroupWithExerciseAndSets } from 'db/users/schema'
 
 export default function PickExerciseDrawer({
   sessionId,
+  onSubmit,
   children,
 }: {
   sessionId: Session['id']
+  onSubmit?: (setGroup: SetGroupWithExerciseAndSets) => void
   children: React.ReactNode
 }) {
   const [open, setOpen] = useState(false)
@@ -32,6 +34,7 @@ export default function PickExerciseDrawer({
       const exs = await getExercises()
       setExercises(exs)
       console.log({ exs })
+      setSelectedExercise(exs[0])
     }
     fetchData()
   }, [])
@@ -65,11 +68,28 @@ export default function PickExerciseDrawer({
           <Button
             onClick={async () => {
               console.log({ sessionId })
-              await createSetGroup({
-                exerciseId: selectedExercise.id,
-                sessionId,
-              })
-              setOpen(false)
+              if (selectedExercise) {
+                const newSetGroup = await createSetGroup({
+                  exerciseId: selectedExercise?.id,
+                  sessionId,
+                })
+                if (newSetGroup.length > 0) {
+                  const newSet = await createSet({
+                    exerciseId: selectedExercise?.id,
+                    sessionId,
+                    setGroupId: newSetGroup[0].id,
+                  })
+                  const extendedSetGroup: SetGroupWithExerciseAndSets = {
+                    ...newSetGroup[0],
+                    exercise: selectedExercise,
+                    sets: newSet,
+                  }
+                  if (onSubmit) {
+                    onSubmit(extendedSetGroup)
+                  }
+                  setOpen(false)
+                }
+              }
             }}
           >
             Submit {selectedExercise?.name}

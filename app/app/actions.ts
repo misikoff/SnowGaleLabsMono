@@ -228,15 +228,23 @@ export async function createSetGroup({
   noStore()
   const client = await getUserClient()
 
-  await client
+  return await client
     .insert(setGroups)
     .values({ programId, microcycleId, order, sessionId, exerciseId })
+    .returning()
 }
 
 export async function deleteSetGroup(id: SetGroup['id']) {
   noStore()
   const client = await getUserClient()
-  await client.delete(setGroups).where(eq(setGroups.id, id))
+
+  // delete all sets with the set group id
+  await client.delete(sets).where(eq(sets.setGroupId, id))
+
+  return await client
+    .delete(setGroups)
+    .where(eq(setGroups.id, id))
+    .returning({ deletedId: setGroups.id })
 }
 
 // Set Functions
@@ -248,7 +256,7 @@ export async function createSet({
   exerciseId,
   setGroupId,
 }: {
-  order: number
+  order?: Set['order']
   programId?: Program['id']
   microcycleId?: Microcycle['id']
   sessionId?: Session['id']
@@ -257,20 +265,26 @@ export async function createSet({
 }) {
   noStore()
   const client = await getUserClient()
-  await client.insert(sets).values({
-    programId,
-    microcycleId,
-    order,
-    sessionId,
-    exerciseId,
-    setGroupId,
-  })
+  return await client
+    .insert(sets)
+    .values({
+      programId,
+      microcycleId,
+      order,
+      sessionId,
+      exerciseId,
+      setGroupId,
+    })
+    .returning()
 }
 
 export async function deleteSet(id: Set['id']) {
   noStore()
   const client = await getUserClient()
-  return await client.delete(sets).where(eq(sets.id, id))
+  return await client
+    .delete(sets)
+    .where(eq(sets.id, id))
+    .returning({ deletedId: sets.id })
 }
 
 export async function getSessions() {
@@ -293,14 +307,17 @@ export async function getSession(id: Session['id']) {
   const client = await getUserClient()
 
   // return (
-  //   await (await getUserClient()).select().from(sessions).where(eq(sessions.id, id)).limit(1)
+  //   await client.select().from(sessions).where(eq(sessions.id, id)).limit(1)
   // )[0]
   return await client.query.sessions.findFirst({
     where: eq(sessions.id, id),
 
     with: {
       setGroups: {
-        with: { sets: { orderBy: [asc(sets.order)] }, exercise: true },
+        with: {
+          sets: { orderBy: [asc(sets.order)] },
+          exercise: true,
+        },
         orderBy: [asc(setGroups.order)],
       },
     },

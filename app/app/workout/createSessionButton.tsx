@@ -16,7 +16,7 @@ export default function CreateSessionButton() {
         }
       }}
     >
-      Click me
+      New Session
     </Button>
   )
 }

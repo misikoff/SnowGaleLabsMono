@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 import SetGroupBlock from 'components/workout/setGroupBlock'
 import { getSession } from 'app/app/actions'
-import { Exercise, Set } from 'db/users/schema'
+import { Set, SetGroupWithExerciseAndSets } from 'db/users/schema'
 
 import AddExerciseButton from './addExerciseButton'
 
@@ -110,6 +110,68 @@ export default function Home({ params }: { params: { slug: string } }) {
     fetchData()
   }, [params.slug])
 
+  // handle added setgroup without having to reload the page
+  const handleAddSetGroup = (setGroup: SetGroupWithExerciseAndSets) => {
+    setSession((prev: any) => {
+      return {
+        ...prev,
+        setGroups: [...prev.setGroups, setGroup],
+      }
+    })
+  }
+
+  const onSetRemoved = (id: number) => {
+    setSession((prev: any) => {
+      const newSetGroups = prev.setGroups.map(
+        (g: SetGroupWithExerciseAndSets) => {
+          // if (g.id === set.setGroupId) {
+          //   return {
+          //     ...g,
+          //     sets: g.sets.filter((s: Set) => s.id !== set.id),
+          //   }
+          // }
+          g.sets = g.sets.filter((s: Set) => s.id !== id)
+          return g
+        },
+      )
+      return {
+        ...prev,
+        setGroups: newSetGroups,
+      }
+    })
+  }
+
+  const onSetAdded = (set: Set) => {
+    setSession((prev: any) => {
+      const newSetGroups = prev.setGroups.map(
+        (g: SetGroupWithExerciseAndSets) => {
+          if (g.id === set.setGroupId) {
+            return {
+              ...g,
+              sets: [...g.sets, set],
+            }
+          }
+          return g
+        },
+      )
+      return {
+        ...prev,
+        setGroups: newSetGroups,
+      }
+    })
+  }
+
+  const onSetGroupRemoved = (id: number) => {
+    setSession((prev: any) => {
+      return {
+        ...prev,
+        setGroups: prev.setGroups.filter(
+          (g: SetGroupWithExerciseAndSets) => g.id !== id,
+        ),
+      }
+    })
+  }
+
   return (
     <div>
       <div>{session?.name}</div>
@@ -117,15 +179,20 @@ export default function Home({ params }: { params: { slug: string } }) {
 
       <div className='flex flex-col gap-y-4'>
         {session?.setGroups.map(
-          (
-            g: { exercise: Exercise; sets: Set[]; id: number },
-            index: number,
-          ) => <SetGroupBlock key={index} setGroup={g} />,
+          (g: SetGroupWithExerciseAndSets, index: number) => (
+            <SetGroupBlock
+              key={index}
+              setGroup={g}
+              onSubmit={onSetAdded}
+              onSetRemoved={onSetRemoved}
+              onSetGroupRemoved={onSetGroupRemoved}
+            />
+          ),
         )}
       </div>
 
       {/* unless session is locked */}
-      <AddExerciseButton session={session} />
+      <AddExerciseButton session={session} onSubmit={handleAddSetGroup} />
     </div>
   )
 }
