@@ -293,6 +293,28 @@ export async function getSessions() {
   return await client.select().from(sessions)
 }
 
+export async function updateSet({
+  id,
+  reps,
+  RPE,
+  RIR,
+  weight,
+}: {
+  id: Set['id']
+  reps?: Set['reps']
+  RPE?: Set['RPE']
+  RIR?: Set['RIR']
+  weight?: Set['weight']
+}) {
+  noStore()
+  const client = await getUserClient()
+  return await client
+    .update(sets)
+    .set({ reps, RPE, RIR, weight })
+    .where(eq(sets.id, id))
+    .returning()
+}
+
 export async function getSessionsForProgram(programId: Program['id']) {
   noStore()
   const client = await getUserClient()

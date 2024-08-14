@@ -18,6 +18,7 @@ export default function SetGroupBlock({
   onSubmit,
   onSetRemoved,
   onSetGroupRemoved,
+  onSetUpdated,
 }: {
   className?: string
   setGroup: SetGroupWithExerciseAndSets
@@ -25,6 +26,7 @@ export default function SetGroupBlock({
   onSubmit?: (set: Set) => void
   onSetRemoved?: (id: number) => void
   onSetGroupRemoved?: (id: number) => void
+  onSetUpdated?: (set: Set) => void
 }) {
   return (
     <div className={clsx(className, 'bg-gray-800 rounded-xl p-4')}>
@@ -51,16 +53,18 @@ export default function SetGroupBlock({
                 <span className='text-indigo-600'>{index + 1}</span>
               </span>
               {set.prescribedWeight} x {set.prescribedReps}
+              <br />
+              {set.weight && set.reps && set.RPE && (
+                <>
+                  Performed {set.weight} x {set.reps} @ RPE {set.RPE}
+                </>
+              )}
               {/* {getSetType(set)} */}
               <div className='flex-grow' />
               {setGroup.sets.length > 1 && (
                 <RemoveSetButton set={set} onSetRemoved={onSetRemoved} />
               )}
-              <PerformanceButton
-                weight={set.prescribedWeight}
-                reps={set.prescribedReps}
-                difficulty={set.prescribedRIR}
-              >
+              <PerformanceButton set={set} onSubmit={onSetUpdated}>
                 <Button className='justify-self-end rounded-full text-blue-400'>
                   Performance
                 </Button>

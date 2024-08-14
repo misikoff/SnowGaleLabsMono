@@ -238,3 +238,7 @@ export interface SetGroupWithExerciseAndSets extends SetGroup {
   exercise: Exercise
   sets: Set[]
 }
+
+export interface SessionWithSetGroupWithExerciseAndSets extends Session {
+  setGroups: SetGroupWithExerciseAndSets[]
+}

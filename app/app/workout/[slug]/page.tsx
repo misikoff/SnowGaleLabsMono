@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from 'react'
 
+import Link from 'next/link'
+
+import { Button } from 'components/ui/button'
 import SetGroupBlock from 'components/workout/setGroupBlock'
 import { getSession } from 'app/app/actions'
 import { Set, SetGroupWithExerciseAndSets } from 'db/users/schema'
@@ -172,6 +175,31 @@ export default function Home({ params }: { params: { slug: string } }) {
     })
   }
 
+  const onSetUpdated = (set: Set) => {
+    setSession((prev: any) => {
+      const newSetGroups = prev.setGroups.map(
+        (g: SetGroupWithExerciseAndSets) => {
+          if (g.id === set.setGroupId) {
+            return {
+              ...g,
+              sets: g.sets.map((s: Set) => {
+                if (s.id === set.id) {
+                  return set
+                }
+                return s
+              }),
+            }
+          }
+          return g
+        },
+      )
+      return {
+        ...prev,
+        setGroups: newSetGroups,
+      }
+    })
+  }
+
   return (
     <div>
       <div>{session?.name}</div>
@@ -186,13 +214,19 @@ export default function Home({ params }: { params: { slug: string } }) {
               onSubmit={onSetAdded}
               onSetRemoved={onSetRemoved}
               onSetGroupRemoved={onSetGroupRemoved}
+              onSetUpdated={onSetUpdated}
             />
           ),
         )}
       </div>
 
       {/* unless session is locked */}
-      <AddExerciseButton session={session} onSubmit={handleAddSetGroup} />
+      <div className='flex flex-col'>
+        <AddExerciseButton session={session} onSubmit={handleAddSetGroup} />
+        <Link href={`/app/workout`}>
+          <Button>Finish Workout</Button>
+        </Link>
+      </div>
     </div>
   )
 }

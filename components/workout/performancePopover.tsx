@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 import { MinusIcon, PlusIcon } from 'lucide-react'
 
@@ -15,21 +15,22 @@ import {
   SheetTitle,
   SheetTrigger,
 } from 'components/ui/sheet'
+import { updateSet } from 'app/app/actions'
+import { Set } from 'db/users/schema'
 
 export default function PerformanceButton({
   children,
-  weight = 0,
-  reps = 0,
-  difficulty = 0,
+  set,
+  onSubmit,
 }: {
-  children: any
-  weight?: any
-  reps?: any
-  difficulty?: any
+  children: React.ReactNode
+  set: Set
+  onSubmit?: (set: Set) => void
 }) {
-  const [weightValue, setWeightValue] = useState(weight)
-  const [repValue, setRepValue] = useState(reps)
-  const [difficultyValue, setDifficultyValue] = useState(difficulty)
+  const [weightValue, setWeightValue] = useState(set.weight ?? 0)
+  const [repValue, setRepValue] = useState(set.reps ?? 0)
+  // TODO: handle other dififculty methodologies, like RIR
+  const [difficultyValue, setDifficultyValue] = useState(set.RPE ?? 5)
 
   const weightAdjustment = 5
   function decrementWeight() {
@@ -65,6 +66,34 @@ export default function PerformanceButton({
     let newValue = difficultyValue + difficultyAdjustment
     newValue = Math.max(newValue, 0)
     setDifficultyValue(newValue)
+  }
+
+  const save = async () => {
+    const newSet = await updateSet({
+      id: set.id,
+      reps: repValue,
+      weight: weightValue,
+      RPE: difficultyValue,
+    })
+    if (onSubmit) {
+      if (newSet.length > 0) {
+        onSubmit(newSet[0])
+      }
+    }
+  }
+
+  const clear = async () => {
+    const newSet = await updateSet({
+      id: set.id,
+      reps: 0,
+      weight: 0,
+      RPE: 0,
+    })
+    if (onSubmit) {
+      if (newSet.length > 0) {
+        onSubmit(newSet[0])
+      }
+    }
   }
 
   return (
@@ -112,12 +141,18 @@ export default function PerformanceButton({
         <div className='text-center'>Difficulty</div>
         <div className='flex w-full gap-x-4'>
           <SheetClose className='w-full'>
-            <Button className='justify-self-end w-full uppercase font-mono text-gray-400'>
+            <Button
+              onClick={clear}
+              className='justify-self-end w-full uppercase font-mono text-gray-400'
+            >
               Clear
             </Button>
           </SheetClose>
           <SheetClose className='w-full'>
-            <Button className='justify-self-end w-full uppercase font-mono text-white bg-green-400'>
+            <Button
+              onClick={save}
+              className='justify-self-end w-full uppercase font-mono text-white bg-green-400'
+            >
               Done
             </Button>
           </SheetClose>
