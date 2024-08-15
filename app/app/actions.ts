@@ -155,24 +155,77 @@ export async function getMicrocycleWithSessions(
 }
 
 export async function createSession({
+  name,
   order,
   programId,
   microcycleId,
-  name,
 }: {
-  order: number
+  name?: Session['name']
+  order?: Session['order']
   programId?: Program['id']
   microcycleId?: Microcycle['id']
-  name?: string
 }) {
   noStore()
   const client = await getUserClient()
-  await client.insert(sessions).values({ name, programId, microcycleId, order })
+  const session = await client
+    .insert(sessions)
+    .values({ name, order, programId, microcycleId })
+    // .returning()
+    .returning({ insertedId: sessions.id })
+  console.log({ session })
+  if (session.length > 0) {
+    return session[0].insertedId
+  }
+  return null
+}
+
+export async function getSession(id: Session['id']) {
+  noStore()
+  const client = await getUserClient()
+
+  // return (
+  //   await client.select().from(sessions).where(eq(sessions.id, id)).limit(1)
+  // )[0]
+  return await client.query.sessions.findFirst({
+    where: eq(sessions.id, id),
+    with: {
+      setGroups: {
+        with: {
+          sets: { orderBy: [asc(sets.order)] },
+          exercise: true,
+        },
+        orderBy: [asc(setGroups.order)],
+      },
+    },
+  })
+}
+
+export async function updateSession({
+  id,
+  name,
+  order,
+  completed,
+}: {
+  id: Session['id']
+  name?: Session['name']
+  order?: Session['order']
+  completed?: Session['completed']
+}) {
+  noStore()
+  const client = await getUserClient()
+  return await client
+    .update(sessions)
+    .set({ name, order, completed })
+    .where(eq(sessions.id, id))
+    .returning()
 }
 
 export async function deleteSession(id: Session['id']) {
   noStore()
-  await (await getUserClient()).delete(sessions).where(eq(sessions.id, id))
+  const client = await getUserClient()
+  await client.delete(sets).where(eq(sets.sessionId, id))
+  await client.delete(setGroups).where(eq(setGroups.sessionId, id))
+  await client.delete(sessions).where(eq(sessions.id, id))
 }
 
 export async function getSessionWithSetGroups(sessionId: Session['id']) {
@@ -186,6 +239,19 @@ export async function getSessionWithSetGroups(sessionId: Session['id']) {
         orderBy: [asc(setGroups.order)],
       },
     },
+  })
+}
+
+export async function getSetGroupsForSession(sessionId: Session['id']) {
+  noStore()
+  const client = await getUserClient()
+  return await client.query.setGroups.findMany({
+    where: eq(sessions.id, sessionId),
+    with: {
+      sets: { orderBy: [asc(sets.order)] },
+      exercise: true,
+    },
+    orderBy: [asc(setGroups.order)],
   })
 }
 
@@ -210,7 +276,7 @@ export async function createSetGroup({
   sessionId,
   exerciseId,
 }: {
-  order: number
+  order?: SetGroup['order']
   programId?: Program['id']
   microcycleId?: Microcycle['id']
   sessionId?: Session['id']
@@ -219,15 +285,46 @@ export async function createSetGroup({
   noStore()
   const client = await getUserClient()
 
-  await client
+  return await client
     .insert(setGroups)
     .values({ programId, microcycleId, order, sessionId, exerciseId })
+    .returning()
+}
+
+export async function updateSetGroup({
+  id,
+  // sessionId,
+  // microcycleId,
+  // programId,
+  exerciseId,
+  order,
+}: {
+  id: Set['id']
+  // sessionId?: Session['id']
+  // microcycleId?: Microcycle['id']
+  // programId?: Program['id']
+  exerciseId?: Exercise['id']
+  order?: SetGroup['order']
+}) {
+  noStore()
+  const client = await getUserClient()
+  return await client
+    .update(setGroups)
+    .set({ exerciseId, order })
+    .where(eq(setGroups.id, id))
+    .returning()
 }
 
 export async function deleteSetGroup(id: SetGroup['id']) {
   noStore()
   const client = await getUserClient()
-  await client.delete(setGroups).where(eq(setGroups.id, id))
+
+  await client.delete(sets).where(eq(sets.setGroupId, id))
+
+  return await client
+    .delete(setGroups)
+    .where(eq(setGroups.id, id))
+    .returning({ deletedId: setGroups.id })
 }
 
 // Set Functions
@@ -239,7 +336,7 @@ export async function createSet({
   exerciseId,
   setGroupId,
 }: {
-  order: number
+  order?: Set['order']
   programId?: Program['id']
   microcycleId?: Microcycle['id']
   sessionId?: Session['id']
@@ -248,20 +345,56 @@ export async function createSet({
 }) {
   noStore()
   const client = await getUserClient()
-  await client.insert(sets).values({
-    programId,
-    microcycleId,
-    order,
-    sessionId,
-    exerciseId,
-    setGroupId,
-  })
+  return await client
+    .insert(sets)
+    .values({
+      programId,
+      microcycleId,
+      order,
+      sessionId,
+      exerciseId,
+      setGroupId,
+    })
+    .returning()
 }
 
 export async function deleteSet(id: Set['id']) {
   noStore()
   const client = await getUserClient()
-  return await client.delete(sets).where(eq(sets.id, id))
+  return await client
+    .delete(sets)
+    .where(eq(sets.id, id))
+    .returning({ deletedId: sets.id })
+}
+
+export async function getSessions() {
+  noStore()
+  const client = await getUserClient()
+  return await client.select().from(sessions)
+}
+
+export async function updateSet({
+  id,
+  reps,
+  RPE,
+  RIR,
+  weight,
+  exerciseId,
+}: {
+  id: Set['id']
+  reps?: Set['reps']
+  RPE?: Set['RPE']
+  RIR?: Set['RIR']
+  weight?: Set['weight']
+  exerciseId?: Set['exerciseId']
+}) {
+  noStore()
+  const client = await getUserClient()
+  return await client
+    .update(sets)
+    .set({ reps, RPE, RIR, weight, exerciseId })
+    .where(eq(sets.id, id))
+    .returning()
 }
 
 export async function getSessionsForProgram(programId: Program['id']) {
@@ -271,25 +404,6 @@ export async function getSessionsForProgram(programId: Program['id']) {
     .select()
     .from(sessions)
     .where(eq(sessions.programId, programId))
-}
-
-export async function getSession(id: Session['id']) {
-  noStore()
-  const client = await getUserClient()
-
-  // return (
-  //   await (await getUserClient()).select().from(sessions).where(eq(sessions.id, id)).limit(1)
-  // )[0]
-  return await client.query.sessions.findFirst({
-    where: eq(sessions.id, id),
-
-    with: {
-      setGroups: {
-        with: { sets: { orderBy: [asc(sets.order)] }, exercise: true },
-        orderBy: [asc(setGroups.order)],
-      },
-    },
-  })
 }
 
 export async function getSetsForSession(sessionId: Session['id']) {
@@ -334,7 +448,8 @@ export async function getExercises(force = false) {
   if (force) {
     noStore()
   }
-  return (await (await getUserClient()).select().from(exercises)) as Exercise[]
+  const client = await getUserClient()
+  return (await client.select().from(exercises)) as Exercise[]
 }
 
 export async function deleteAllExercises() {

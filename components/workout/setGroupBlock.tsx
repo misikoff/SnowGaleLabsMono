@@ -2,28 +2,47 @@ import clsx from 'clsx'
 import { InfoIcon, ArrowRightLeftIcon } from 'lucide-react'
 
 import { Button } from 'components/ui/button'
-import { Exercise, Set, exercises } from 'db/users/schema'
+import { Set, SetGroupWithExerciseAndSets } from 'db/users/schema'
 
+import AddSetButton from './addSetButton'
 import InfoPopoverExercise from './infoPopoverExercise'
 import PerformanceButton from './performancePopover'
+import RemoveSetButton from './removeSetButton'
+import RemoveSetGroupButton from './removeSetGroupButton'
 import SwapButton from './swapPopover'
 
 export default function SetGroupBlock({
   className = '',
   setGroup,
+  locked = false,
+  onSubmit,
+  onSetRemoved,
+  onSetGroupRemoved,
+  onSetUpdated,
+  onSetGroupUpdated,
 }: {
   className?: string
-  setGroup: { exercise: Exercise; sets: Set[]; id: number }
+  setGroup: SetGroupWithExerciseAndSets
+  locked?: boolean
+  onSubmit?: (set: Set) => void
+  onSetRemoved?: (id: number) => void
+  onSetGroupRemoved?: (id: number) => void
+  onSetUpdated?: (set: Set) => void
+  onSetGroupUpdated?: (setGroup: SetGroupWithExerciseAndSets) => void
 }) {
   return (
     <div className={clsx(className, 'bg-gray-800 rounded-xl p-4')}>
       <div className='flex justify-between'>
         <div className='text-2xl text-white'>{setGroup.exercise.name}</div>
         <div className='flex gap-x-3'>
+          <RemoveSetGroupButton
+            setGroup={setGroup}
+            onSetGroupRemoved={onSetGroupRemoved}
+          />
           <InfoPopoverExercise exercise={setGroup.exercise}>
             <InfoIcon className='w-6 h-6 text-gray-400' />
           </InfoPopoverExercise>
-          <SwapButton>
+          <SwapButton setGroup={setGroup} onSubmit={onSetGroupUpdated}>
             <ArrowRightLeftIcon className='w-6 h-6 text-gray-400' />
           </SwapButton>
         </div>
@@ -36,13 +55,18 @@ export default function SetGroupBlock({
                 <span className='text-indigo-600'>{index + 1}</span>
               </span>
               {set.prescribedWeight} x {set.prescribedReps}
+              <br />
+              {set.weight !== 0 && set.reps !== 0 && set.RPE !== 0 && (
+                <>
+                  Performed {set.weight} x {set.reps} @ RPE {set.RPE}
+                </>
+              )}
               {/* {getSetType(set)} */}
               <div className='flex-grow' />
-              <PerformanceButton
-                weight={set.prescribedWeight}
-                reps={set.prescribedReps}
-                difficulty={set.prescribedRIR}
-              >
+              {setGroup.sets.length > 1 && (
+                <RemoveSetButton set={set} onSetRemoved={onSetRemoved} />
+              )}
+              <PerformanceButton set={set} onSubmit={onSetUpdated}>
                 <Button className='justify-self-end rounded-full text-blue-400'>
                   Performance
                 </Button>
@@ -51,6 +75,7 @@ export default function SetGroupBlock({
           </div>
         ))}
       </div>
+      {!locked && <AddSetButton setGroup={setGroup} onSubmit={onSubmit} />}
     </div>
   )
 }

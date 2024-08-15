@@ -7,7 +7,7 @@ import { ArrowRightIcon } from 'lucide-react'
 
 import SetGroupBlock from 'components/workout/setGroupBlock'
 import { getSession } from 'app/app/actions'
-import { Exercise, Set } from 'db/users/schema'
+import { SessionWithSetGroupWithExerciseAndSets } from 'db/users/schema'
 
 // // const user = {
 // //   preferredUnits: 'lbs',
@@ -101,12 +101,14 @@ import { Exercise, Set } from 'db/users/schema'
 // }
 
 export default function Home({ params }: { params: { slug: string } }) {
-  const [session, setSession] = useState<any>()
+  const [session, setSession] =
+    useState<SessionWithSetGroupWithExerciseAndSets>()
 
   useEffect(() => {
     async function fetchData() {
       const session = await getSession(parseInt(params.slug))
-      setSession(session)
+      setSession(session as SessionWithSetGroupWithExerciseAndSets) // TODO: remove this casting by ensuring getSession returns the correct type
+      // this is probably about Exercise possible being null
       console.log({ session })
     }
     fetchData()
@@ -122,12 +124,9 @@ export default function Home({ params }: { params: { slug: string } }) {
         Start Training <ArrowRightIcon />
       </Link>
       <div className='flex flex-col gap-y-4'>
-        {session?.setGroups.map(
-          (
-            g: { exercise: Exercise; sets: Set[]; id: number },
-            index: number,
-          ) => <SetGroupBlock key={index} setGroup={g} />,
-        )}
+        {session?.setGroups.map((g, index: number) => (
+          <SetGroupBlock key={index} setGroup={g} />
+        ))}
       </div>
     </div>
   )

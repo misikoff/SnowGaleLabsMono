@@ -116,6 +116,8 @@ export const sessions = sqliteTable(
     microcycleId: integer('microcycle_id').references(() => microcycles.id),
     programId: integer('program_id').references(() => programs.id),
     order: integer('order'),
+    completed: integer('completed', { mode: 'boolean' }).default(false),
+    // TODO: add date created, date completed, date updated, and implement sorting by those where appropriate
   },
   // (exercises) => {
   //   return {
@@ -233,3 +235,12 @@ export type Microcycle = typeof microcycles.$inferSelect
 export type Session = typeof sessions.$inferSelect
 export type SetGroup = typeof setGroups.$inferSelect
 export type Set = typeof sets.$inferSelect
+
+export interface SetGroupWithExerciseAndSets extends SetGroup {
+  exercise: Exercise
+  sets: Set[]
+}
+
+export interface SessionWithSetGroupWithExerciseAndSets extends Session {
+  setGroups: SetGroupWithExerciseAndSets[]
+}
