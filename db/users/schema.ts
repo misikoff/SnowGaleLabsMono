@@ -116,6 +116,8 @@ export const sessions = sqliteTable(
     microcycleId: integer('microcycle_id').references(() => microcycles.id),
     programId: integer('program_id').references(() => programs.id),
     order: integer('order'),
+    completed: integer('completed', { mode: 'boolean' }).default(false),
+    // TODO: add date created, date completed, date updated, and implement sorting by those where appropriate
   },
   // (exercises) => {
   //   return {

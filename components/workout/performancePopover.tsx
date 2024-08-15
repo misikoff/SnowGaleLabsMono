@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { MinusIcon, PlusIcon } from 'lucide-react'
 
@@ -27,10 +27,19 @@ export default function PerformanceButton({
   set: Set
   onSubmit?: (set: Set) => void
 }) {
+  const [open, setOpen] = useState(false)
   const [weightValue, setWeightValue] = useState(set.weight ?? 0)
   const [repValue, setRepValue] = useState(set.reps ?? 0)
   // TODO: handle other dififculty methodologies, like RIR
   const [difficultyValue, setDifficultyValue] = useState(set.RPE ?? 5)
+
+  useEffect(() => {
+    if (!open) {
+      setWeightValue(set.weight ?? 0)
+      setRepValue(set.reps ?? 0)
+      setDifficultyValue(set.RPE ?? 5)
+    }
+  }, [open, set.RPE, set.reps, set.weight])
 
   const weightAdjustment = 5
   function decrementWeight() {
@@ -68,36 +77,46 @@ export default function PerformanceButton({
     setDifficultyValue(newValue)
   }
 
-  const save = async () => {
+  const sendUpdate = async ({
+    reps,
+    weight,
+    RPE,
+  }: {
+    reps: number
+    weight: number
+    RPE: number
+  }) => {
     const newSet = await updateSet({
       id: set.id,
+      reps,
+      weight,
+      RPE,
+    })
+    if (onSubmit) {
+      if (newSet.length > 0) {
+        onSubmit(newSet[0])
+      }
+    }
+  }
+
+  const save = async () => {
+    await sendUpdate({
       reps: repValue,
       weight: weightValue,
       RPE: difficultyValue,
     })
-    if (onSubmit) {
-      if (newSet.length > 0) {
-        onSubmit(newSet[0])
-      }
-    }
   }
 
   const clear = async () => {
-    const newSet = await updateSet({
-      id: set.id,
-      reps: 0,
-      weight: 0,
-      RPE: 0,
-    })
-    if (onSubmit) {
-      if (newSet.length > 0) {
-        onSubmit(newSet[0])
-      }
-    }
+    setRepValue(0)
+    setWeightValue(0)
+    setDifficultyValue(0)
+    // because the values haven't been updated yet, these have to be hardcoded as zeroes
+    await sendUpdate({ reps: 0, weight: 0, RPE: 0 })
   }
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger>{children}</SheetTrigger>
       <SheetContent side='bottom'>
         <SheetHeader>
@@ -108,37 +127,51 @@ export default function PerformanceButton({
           servers.
         </SheetDescription> */}
         </SheetHeader>
-        <div className='flex flex-col'>
+        <div className='py-4'>
+          <div className='flex flex-col'>
+            <div className='text-center'>weight</div>
+            <div className='flex justify-between'>
+              <Button onClick={decrementWeight}>
+                <MinusIcon />
+              </Button>
+
+              {/* {value} */}
+              <AnimatedNumber value={weightValue} />
+
+              <Button onClick={incrementWeight}>
+                <PlusIcon />
+              </Button>
+            </div>
+          </div>
+
+          <div className='text-center'>reps</div>
           <div className='flex justify-between'>
-            <MinusIcon onClick={decrementWeight} />
+            <Button onClick={decrementRep}>
+              <MinusIcon />
+            </Button>
 
             {/* {value} */}
-            <AnimatedNumber value={weightValue} />
+            <AnimatedNumber value={repValue} />
 
-            <PlusIcon onClick={incrementWeight} />
+            <Button onClick={incrementRep}>
+              <PlusIcon />
+            </Button>
+          </div>
+
+          <div className='text-center'>Difficulty</div>
+          <div className='flex justify-between'>
+            <Button onClick={decrementDifficulty}>
+              <MinusIcon />
+            </Button>
+
+            {/* {value} */}
+            <AnimatedNumber value={difficultyValue} />
+
+            <Button onClick={incrementDifficulty}>
+              <PlusIcon />
+            </Button>
           </div>
         </div>
-        <div className='text-center'>weight</div>
-
-        <div className='flex justify-between'>
-          <MinusIcon onClick={decrementRep} />
-
-          {/* {value} */}
-          <AnimatedNumber value={repValue} />
-
-          <PlusIcon onClick={incrementRep} />
-        </div>
-        <div className='text-center'>reps</div>
-
-        <div className='flex justify-between'>
-          <MinusIcon onClick={decrementDifficulty} />
-
-          {/* {value} */}
-          <AnimatedNumber value={difficultyValue} />
-
-          <PlusIcon onClick={incrementDifficulty} />
-        </div>
-        <div className='text-center'>Difficulty</div>
         <div className='flex w-full gap-x-4'>
           <SheetClose className='w-full'>
             <Button

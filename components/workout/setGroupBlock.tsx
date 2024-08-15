@@ -19,6 +19,7 @@ export default function SetGroupBlock({
   onSetRemoved,
   onSetGroupRemoved,
   onSetUpdated,
+  onSetGroupUpdated,
 }: {
   className?: string
   setGroup: SetGroupWithExerciseAndSets
@@ -27,6 +28,7 @@ export default function SetGroupBlock({
   onSetRemoved?: (id: number) => void
   onSetGroupRemoved?: (id: number) => void
   onSetUpdated?: (set: Set) => void
+  onSetGroupUpdated?: (setGroup: SetGroupWithExerciseAndSets) => void
 }) {
   return (
     <div className={clsx(className, 'bg-gray-800 rounded-xl p-4')}>
@@ -40,7 +42,7 @@ export default function SetGroupBlock({
           <InfoPopoverExercise exercise={setGroup.exercise}>
             <InfoIcon className='w-6 h-6 text-gray-400' />
           </InfoPopoverExercise>
-          <SwapButton>
+          <SwapButton setGroup={setGroup} onSubmit={onSetGroupUpdated}>
             <ArrowRightLeftIcon className='w-6 h-6 text-gray-400' />
           </SwapButton>
         </div>
@@ -54,7 +56,7 @@ export default function SetGroupBlock({
               </span>
               {set.prescribedWeight} x {set.prescribedReps}
               <br />
-              {set.weight && set.reps && set.RPE && (
+              {set.weight !== 0 && set.reps !== 0 && set.RPE !== 0 && (
                 <>
                   Performed {set.weight} x {set.reps} @ RPE {set.RPE}
                 </>

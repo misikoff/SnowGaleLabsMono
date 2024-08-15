@@ -3,11 +3,19 @@
 import { useEffect, useState } from 'react'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { ArrowDownNarrowWide, ArrowUpNarrowWide } from 'lucide-react'
 
 import { Button } from 'components/ui/button'
 import SetGroupBlock from 'components/workout/setGroupBlock'
-import { getSession } from 'app/app/actions'
-import { Set, SetGroupWithExerciseAndSets } from 'db/users/schema'
+import {
+  deleteSession,
+  getSession,
+  getSetGroupsForSession,
+  updateSession,
+  updateSetGroup,
+} from 'app/app/actions'
+import { Set, SetGroup, SetGroupWithExerciseAndSets } from 'db/users/schema'
 
 import AddExerciseButton from './addExerciseButton'
 
@@ -102,6 +110,7 @@ import AddExerciseButton from './addExerciseButton'
 // }
 
 export default function Home({ params }: { params: { slug: string } }) {
+  const router = useRouter()
   const [session, setSession] = useState<any>()
 
   useEffect(() => {
@@ -175,6 +184,23 @@ export default function Home({ params }: { params: { slug: string } }) {
     })
   }
 
+  const onSetGroupUpdated = (setGroup: SetGroupWithExerciseAndSets) => {
+    setSession((prev: any) => {
+      const newSetGroups = prev.setGroups.map(
+        (g: SetGroupWithExerciseAndSets) => {
+          if (g.id === setGroup.id) {
+            return setGroup
+          }
+          return g
+        },
+      )
+      return {
+        ...prev,
+        setGroups: newSetGroups,
+      }
+    })
+  }
+
   const onSetUpdated = (set: Set) => {
     setSession((prev: any) => {
       const newSetGroups = prev.setGroups.map(
@@ -204,18 +230,123 @@ export default function Home({ params }: { params: { slug: string } }) {
     <div>
       <div>{session?.name}</div>
       <div>{session?.id}</div>
+      <Button
+        onClick={async () => {
+          // TODO add confirmation
+          await deleteSession(session.id)
+          router.push('/app/workout')
+        }}
+      >
+        Delete Session
+      </Button>
 
       <div className='flex flex-col gap-y-4'>
         {session?.setGroups.map(
           (g: SetGroupWithExerciseAndSets, index: number) => (
-            <SetGroupBlock
-              key={index}
-              setGroup={g}
-              onSubmit={onSetAdded}
-              onSetRemoved={onSetRemoved}
-              onSetGroupRemoved={onSetGroupRemoved}
-              onSetUpdated={onSetUpdated}
-            />
+            <div key={index}>
+              <Button
+                disabled={index === 0}
+                onClick={async () => {
+                  // shift this setgroup down by changing the order of all set groups
+                  const order = session.setGroups.map(
+                    (g: SetGroupWithExerciseAndSets) => g.id,
+                  )
+                  // move current setGroup up one
+                  const currentOrder = order[index]
+                  order[index] = order[index - 1]
+                  order[index - 1] = currentOrder
+                  console.log({ order })
+
+                  // sort setGroups by their id index in order
+                  const orderedSetGroups = session.setGroups.sort(
+                    (
+                      a: SetGroupWithExerciseAndSets,
+                      b: SetGroupWithExerciseAndSets,
+                    ) => order.indexOf(a.id) - order.indexOf(b.id),
+                  )
+
+                  // update the set groups that were moved
+                  orderedSetGroups.forEach(
+                    async (
+                      curGroup: SetGroupWithExerciseAndSets,
+                      i: number,
+                    ) => {
+                      const newSetGroup = await updateSetGroup({
+                        id: curGroup.id,
+                        order: i,
+                      })
+                      if (newSetGroup.length > 0) {
+                        console.log({ newSetGroup })
+                        const newSetGroupWithSetsAndExercise = {
+                          ...newSetGroup[0],
+                          exercise: curGroup.exercise,
+                          sets: curGroup.sets,
+                        }
+                        // TODO: simplify this by updating all the set groups at once
+                        onSetGroupUpdated(newSetGroupWithSetsAndExercise)
+                      }
+                    },
+                  )
+                }}
+              >
+                <ArrowUpNarrowWide />
+              </Button>
+              <Button
+                disabled={index === session.setGroups.length - 1}
+                onClick={async () => {
+                  // shift this setgroup down by changing the order of all set groups
+                  const order = session.setGroups.map(
+                    (g: SetGroupWithExerciseAndSets) => g.id,
+                  )
+                  // move current setGroup down one
+                  const currentOrder = order[index]
+                  order[index] = order[index + 1]
+                  order[index + 1] = currentOrder
+                  console.log({ order })
+
+                  // sort setGroups by their id index in order
+                  const orderedSetGroups = session.setGroups.sort(
+                    (
+                      a: SetGroupWithExerciseAndSets,
+                      b: SetGroupWithExerciseAndSets,
+                    ) => order.indexOf(a.id) - order.indexOf(b.id),
+                  )
+
+                  // update the set groups that were moved
+                  orderedSetGroups.forEach(
+                    async (
+                      curGroup: SetGroupWithExerciseAndSets,
+                      i: number,
+                    ) => {
+                      const newSetGroup = await updateSetGroup({
+                        id: curGroup.id,
+                        order: i,
+                      })
+                      if (newSetGroup.length > 0) {
+                        console.log({ newSetGroup })
+                        const newSetGroupWithSetsAndExercise = {
+                          ...newSetGroup[0],
+                          exercise: curGroup.exercise,
+                          sets: curGroup.sets,
+                        }
+                        // TODO: simplify this by updating all the set groups at once
+                        onSetGroupUpdated(newSetGroupWithSetsAndExercise)
+                      }
+                    },
+                  )
+                }}
+              >
+                <ArrowDownNarrowWide />
+              </Button>
+              <SetGroupBlock
+                setGroup={g}
+                onSubmit={onSetAdded}
+                onSetRemoved={onSetRemoved}
+                onSetGroupRemoved={onSetGroupRemoved}
+                onSetUpdated={onSetUpdated}
+                onSetGroupUpdated={onSetGroupUpdated}
+              />
+            </div>
           ),
         )}
       </div>
@@ -223,9 +354,14 @@ export default function Home({ params }: { params: { slug: string } }) {
       {/* unless session is locked */}
       <div className='flex flex-col'>
         <AddExerciseButton session={session} onSubmit={handleAddSetGroup} />
-        <Link href={`/app/workout`}>
-          <Button>Finish Workout</Button>
-        </Link>
+        <Button
+          onClick={async () => {
+            await updateSession({ id: session.id, completed: true })
+            router.push('/app/workout')
+          }}
+        >
+          Finish Workout
+        </Button>
       </div>
     </div>
   )
