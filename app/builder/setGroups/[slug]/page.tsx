@@ -14,13 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'components/ui/select'
-import {
-  createSet,
-  deleteSet,
-  deleteSetGroup,
-  getSetGroupWithSets,
-} from 'app/app/actions'
-import { Exercise } from 'db/users/schema'
+import { createSet, deleteSet, getSetGroupWithSets } from 'app/app/actions'
+import { Exercise } from 'db/schema'
 
 // https://stackoverflow.com/questions/59774572/how-to-get-the-return-type-of-async-function-in-typescript
 type AsyncReturnType<T extends (...args: any) => Promise<any>> = T extends (
@@ -36,7 +31,7 @@ export default function Home({ params }: { params: { slug: string } }) {
   const [exerciseId, setExerciseId] = useState<number>()
   useEffect(() => {
     async function setData() {
-      const setGroup1 = await getSetGroupWithSets(parseInt(params.slug))
+      const setGroup1 = await getSetGroupWithSets(params.slug)
       setSetGroup(setGroup1)
       console.log(setGroup1)
     }
@@ -83,13 +78,14 @@ export default function Home({ params }: { params: { slug: string } }) {
               await createSet({
                 order: getNextOrder(),
                 programId: setGroup.programId || undefined,
-                microcycleId: setGroup.microcycleId || undefined,
-                sessionId: setGroup.sessionId || undefined,
-                exerciseId: setGroup.exerciseId || undefined,
+                microcycleId: setGroup.microcycleId,
+                sessionId: setGroup.sessionId!,
+                exerciseId: setGroup.exerciseId!,
                 setGroupId: setGroup.id,
               })
+              // TODO: better error handling above if session or exercise is null
               // setExerciseId(undefined)
-              setSetGroup(await getSetGroupWithSets(parseInt(params.slug)))
+              setSetGroup(await getSetGroupWithSets(params.slug))
               console.log('done')
             }}
           >
@@ -101,7 +97,7 @@ export default function Home({ params }: { params: { slug: string } }) {
                 onClick={async () => {
                   const numSets = setGroup.sets.length
                   await deleteSet(setGroup.sets[numSets - 1].id)
-                  setSetGroup(await getSetGroupWithSets(parseInt(params.slug)))
+                  setSetGroup(await getSetGroupWithSets(params.slug))
                 }}
               >
                 remove set group
@@ -122,9 +118,7 @@ export default function Home({ params }: { params: { slug: string } }) {
                   <Button
                     onClick={async () => {
                       await deleteSet(s.id)
-                      setSetGroup(
-                        await getSetGroupWithSets(parseInt(params.slug)),
-                      )
+                      setSetGroup(await getSetGroupWithSets(params.slug))
                     }}
                   >
                     -

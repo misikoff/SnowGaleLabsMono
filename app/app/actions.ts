@@ -2,16 +2,12 @@
 
 import { unstable_noStore as noStore } from 'next/cache'
 import { currentUser } from '@clerk/nextjs/server'
-import { createClient } from '@tursodatabase/api'
 import { eq, asc } from 'drizzle-orm'
 
-import { buildDbClient as mainClient } from 'db/main/client'
-import { users, User } from 'db/main/schema'
+import { db } from 'db/index'
 import {
-  buildDbClient as userClient,
-  buildSchemaDbClient,
-} from 'db/users/client'
-import {
+  users,
+  User,
   sessions,
   microcycles,
   Microcycle,
@@ -25,56 +21,21 @@ import {
   programs,
   SetGroup,
   EquipmentType,
-} from 'db/users/schema'
+} from 'db/schema'
 
-async function getUserClient() {
+export async function createUser() {
   const clerkUser = await currentUser()
-  const user = await mainClient().query.users.findFirst({
-    where: eq(users.clerkId, clerkUser?.id || ''),
-  })
-  return userClient({ url: user?.dbUrl as string })
-}
-
-export async function createUser({ name }: { name: User['name'] }) {
-  // create a new database for the user
-  const org = process.env.TURSO_ORG
-  const token = process.env.TURSO_PLATFORM_API_TOKEN
-  const userSchema = process.env.TURSO_USER_SCHEMA
-  const group = process.env.TURSO_GROUP
-
-  const turso = createClient({
-    org: org as string,
-    token: token as string,
-  })
-
-  const clerkUser = await currentUser()
-  // TODO: consider hashing this to make it all lowercase instead
-  const newDatabaseName = `user-${clerkUser?.id.replace('user_', '').toLowerCase() || ''}`
-  console.log({ newDatabaseName })
-  const database = await turso.databases.create(newDatabaseName, {
-    group: group as string,
-    schema: userSchema as string,
-  })
-
-  console.log({ database })
 
   // store the user in the main database
-  await mainClient()
-    .insert(users)
-    .values({
-      name: clerkUser?.fullName,
-      clerkId: clerkUser?.id || '',
-      dbUrl: database.hostname,
-    })
-
-  // need to handle database creation working and main client insert failing
-  // maybe delete created database
-  // maybe change order of operations
+  await db.insert(users).values({
+    name: clerkUser?.fullName,
+    clerkId: clerkUser?.id || '',
+  })
 }
 
 export async function getUsers() {
   noStore()
-  return await mainClient().select().from(users)
+  return await db.select().from(users)
 }
 
 export async function createProgram({
@@ -84,31 +45,25 @@ export async function createProgram({
   name: Program['name']
   description: Program['description']
 }) {
-  const client = await getUserClient()
-  await client.insert(programs).values({ name, description })
+  await db.insert(programs).values({ name, description })
 }
 
 export async function getPrograms() {
   noStore()
-  const client = await getUserClient()
-  return await client.select().from(programs)
+  return await db.select().from(programs)
 }
 
 export async function getProgram(id: Program['id']) {
   noStore()
-  const client = await getUserClient()
   return (
-    await client.select().from(programs).where(eq(programs.id, id)).limit(1)
+    await db.select().from(programs).where(eq(programs.id, id)).limit(1)
   )[0]
 }
 
 export async function getProgramWithMicrocycles(id: Program['id']) {
   noStore()
-  return await (
-    await getUserClient()
-  ).query.programs.findFirst({
+  return await db.query.programs.findFirst({
     where: eq(programs.id, id),
-
     with: {
       // microcycles: true,
       microcycles: {
@@ -129,22 +84,34 @@ export async function createMicrocycle({
   name?: string
 }) {
   noStore()
-  const client = await getUserClient()
-  await client.insert(microcycles).values({ name, programId, order })
+  // get user id from clerk id
+
+  const user = await currentUser()
+  if (!user) {
+    throw new Error('No user found')
+  }
+  const fullUser = await db.query.users.findFirst({
+    where: eq(users.clerkId, user.id),
+  })
+  if (!fullUser) {
+    throw new Error('No user found')
+  }
+
+  await db
+    .insert(microcycles)
+    .values({ userId: fullUser.id, name, programId, order })
 }
 
 export async function deleteMicrocycle(id: Microcycle['id']) {
   noStore()
-  const client = await getUserClient()
-  await client.delete(microcycles).where(eq(microcycles.id, id))
+  await db.delete(microcycles).where(eq(microcycles.id, id))
 }
 
 export async function getMicrocycleWithSessions(
   microcycleId: Microcycle['id'],
 ) {
   noStore()
-  const client = await getUserClient()
-  return await client.query.microcycles.findFirst({
+  return await db.query.microcycles.findFirst({
     where: eq(microcycles.id, microcycleId),
     with: {
       sessions: {
@@ -166,8 +133,7 @@ export async function createSession({
   microcycleId?: Microcycle['id']
 }) {
   noStore()
-  const client = await getUserClient()
-  const session = await client
+  const session = await db
     .insert(sessions)
     .values({ name, order, programId, microcycleId })
     // .returning()
@@ -181,12 +147,11 @@ export async function createSession({
 
 export async function getSession(id: Session['id']) {
   noStore()
-  const client = await getUserClient()
 
   // return (
-  //   await client.select().from(sessions).where(eq(sessions.id, id)).limit(1)
+  //   await db.select().from(sessions).where(eq(sessions.id, id)).limit(1)
   // )[0]
-  return await client.query.sessions.findFirst({
+  return await db.query.sessions.findFirst({
     where: eq(sessions.id, id),
     with: {
       setGroups: {
@@ -212,8 +177,7 @@ export async function updateSession({
   completed?: Session['completed']
 }) {
   noStore()
-  const client = await getUserClient()
-  return await client
+  return await db
     .update(sessions)
     .set({ name, order, completed })
     .where(eq(sessions.id, id))
@@ -221,17 +185,14 @@ export async function updateSession({
 }
 
 export async function deleteSession(id: Session['id']) {
+  // deletes all set groups and sets associated with the session
   noStore()
-  const client = await getUserClient()
-  await client.delete(sets).where(eq(sets.sessionId, id))
-  await client.delete(setGroups).where(eq(setGroups.sessionId, id))
-  await client.delete(sessions).where(eq(sessions.id, id))
+  await db.delete(sessions).where(eq(sessions.id, id))
 }
 
 export async function getSessionWithSetGroups(sessionId: Session['id']) {
   noStore()
-  const client = await getUserClient()
-  return await client.query.sessions.findFirst({
+  return await db.query.sessions.findFirst({
     where: eq(sessions.id, sessionId),
     with: {
       setGroups: {
@@ -244,8 +205,7 @@ export async function getSessionWithSetGroups(sessionId: Session['id']) {
 
 export async function getSetGroupsForSession(sessionId: Session['id']) {
   noStore()
-  const client = await getUserClient()
-  return await client.query.setGroups.findMany({
+  return await db.query.setGroups.findMany({
     where: eq(sessions.id, sessionId),
     with: {
       sets: { orderBy: [asc(sets.order)] },
@@ -257,8 +217,7 @@ export async function getSetGroupsForSession(sessionId: Session['id']) {
 
 export async function getSetGroupWithSets(setGroupId: SetGroup['id']) {
   noStore()
-  const client = await getUserClient()
-  return await client.query.setGroups.findFirst({
+  return await db.query.setGroups.findFirst({
     where: eq(setGroups.id, setGroupId),
     with: {
       exercise: true,
@@ -283,9 +242,7 @@ export async function createSetGroup({
   exerciseId?: Exercise['id']
 }) {
   noStore()
-  const client = await getUserClient()
-
-  return await client
+  return await db
     .insert(setGroups)
     .values({ programId, microcycleId, order, sessionId, exerciseId })
     .returning()
@@ -307,8 +264,7 @@ export async function updateSetGroup({
   order?: SetGroup['order']
 }) {
   noStore()
-  const client = await getUserClient()
-  return await client
+  return await db
     .update(setGroups)
     .set({ exerciseId, order })
     .where(eq(setGroups.id, id))
@@ -317,11 +273,8 @@ export async function updateSetGroup({
 
 export async function deleteSetGroup(id: SetGroup['id']) {
   noStore()
-  const client = await getUserClient()
-
-  await client.delete(sets).where(eq(sets.setGroupId, id))
-
-  return await client
+  // delete all sets associated with the set group
+  return await db
     .delete(setGroups)
     .where(eq(setGroups.id, id))
     .returning({ deletedId: setGroups.id })
@@ -337,15 +290,14 @@ export async function createSet({
   setGroupId,
 }: {
   order?: Set['order']
-  programId?: Program['id']
-  microcycleId?: Microcycle['id']
-  sessionId?: Session['id']
-  exerciseId?: Exercise['id']
-  setGroupId?: SetGroup['id']
+  programId?: Set['programId']
+  microcycleId?: Set['microcycleId']
+  sessionId: Set['sessionId']
+  exerciseId: Set['exerciseId']
+  setGroupId: Set['setGroupId']
 }) {
   noStore()
-  const client = await getUserClient()
-  return await client
+  return await db
     .insert(sets)
     .values({
       programId,
@@ -360,8 +312,7 @@ export async function createSet({
 
 export async function deleteSet(id: Set['id']) {
   noStore()
-  const client = await getUserClient()
-  return await client
+  return await db
     .delete(sets)
     .where(eq(sets.id, id))
     .returning({ deletedId: sets.id })
@@ -369,8 +320,7 @@ export async function deleteSet(id: Set['id']) {
 
 export async function getSessions() {
   noStore()
-  const client = await getUserClient()
-  return await client.select().from(sessions)
+  return await db.select().from(sessions)
 }
 
 export async function updateSet({
@@ -389,8 +339,7 @@ export async function updateSet({
   exerciseId?: Set['exerciseId']
 }) {
   noStore()
-  const client = await getUserClient()
-  return await client
+  return await db
     .update(sets)
     .set({ reps, RPE, RIR, weight, exerciseId })
     .where(eq(sets.id, id))
@@ -399,8 +348,7 @@ export async function updateSet({
 
 export async function getSessionsForProgram(programId: Program['id']) {
   noStore()
-  const client = await getUserClient()
-  return await client
+  return await db
     .select()
     .from(sessions)
     .where(eq(sessions.programId, programId))
@@ -408,7 +356,7 @@ export async function getSessionsForProgram(programId: Program['id']) {
 
 export async function getSetsForSession(sessionId: Session['id']) {
   noStore()
-  const rows = await (await getUserClient())
+  const rows = await db
     .select()
     .from(setGroups)
     .where(eq(setGroups.sessionId, sessionId))
@@ -448,28 +396,24 @@ export async function getExercises(force = false) {
   if (force) {
     noStore()
   }
-  const client = await getUserClient()
-  return (await client.select().from(exercises)) as Exercise[]
+
+  return (await db.select().from(exercises)) as Exercise[]
 }
 
 export async function deleteAllExercises() {
   noStore()
-  const client = await getUserClient()
-  await client.delete(exercises) //.where(ne(exercises.id, 0))
+  await db.delete(exercises) //.where(ne(exercises.id, 0))
 }
 
-export async function deleteAllSchemaExercises() {
+export async function deleteAllMainExercises() {
   noStore()
-
-  await buildSchemaDbClient().delete(exercises) //.where(ne(exercises.id, 0))
+  await db.delete(exercises) //.where(ne(exercises.id, 0))
 }
 
 export async function createExercise({
-  id,
   name,
   equipment,
 }: {
-  id: number
   name: string
   equipment:
     | 'barbell'
@@ -480,27 +424,21 @@ export async function createExercise({
     | 'band'
     | 'other'
 }) {
-  console.log('adding exercise', id)
+  console.log('adding exercise', name)
   noStore()
-
-  await buildSchemaDbClient()
-    .insert(exercises)
-    .values({ id, name, equipmentType: equipment })
+  await db.insert(exercises).values({ name, equipmentType: equipment })
 }
 
-export async function createSchemaExercise({
-  id,
+export async function createMainExercise({
   name,
   equipment,
 }: {
-  id: number
   name: string
   equipment: EquipmentType
 }) {
-  console.log('adding exercise', id)
+  console.log('adding exercise', name)
   noStore()
-
-  await buildSchemaDbClient()
+  await db
     .insert(exercises)
-    .values({ id, name, equipmentType: equipment })
+    .values({ name, equipmentType: equipment, isMainExercise: true })
 }

@@ -14,7 +14,7 @@ import {
   DrawerTrigger,
 } from 'components/ui/drawer'
 import { createSet, createSetGroup, getExercises } from 'app/app/actions'
-import { Exercise, Session, SetGroupWithExerciseAndSets } from 'db/users/schema'
+import { Exercise, Session, SetGroupWithExerciseAndSets } from 'db/schema'
 
 export default function PickExerciseDrawer({
   sessionId,

@@ -2,14 +2,14 @@
 
 import { Button } from 'components/ui/button'
 import { deleteSet } from 'app/app/actions'
-import { Set } from 'db/users/schema'
+import { Set } from 'db/schema'
 
 export default function RemoveSetButton({
   set,
   onSetRemoved,
 }: {
   set: Set
-  onSetRemoved?: (id: number) => void
+  onSetRemoved?: (id: string) => void
 }) {
   return (
     <Button

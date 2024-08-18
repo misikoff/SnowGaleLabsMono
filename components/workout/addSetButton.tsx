@@ -2,7 +2,7 @@
 
 import { Button } from 'components/ui/button'
 import { createSet } from 'app/app/actions'
-import { Set, SetGroup } from 'db/users/schema'
+import { Set, SetGroup } from 'db/schema'
 
 export default function AddSetButton({
   setGroup,
@@ -15,10 +15,11 @@ export default function AddSetButton({
     <Button
       onClick={async () => {
         const newSet = await createSet({
-          exerciseId: setGroup.exerciseId || undefined, // TODO: figure out how to simplify
+          exerciseId: setGroup.exerciseId!, // TODO: figure out how to simplify
           // setGroup exercise type is exerciseId: number | null instead of exerciseId: number | undefined
-          sessionId: setGroup.sessionId || undefined,
-          setGroupId: setGroup.id || undefined,
+          sessionId: setGroup.sessionId!,
+          setGroupId: setGroup.id,
+          // TODO: better error handling if exercise or session is null
         })
         if (onSubmit) {
           onSubmit(newSet[0])

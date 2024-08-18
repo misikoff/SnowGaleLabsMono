@@ -2,7 +2,7 @@
 
 import { Button } from 'components/ui/button'
 import PickExerciseDrawer from 'components/workout/pickExerciseDrawer'
-import { Session, SetGroupWithExerciseAndSets } from 'db/users/schema'
+import { Session, SetGroupWithExerciseAndSets } from 'db/schema'
 
 export default function AddExerciseButton({
   session,

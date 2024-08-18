@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from 'react'
 
-import { MinusIcon, PlusIcon } from 'lucide-react'
-
 import { Button } from 'components/ui/button'
 import {
   Sheet,
@@ -15,7 +13,7 @@ import {
   SheetTrigger,
 } from 'components/ui/sheet'
 import { getExercises, updateSet, updateSetGroup } from 'app/app/actions'
-import { Exercise, SetGroupWithExerciseAndSets } from 'db/users/schema'
+import { Exercise, SetGroupWithExerciseAndSets } from 'db/schema'
 
 export default function SwapButton({
   setGroup,

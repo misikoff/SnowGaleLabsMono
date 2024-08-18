@@ -9,7 +9,7 @@ import { Input } from 'components/ui/input'
 import { Label } from 'components/ui/label'
 import { Textarea } from 'components/ui/textarea'
 import { createProgram, getPrograms, getUsers } from 'app/app/actions'
-import { Program } from 'db/users/schema'
+import { Program } from 'db/schema'
 
 export default function Home() {
   const [programName, setProgramName] = useState('')

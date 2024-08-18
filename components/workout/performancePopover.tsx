@@ -16,7 +16,7 @@ import {
   SheetTrigger,
 } from 'components/ui/sheet'
 import { updateSet } from 'app/app/actions'
-import { Set } from 'db/users/schema'
+import { Set } from 'db/schema'
 
 export default function PerformanceButton({
   children,

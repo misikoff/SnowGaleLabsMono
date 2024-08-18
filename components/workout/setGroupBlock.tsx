@@ -2,7 +2,7 @@ import clsx from 'clsx'
 import { InfoIcon, ArrowRightLeftIcon } from 'lucide-react'
 
 import { Button } from 'components/ui/button'
-import { Set, SetGroupWithExerciseAndSets } from 'db/users/schema'
+import { Set, SetGroupWithExerciseAndSets } from 'db/schema'
 
 import AddSetButton from './addSetButton'
 import InfoPopoverExercise from './infoPopoverExercise'
@@ -25,8 +25,8 @@ export default function SetGroupBlock({
   setGroup: SetGroupWithExerciseAndSets
   locked?: boolean
   onSubmit?: (set: Set) => void
-  onSetRemoved?: (id: number) => void
-  onSetGroupRemoved?: (id: number) => void
+  onSetRemoved?: (id: string) => void
+  onSetGroupRemoved?: (id: string) => void
   onSetUpdated?: (set: Set) => void
   onSetGroupUpdated?: (setGroup: SetGroupWithExerciseAndSets) => void
 }) {

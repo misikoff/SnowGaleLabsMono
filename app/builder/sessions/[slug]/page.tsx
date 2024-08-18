@@ -20,7 +20,7 @@ import {
   getExercises,
   getSessionWithSetGroups,
 } from 'app/app/actions'
-import { Exercise } from 'db/users/schema'
+import { Exercise } from 'db/schema'
 
 // https://stackoverflow.com/questions/59774572/how-to-get-the-return-type-of-async-function-in-typescript
 type AsyncReturnType<T extends (...args: any) => Promise<any>> = T extends (
@@ -34,10 +34,10 @@ export default function Home({ params }: { params: { slug: string } }) {
   const [session, setSession] =
     useState<AsyncReturnType<typeof getSessionWithSetGroups>>()
   const [exercises, setExercises] = useState<Exercise[]>()
-  const [exerciseId, setExerciseId] = useState<number>()
+  const [exerciseId, setExerciseId] = useState<string>()
   useEffect(() => {
     async function setData() {
-      const session1 = await getSessionWithSetGroups(parseInt(params.slug))
+      const session1 = await getSessionWithSetGroups(params.slug)
       setSession(session1)
       console.log(session1)
       const exercises1 = await getExercises()
@@ -63,7 +63,7 @@ export default function Home({ params }: { params: { slug: string } }) {
           <Select
             onValueChange={(e) => {
               console.log(e)
-              setExerciseId(parseInt(e))
+              setExerciseId(e)
             }}
           >
             <SelectTrigger className='w-[180px]'>
@@ -92,7 +92,7 @@ export default function Home({ params }: { params: { slug: string } }) {
                 exerciseId: exerciseId || undefined,
               })
               setExerciseId(undefined)
-              setSession(await getSessionWithSetGroups(parseInt(params.slug)))
+              setSession(await getSessionWithSetGroups(params.slug))
               console.log('done')
             }}
           >
@@ -104,9 +104,7 @@ export default function Home({ params }: { params: { slug: string } }) {
                 onClick={async () => {
                   const numSetGroups = session.setGroups.length
                   await deleteSetGroup(session.setGroups[numSetGroups - 1].id)
-                  setSession(
-                    await getSessionWithSetGroups(parseInt(params.slug)),
-                  )
+                  setSession(await getSessionWithSetGroups(params.slug))
                 }}
               >
                 remove set group
@@ -127,9 +125,7 @@ export default function Home({ params }: { params: { slug: string } }) {
                   <Button
                     onClick={async () => {
                       await deleteSetGroup(s.id)
-                      setSession(
-                        await getSessionWithSetGroups(parseInt(params.slug)),
-                      )
+                      setSession(await getSessionWithSetGroups(params.slug))
                     }}
                   >
                     -

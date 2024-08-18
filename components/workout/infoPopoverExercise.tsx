@@ -15,7 +15,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from 'components/ui/sheet'
-import { Exercise } from 'db/users/schema'
+import { Exercise } from 'db/schema'
 
 // const exercise = {
 //   name: 'Squat',

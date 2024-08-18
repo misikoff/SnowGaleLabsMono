@@ -7,7 +7,7 @@ import { ArrowRightIcon } from 'lucide-react'
 
 import SetGroupBlock from 'components/workout/setGroupBlock'
 import { getSession } from 'app/app/actions'
-import { SessionWithSetGroupWithExerciseAndSets } from 'db/users/schema'
+import { SessionWithSetGroupWithExerciseAndSets } from 'db/schema'
 
 // // const user = {
 // //   preferredUnits: 'lbs',
@@ -106,7 +106,7 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   useEffect(() => {
     async function fetchData() {
-      const session = await getSession(parseInt(params.slug))
+      const session = await getSession(params.slug)
       setSession(session as SessionWithSetGroupWithExerciseAndSets) // TODO: remove this casting by ensuring getSession returns the correct type
       // this is probably about Exercise possible being null
       console.log({ session })
