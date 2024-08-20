@@ -33,6 +33,11 @@ export async function createUser() {
   })
 }
 
+export async function deleteUser(id: User['id']) {
+  noStore()
+  await db.delete(users).where(eq(users.id, id))
+}
+
 export async function getUsers() {
   noStore()
   return await db.select().from(users)
@@ -406,39 +411,34 @@ export async function deleteAllExercises() {
 }
 
 export async function deleteAllMainExercises() {
+  // TODO: test for admin authorization to delete main exercises
   noStore()
   await db.delete(exercises) //.where(ne(exercises.id, 0))
 }
 
 export async function createExercise({
   name,
-  equipment,
+  equipmentType,
 }: {
-  name: string
-  equipment:
-    | 'barbell'
-    | 'dumbbell'
-    | 'cable'
-    | 'machine'
-    | 'bodyweight'
-    | 'band'
-    | 'other'
+  name: Exercise['name']
+  equipmentType: Exercise['equipmentType']
 }) {
   console.log('adding exercise', name)
   noStore()
-  await db.insert(exercises).values({ name, equipmentType: equipment })
+  await db.insert(exercises).values({ name, equipmentType })
 }
 
 export async function createMainExercise({
   name,
-  equipment,
+  equipmentType,
 }: {
-  name: string
-  equipment: EquipmentType
+  name: Exercise['name']
+  equipmentType: Exercise['equipmentType']
 }) {
-  console.log('adding exercise', name)
+  // TODO: test for admin authorization to create main exercises
   noStore()
+  console.log('adding exercise', name)
   await db
     .insert(exercises)
-    .values({ name, equipmentType: equipment, isMainExercise: true })
+    .values({ name, equipmentType, isMainExercise: true })
 }

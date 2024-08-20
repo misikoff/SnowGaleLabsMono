@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS "sessions" (
 	"order" smallint,
 	"completed" boolean DEFAULT false,
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
 	"completed_at" timestamp
 );
 --> statement-breakpoint
@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"name" text,
 	"clerk_id" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp NOT NULL
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 DO $$ BEGIN

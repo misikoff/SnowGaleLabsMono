@@ -1,5 +1,6 @@
 import { relations, sql } from 'drizzle-orm'
 import {
+  AnyPgColumn,
   boolean,
   index,
   integer,
@@ -36,6 +37,7 @@ export const users = pgTable(
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at')
       .notNull()
+      .defaultNow()
       .$onUpdate(() => new Date()),
   },
   (table) => ({
@@ -62,11 +64,9 @@ export const exercises = pgTable(
       .primaryKey(),
     userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
     isMainExercise: boolean('is_main_exercise').default(false),
-    // only generate main exercise id if isMainExercise is true
-    mainExerciseId: uuid('main_exercise_id').$onUpdate(() => {
-      return sql`CASE WHEN is_main_exercise = true THEN uuid_generate_v4() ELSE null END`
-    }),
-    // TODO: test the above
+    clonedFromId: uuid('cloned_from_id').references(
+      (): AnyPgColumn => exercises.id,
+    ),
     name: text('name'),
     description: text('description'),
     equipmentType: text('equipment_type', { enum: equipmentEnum }),
@@ -86,12 +86,16 @@ export const exercises = pgTable(
     notes: text('notes'),
   },
   (table) => ({
-    isMainExerciseIndex: index('is_main_exercise_idx').on(table.isMainExercise),
-    userIdIndex: index('user_id_idx').on(table.userId),
+    isMainExerciseIndex: index('exercise_is_main_exercise_idx').on(
+      table.isMainExercise,
+    ),
+    userIdIndex: index('exercise_user_id_idx').on(table.userId),
+    clonedFromIdIndex: index('exercise_cloned_from_id_idx').on(
+      table.clonedFromId,
+    ),
   }),
 )
 
-// // create a table or Programs with a name and a description and a user column for the user who created it
 export const programs = pgTable(
   'programs',
   {
@@ -188,12 +192,10 @@ export const sessions = pgTable(
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at')
       .notNull()
+      .defaultNow()
       .$onUpdate(() => new Date()),
     // set completed at when completed becomes true
-    completedAt: timestamp('completed_at').$onUpdate(() => {
-      return sql`CASE WHEN completed = true THEN now() ELSE null END`
-    }),
-    // TODO: test the above
+    completedAt: timestamp('completed_at'),
   },
   (table) => ({
     userIdIndex: index('session_user_id_idx').on(table.userId),
@@ -204,9 +206,18 @@ export const sessionsRelations = relations(sessions, ({ one, many }) => ({
   user: one(users),
   sets: many(sets),
   setGroups: many(setGroups),
-  program: one(programs),
-  macrocycle: one(macrocycles),
-  microcycle: one(microcycles),
+  program: one(programs, {
+    fields: [sessions.programId],
+    references: [programs.id],
+  }),
+  macrocycle: one(macrocycles, {
+    fields: [sessions.macrocycleId],
+    references: [macrocycles.id],
+  }),
+  microcycle: one(microcycles, {
+    fields: [sessions.microcycleId],
+    references: [microcycles.id],
+  }),
 }))
 
 export const setGroups = pgTable(
@@ -216,18 +227,14 @@ export const setGroups = pgTable(
       .default(sql`gen_random_uuid()`)
       .primaryKey(),
     userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
-    sessionId: uuid('session_id').references(() => sessions.id),
+    sessionId: uuid('session_id').references(() => sessions.id, {
+      onDelete: 'cascade',
+    }),
     microcycleId: uuid('microcycle_id').references(() => microcycles.id),
     programId: uuid('program_id').references(() => programs.id),
     type: text('type', { enum: setGroupType }).default('normal'),
     // if type is not normal then set exerciseId to null, but dont generate the id automatically
-    // TODO: if type is normal make sure the excerciseId is not null
-    exerciseId: uuid('exercise_id')
-      .references(() => exercises.id)
-      .$onUpdate(() => {
-        return sql`CASE WHEN type != 'normal' THEN null END`
-      }),
-    // TODO: test the above
+    exerciseId: uuid('exercise_id').references(() => exercises.id),
     order: smallint('order'),
   },
   (table) => ({
@@ -238,10 +245,22 @@ export const setGroups = pgTable(
 
 export const setGroupsRelation = relations(setGroups, ({ one, many }) => ({
   user: one(users),
-  exercise: one(exercises),
-  session: one(sessions),
-  microcycle: one(microcycles),
-  program: one(programs),
+  exercise: one(exercises, {
+    fields: [setGroups.exerciseId],
+    references: [exercises.id],
+  }),
+  session: one(sessions, {
+    fields: [setGroups.sessionId],
+    references: [sessions.id],
+  }),
+  microcycle: one(microcycles, {
+    fields: [setGroups.microcycleId],
+    references: [microcycles.id],
+  }),
+  program: one(programs, {
+    fields: [setGroups.programId],
+    references: [programs.id],
+  }),
   sets: many(sets),
 }))
 
@@ -296,11 +315,26 @@ export const sets = pgTable(
 
 export const setsRelation = relations(sets, ({ one }) => ({
   user: one(users),
-  session: one(sessions),
-  microcycle: one(microcycles),
-  program: one(programs),
-  exercise: one(exercises),
-  setGroup: one(setGroups),
+  session: one(sessions, {
+    fields: [sets.sessionId],
+    references: [sessions.id],
+  }),
+  microcycle: one(microcycles, {
+    fields: [sets.microcycleId],
+    references: [microcycles.id],
+  }),
+  program: one(programs, {
+    fields: [sets.programId],
+    references: [programs.id],
+  }),
+  exercise: one(exercises, {
+    fields: [sets.exerciseId],
+    references: [exercises.id],
+  }),
+  setGroup: one(setGroups, {
+    fields: [sets.setGroupId],
+    references: [setGroups.id],
+  }),
 }))
 
 export type User = typeof users.$inferSelect

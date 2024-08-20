@@ -49,18 +49,18 @@ export default function Home() {
       <Button
         onClick={async () => {
           await deleteAllMainExercises()
-          alert('deleted all schema exercises')
+          alert('deleted all main exercises')
         }}
       >
-        delete all exercises
+        delete all main exercises
       </Button>
 
       <Button
         onClick={async () => {
-          exercisesArray.forEach(async ({ name, equipment }) => {
+          exercisesArray.forEach(async ({ name, equipmentType }) => {
             await createMainExercise({
               name,
-              equipment: equipment as EquipmentType,
+              equipmentType: equipmentType as EquipmentType,
             })
           })
 
@@ -68,6 +68,14 @@ export default function Home() {
         }}
       >
         add main exercises
+      </Button>
+
+      <Button
+        onClick={async () => {
+          const x = await getUsers()
+        }}
+      >
+        get users
       </Button>
     </div>
   )

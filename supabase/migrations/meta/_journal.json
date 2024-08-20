@@ -1,12 +1,26 @@
 {
-  "version": "5",
-  "dialect": "pg",
+  "version": "7",
+  "dialect": "postgresql",
   "entries": [
     {
       "idx": 0,
       "version": "7",
-      "when": 1724012155572,
-      "tag": "0000_youthful_avengers",
+      "when": 1724023715191,
+      "tag": "0000_friendly_annihilus",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1724087171986,
+      "tag": "0001_talented_speed_demon",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1724115000213,
+      "tag": "0002_spicy_joseph",
       "breakpoints": true
     }
   ]
