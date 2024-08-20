@@ -1,15 +1,15 @@
 'use client'
 
 import { Button } from 'components/ui/button'
-import { deleteSet, deleteSetGroup } from 'app/app/actions'
-import { SetGroupWithExerciseAndSets } from 'db/users/schema'
+import { deleteSetGroup } from 'app/app/actions'
+import { SetGroupWithExerciseAndSets } from 'db/schema'
 
 export default function RemoveSetGroupButton({
   setGroup,
   onSetGroupRemoved,
 }: {
   setGroup: SetGroupWithExerciseAndSets
-  onSetGroupRemoved?: (id: number) => void
+  onSetGroupRemoved?: (id: string) => void
 }) {
   return (
     <Button

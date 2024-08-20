@@ -20,7 +20,7 @@ export default function TestButton() {
       <button onClick={test}>Test</button>
       <button
         onClick={async () => {
-          await createUser({ name: 'testUser' })
+          await createUser()
         }}
       >
         create user

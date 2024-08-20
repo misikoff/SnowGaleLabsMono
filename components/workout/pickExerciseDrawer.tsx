@@ -14,7 +14,7 @@ import {
   DrawerTrigger,
 } from 'components/ui/drawer'
 import { createSet, createSetGroup, getExercises } from 'app/app/actions'
-import { Exercise, Session, SetGroupWithExerciseAndSets } from 'db/users/schema'
+import { Exercise, Session, SetGroupWithExerciseAndSets } from 'db/schema'
 
 export default function PickExerciseDrawer({
   sessionId,
@@ -52,7 +52,7 @@ export default function PickExerciseDrawer({
             onChange={(e) => {
               setSelectedExercise(
                 exercises.find((exercise) => {
-                  return exercise.id === parseInt(e.target.value)
+                  return exercise.id === e.target.value
                 }),
               )
             }}

@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { Badge } from 'components/ui/badge'
 import { Button } from 'components/ui/button'
 import { deleteSession, getSessions } from 'app/app/actions'
-import { Session } from 'db/users/schema'
+import { Session } from 'db/schema'
 
 import CreateSessionButton from './createSessionButton'
 

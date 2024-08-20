@@ -15,7 +15,7 @@ import {
   updateSession,
   updateSetGroup,
 } from 'app/app/actions'
-import { Set, SetGroup, SetGroupWithExerciseAndSets } from 'db/users/schema'
+import { Set, SetGroupWithExerciseAndSets } from 'db/schema'
 
 import AddExerciseButton from './addExerciseButton'
 
@@ -115,7 +115,7 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   useEffect(() => {
     async function fetchData() {
-      const session = await getSession(parseInt(params.slug))
+      const session = await getSession(params.slug)
       setSession(session)
       console.log({ session })
     }
@@ -132,7 +132,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     })
   }
 
-  const onSetRemoved = (id: number) => {
+  const onSetRemoved = (id: string) => {
     setSession((prev: any) => {
       const newSetGroups = prev.setGroups.map(
         (g: SetGroupWithExerciseAndSets) => {
@@ -173,7 +173,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     })
   }
 
-  const onSetGroupRemoved = (id: number) => {
+  const onSetGroupRemoved = (id: string) => {
     setSession((prev: any) => {
       return {
         ...prev,

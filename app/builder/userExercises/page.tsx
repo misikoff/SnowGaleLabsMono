@@ -6,14 +6,14 @@ import { Button } from 'components/ui/button'
 import { Input } from 'components/ui/input'
 import { Label } from 'components/ui/label'
 import {
-  createSchemaExercise,
+  createMainExercise,
   createUser,
-  deleteAllSchemaExercises,
+  deleteAllMainExercises,
   getUsers,
 } from 'app/app/actions'
-import { User } from 'db/main/schema'
+import { User } from 'db/schema'
+import { EquipmentType } from 'db/schema'
 import { exercisesArray } from 'db/seedData'
-import { EquipmentType } from 'db/users/schema'
 
 export default function Home() {
   const [userName, setUserName] = useState('')
@@ -35,8 +35,7 @@ export default function Home() {
       {userName}
       <Button
         onClick={async () => {
-          await createUser({ name: userName })
-          setUserName('')
+          await createUser()
           setUsers((await getUsers()) as any)
         }}
       >
@@ -49,27 +48,34 @@ export default function Home() {
 
       <Button
         onClick={async () => {
-          await deleteAllSchemaExercises()
-          alert('deleted all schema exercises')
+          await deleteAllMainExercises()
+          alert('deleted all main exercises')
         }}
       >
-        delete all exercises
+        delete all main exercises
       </Button>
 
       <Button
         onClick={async () => {
-          exercisesArray.forEach(async ({ id, name, equipment }) => {
-            await createSchemaExercise({
-              id,
+          exercisesArray.forEach(async ({ name, equipmentType }) => {
+            await createMainExercise({
               name,
-              equipment: equipment as EquipmentType,
+              equipmentType: equipmentType as EquipmentType,
             })
           })
 
           alert('created all exercises')
         }}
       >
-        add all exercises to schema / user template
+        add main exercises
+      </Button>
+
+      <Button
+        onClick={async () => {
+          const x = await getUsers()
+        }}
+      >
+        get users
       </Button>
     </div>
   )

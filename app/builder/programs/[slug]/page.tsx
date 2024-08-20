@@ -25,7 +25,7 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   useEffect(() => {
     async function setData() {
-      const program1 = await getProgramWithMicrocycles(parseInt(params.slug))
+      const program1 = await getProgramWithMicrocycles(params.slug)
       setProgram(program1)
       console.log(program1)
     }
@@ -51,7 +51,7 @@ export default function Home({ params }: { params: { slug: string } }) {
                 programId: program.id,
                 order: getNextOrder(),
               })
-              setProgram(await getProgramWithMicrocycles(parseInt(params.slug)))
+              setProgram(await getProgramWithMicrocycles(params.slug))
               console.log('done')
             }}
           >
@@ -65,9 +65,7 @@ export default function Home({ params }: { params: { slug: string } }) {
                   await deleteMicrocycle(
                     program.microcycles[numMicrocycles - 1].id,
                   )
-                  setProgram(
-                    await getProgramWithMicrocycles(parseInt(params.slug)),
-                  )
+                  setProgram(await getProgramWithMicrocycles(params.slug))
                 }}
               >
                 remove microcycle
@@ -88,9 +86,7 @@ export default function Home({ params }: { params: { slug: string } }) {
                   <Button
                     onClick={async () => {
                       await deleteMicrocycle(m.id)
-                      setProgram(
-                        await getProgramWithMicrocycles(parseInt(params.slug)),
-                      )
+                      setProgram(await getProgramWithMicrocycles(params.slug))
                     }}
                   >
                     -

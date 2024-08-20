@@ -25,7 +25,7 @@ export default function Home({ params }: { params: { slug: string } }) {
 
   useEffect(() => {
     async function setData() {
-      const microcycle1 = await getMicrocycleWithSessions(parseInt(params.slug))
+      const microcycle1 = await getMicrocycleWithSessions(params.slug)
       setMicrocycle(microcycle1)
       console.log(microcycle1)
     }
@@ -52,9 +52,7 @@ export default function Home({ params }: { params: { slug: string } }) {
                 programId: microcycle.programId || undefined,
                 microcycleId: microcycle.id,
               })
-              setMicrocycle(
-                await getMicrocycleWithSessions(parseInt(params.slug)),
-              )
+              setMicrocycle(await getMicrocycleWithSessions(params.slug))
               console.log('done')
             }}
           >
@@ -66,9 +64,7 @@ export default function Home({ params }: { params: { slug: string } }) {
                 onClick={async () => {
                   const numSessions = microcycle.sessions.length
                   await deleteSession(microcycle.sessions[numSessions - 1].id)
-                  setMicrocycle(
-                    await getMicrocycleWithSessions(parseInt(params.slug)),
-                  )
+                  setMicrocycle(await getMicrocycleWithSessions(params.slug))
                 }}
               >
                 remove session
@@ -90,7 +86,7 @@ export default function Home({ params }: { params: { slug: string } }) {
                     onClick={async () => {
                       await deleteSession(s.id)
                       setMicrocycle(
-                        await getMicrocycleWithSessions(parseInt(params.slug)),
+                        await getMicrocycleWithSessions(params.slug),
                       )
                     }}
                   >

@@ -1,1 +1,0 @@
-ALTER TABLE `agents` ADD `newColMyDude` integer DEFAULT (cast(unixepoch() as int));

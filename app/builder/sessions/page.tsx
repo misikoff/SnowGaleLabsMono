@@ -10,22 +10,15 @@ import {
   deleteMicrocycle,
   getProgramWithMicrocycles,
 } from 'app/app/actions'
-
-// https://stackoverflow.com/questions/59774572/how-to-get-the-return-type-of-async-function-in-typescript
-type AsyncReturnType<T extends (...args: any) => Promise<any>> = T extends (
-  ...args: any
-) => Promise<infer R>
-  ? R
-  : any
+import { ProgramWithMicrocycles } from 'db/schema'
 
 // make sure button is not clickable when running
 export default function Home({ params }: { params: { slug: string } }) {
-  const [program, setProgram] =
-    useState<AsyncReturnType<typeof getProgramWithMicrocycles>>()
+  const [program, setProgram] = useState<ProgramWithMicrocycles>()
 
   useEffect(() => {
     async function setData() {
-      const program1 = await getProgramWithMicrocycles(parseInt(params.slug))
+      const program1 = await getProgramWithMicrocycles(params.slug)
       setProgram(program1)
       console.log(program1)
     }
@@ -51,7 +44,7 @@ export default function Home({ params }: { params: { slug: string } }) {
                 programId: program.id,
                 order: getNextOrder(),
               })
-              setProgram(await getProgramWithMicrocycles(parseInt(params.slug)))
+              setProgram(await getProgramWithMicrocycles(params.slug))
               console.log('done')
             }}
           >
@@ -65,9 +58,7 @@ export default function Home({ params }: { params: { slug: string } }) {
                   await deleteMicrocycle(
                     program.microcycles[numMicrocycles - 1].id,
                   )
-                  setProgram(
-                    await getProgramWithMicrocycles(parseInt(params.slug)),
-                  )
+                  setProgram(await getProgramWithMicrocycles(params.slug))
                 }}
               >
                 remove microcycle
@@ -88,9 +79,7 @@ export default function Home({ params }: { params: { slug: string } }) {
                   <Button
                     onClick={async () => {
                       await deleteMicrocycle(m.id)
-                      setProgram(
-                        await getProgramWithMicrocycles(parseInt(params.slug)),
-                      )
+                      setProgram(await getProgramWithMicrocycles(params.slug))
                     }}
                   >
                     -

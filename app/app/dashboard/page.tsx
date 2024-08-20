@@ -6,7 +6,7 @@ import Link from 'next/link'
 import clsx from 'clsx'
 import { ChevronLeft, ChevronRight, InfoIcon } from 'lucide-react'
 
-import { Session } from 'db/users/schema'
+import { Session } from 'db/schema'
 
 import InfoPopoverProgram from './infoPopoverProgram'
 import InfoPopoverReadiness from './infoPopoverReadiness'
@@ -19,7 +19,7 @@ export default function Home() {
 
   useEffect(() => {
     async function fetchData() {
-      const sessions = await getSessionsForProgram(1)
+      const sessions = await getSessionsForProgram('1')
       setSessions(sessions)
     }
     fetchData()
