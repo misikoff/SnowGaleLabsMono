@@ -27,7 +27,7 @@ export default function Home() {
       {userName}
       <Button
         onClick={async () => {
-          await createUser({ name: userName })
+          await createUser()
           setUserName('')
           setUsers((await getUsers()) as any)
         }}

@@ -71,7 +71,7 @@ export default function SwapButton({
           onChange={(e) => {
             setSelectedExercise(
               exercises.find((exercise) => {
-                return exercise.id === parseInt(e.target.value)
+                return exercise.id === e.target.value
               }),
             )
           }}

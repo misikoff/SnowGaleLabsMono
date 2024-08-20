@@ -18,8 +18,11 @@ export default function Home() {
 
       <Button
         onClick={async () => {
-          exercisesArray.forEach(async ({ id, name, equipment }) => {
-            await createExercise({ id, name, equipment: equipment as any })
+          exercisesArray.forEach(async ({ id, name, equipmentType }) => {
+            await createExercise({
+              name,
+              equipmentType: equipmentType,
+            })
           })
 
           alert('created all exercises')

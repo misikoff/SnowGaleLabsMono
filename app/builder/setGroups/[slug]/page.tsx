@@ -54,7 +54,7 @@ export default function Home({ params }: { params: { slug: string } }) {
           {/* <Select
             onValueChange={(e) => {
               console.log(e)
-              setExerciseId(parseInt(e))
+              setExerciseId((e))
             }}
           >
             <SelectTrigger className='w-[180px]'>

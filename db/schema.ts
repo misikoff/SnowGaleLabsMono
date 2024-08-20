@@ -355,5 +355,9 @@ export interface SessionWithSetGroupWithExerciseAndSets extends Session {
   setGroups: SetGroupWithExerciseAndSets[]
 }
 
+export interface ProgramWithMicrocycles extends Program {
+  microcycles: Microcycle[]
+}
+
 // TODO: determine if all relations can be removed because they are redundant for dribble query
 // https://orm.drizzle.team/docs/rqb
