@@ -42,10 +42,10 @@
   dependencies:
     regenerator-runtime "^0.14.0"
 
-"@clerk/backend@1.7.0":
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/@clerk/backend/-/backend-1.7.0.tgz#fc9e435bb0bfbf14f98ff65214cfdf8b5ae0726b"
-  integrity sha512-ynU1XBdlezegTlwNtRxf8AjOQtTeBQligNKZtHOWZEfTM9CzJs8XEwAOpKYQ6/LRt0hlch8YeP5qHjD5W8sYvw==
+"@clerk/backend@1.8.0":
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/@clerk/backend/-/backend-1.8.0.tgz#69724561a73b7b36d40bf6d3f4ba35dfbda1c83d"
+  integrity sha512-csIF8eHM84JPP6ZuOdE37saDRIY7Dp5B8Yt26FZSehCveUTeI16iCCbVb8Co4hutlKZa08Mcb2GEcXavRnkvfA==
   dependencies:
     "@clerk/shared" "2.5.2"
     "@clerk/types" "4.14.0"
@@ -62,12 +62,12 @@
     "@clerk/types" "4.14.0"
     tslib "2.4.1"
 
-"@clerk/nextjs@^5.3.2":
-  version "5.3.2"
-  resolved "https://registry.yarnpkg.com/@clerk/nextjs/-/nextjs-5.3.2.tgz#3d114e44cdc03d2f189eaaa1df2a55e27e474d8d"
-  integrity sha512-yYxLfELDrWVKGrOwL/Xi3Dkk06UNm+zbqlb+uLulPf5+wlxpTsz9Srf620Ff2awtUKUbNqGZg91i+wjxgFOl8Q==
+"@clerk/nextjs@^5.3.3":
+  version "5.3.3"
+  resolved "https://registry.yarnpkg.com/@clerk/nextjs/-/nextjs-5.3.3.tgz#611c4ab00165b55461e272910baf197af8113133"
+  integrity sha512-Zn5FkuB/wo1uFSxIqsc4fcOZDd43zN4RPFbhpDYzF1JbjMuS18zzDJOlbScYl14pEC0Usqu0Z6lrMlyHmwFxkQ==
   dependencies:
-    "@clerk/backend" "1.7.0"
+    "@clerk/backend" "1.8.0"
     "@clerk/clerk-react" "5.4.2"
     "@clerk/shared" "2.5.2"
     "@clerk/types" "4.14.0"
