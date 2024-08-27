@@ -652,21 +652,21 @@
   resolved "https://registry.yarnpkg.com/@kurkle/color/-/color-0.3.2.tgz#5acd38242e8bde4f9986e7913c8fdf49d3aa199f"
   integrity sha512-fuscdXJ9G1qb7W8VdHi+IwRqij3lBkosAm4ydQtEmbY58OzHXqQhvlxqEkoz0yssNVn38bcpRWgA9PP+OGoisw==
 
-"@libsql/client@^0.9.0":
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@libsql/client/-/client-0.9.0.tgz#c5a24cc0081785380c06f140e9815e5fa39c1d6f"
-  integrity sha512-mT+91wtb8pxK9SWd566D5W2VUCemksUMqICRBtf0WXiS7XzNcQhWyrwYOnVrVmTSze/SCCsNNEKIkCRwk/pr2Q==
+"@libsql/client@^0.10.0":
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/@libsql/client/-/client-0.10.0.tgz#83c1ecee3115be97fd4f09a717dc308d5526925b"
+  integrity sha512-2ERn08T4XOVx34yBtUPq0RDjAdd9TJ5qNH/izugr208ml2F94mk92qC64kXyDVQINodWJvp3kAdq6P4zTtCZ7g==
   dependencies:
-    "@libsql/core" "^0.9.0"
+    "@libsql/core" "^0.10.0"
     "@libsql/hrana-client" "^0.6.2"
     js-base64 "^3.7.5"
     libsql "^0.4.1"
     promise-limit "^2.7.0"
 
-"@libsql/core@^0.9.0":
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@libsql/core/-/core-0.9.0.tgz#5ad580fcd0239baf36904b244049957b22dbddc3"
-  integrity sha512-rCsS/EC32K8ARjDQJGqauGZmkR6orOOY4I7898PyQ/mmltAkMwRgz5kjEmYRZ42o7mP0ayJfbw28qgv7SRFEgg==
+"@libsql/core@^0.10.0":
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/@libsql/core/-/core-0.10.0.tgz#c4a33cbd0e2363219935a1891f83ad1473269637"
+  integrity sha512-rqynAXGaiSpTsykOZdBtI1N4z4O+KZ6mt33K/aHeXAY0gSIfK/ctxuWa0Y1Bjo4FMz1idBTCXz4Ps5kITOvZZw==
   dependencies:
     js-base64 "^3.7.5"
 
