@@ -117,7 +117,7 @@ export default function PerformanceButton({
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger>{children}</SheetTrigger>
+      <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent side='bottom'>
         <SheetHeader>
           <SheetTitle>Performance</SheetTitle>

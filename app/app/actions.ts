@@ -2,7 +2,7 @@
 
 import { unstable_noStore as noStore } from 'next/cache'
 import { currentUser } from '@clerk/nextjs/server'
-import { eq, asc } from 'drizzle-orm'
+import { and, asc, eq } from 'drizzle-orm'
 
 import { db } from 'db/index'
 import {
@@ -91,7 +91,7 @@ export async function getProgramWithMicrocycles(id: Program['id']) {
   noStore()
   const userId = await currentUserId()
   return await db.query.programs.findFirst({
-    where: eq(programs.id, id) && eq(programs.userId, userId),
+    where: and(eq(programs.id, id), eq(programs.userId, userId)),
     with: {
       // microcycles: true,
       microcycles: {
@@ -133,7 +133,10 @@ export async function getMicrocycleWithSessions(
   noStore()
   const userId = await currentUserId()
   return await db.query.microcycles.findFirst({
-    where: eq(microcycles.id, microcycleId) && eq(microcycles.userId, userId),
+    where: and(
+      eq(microcycles.id, microcycleId),
+      eq(microcycles.userId, userId),
+    ),
     with: {
       sessions: {
         orderBy: [asc(microcycles.order)],
@@ -174,13 +177,13 @@ export async function createSession({
 
 export async function getSession(id: Session['id']) {
   noStore()
-
+  console.log({ id })
   // return (
   //   await db.select().from(sessions).where(eq(sessions.id, id)).limit(1)
   // )[0]
   const userId = await currentUserId()
   return await db.query.sessions.findFirst({
-    where: eq(sessions.id, id) && eq(sessions.userId, userId),
+    where: and(eq(sessions.id, id), eq(sessions.userId, userId)),
     with: {
       setGroups: {
         with: {
@@ -222,7 +225,7 @@ export async function getSessionWithSetGroups(sessionId: Session['id']) {
   noStore()
   const userId = await currentUserId()
   return await db.query.sessions.findFirst({
-    where: eq(sessions.id, sessionId) && eq(sessions.userId, userId),
+    where: and(eq(sessions.id, sessionId), eq(sessions.userId, userId)),
     with: {
       setGroups: {
         with: { exercise: true },
@@ -236,7 +239,7 @@ export async function getSetGroupsForSession(sessionId: Session['id']) {
   noStore()
   const userId = await currentUserId()
   return await db.query.setGroups.findMany({
-    where: eq(sessions.id, sessionId) && eq(sessions.userId, userId),
+    where: and(eq(sessions.id, sessionId), eq(sessions.userId, userId)),
     with: {
       sets: { orderBy: [asc(sets.order)] },
       exercise: true,
@@ -249,7 +252,7 @@ export async function getSetGroupWithSets(setGroupId: SetGroup['id']) {
   noStore()
   const userId = await currentUserId()
   return await db.query.setGroups.findFirst({
-    where: eq(setGroups.id, setGroupId) && eq(setGroups.userId, userId),
+    where: and(eq(setGroups.id, setGroupId), eq(setGroups.userId, userId)),
     with: {
       exercise: true,
       sets: {

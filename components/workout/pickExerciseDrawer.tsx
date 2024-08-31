@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 
 import { Button } from 'components/ui/button'
 import {
@@ -15,6 +15,9 @@ import {
 } from 'components/ui/drawer'
 import { createSet, createSetGroup, getExercises } from 'app/app/actions'
 import { Exercise, Session, SetGroupWithExerciseAndSets } from 'db/schema'
+
+import ExerciseSuperScroller from './exerciseSuperScroller'
+import SuperScroller from '../ui/superScroller'
 
 export default function PickExerciseDrawer({
   sessionId,
@@ -39,64 +42,69 @@ export default function PickExerciseDrawer({
     fetchData()
   }, [])
 
+  useEffect(() => {
+    if (!open) {
+      setSelectedExercise(null)
+    }
+  }, [open])
+
   return (
     <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger>{children}</DrawerTrigger>
+      <DrawerTrigger asChild>{children}</DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>Pick Exercise</DrawerTitle>
           <DrawerDescription>This is the exercise to pick</DrawerDescription>
-
-          <select
-            value={selectedExercise?.id}
-            onChange={(e) => {
-              setSelectedExercise(
-                exercises.find((exercise) => {
-                  return exercise.id === e.target.value
-                }),
-              )
-            }}
-          >
-            {exercises.map((exercise) => (
-              <option key={exercise.id} value={exercise.id}>
-                {exercise.name}
-              </option>
-            ))}
-          </select>
         </DrawerHeader>
+        <ExerciseSuperScroller
+          options={exercises}
+          onSelect={(exerciseId: string) => {
+            setSelectedExercise(
+              exercises.find((e) => {
+                return e.id === exerciseId
+              }),
+            )
+          }}
+        />
         <DrawerFooter>
-          <Button
-            onClick={async () => {
-              console.log({ sessionId })
-              if (selectedExercise) {
-                const newSetGroup = await createSetGroup({
-                  exerciseId: selectedExercise?.id,
-                  sessionId,
-                })
-                if (newSetGroup.length > 0) {
-                  const newSet = await createSet({
+          <div className='flex w-full space-x-4'>
+            <Button
+              disabled={!selectedExercise}
+              className='w-full'
+              onClick={async () => {
+                console.log({ sessionId })
+                if (selectedExercise) {
+                  const newSetGroup = await createSetGroup({
                     exerciseId: selectedExercise?.id,
                     sessionId,
-                    setGroupId: newSetGroup[0].id,
                   })
-                  const extendedSetGroup: SetGroupWithExerciseAndSets = {
-                    ...newSetGroup[0],
-                    exercise: selectedExercise,
-                    sets: newSet,
+                  if (newSetGroup.length > 0) {
+                    const newSet = await createSet({
+                      exerciseId: selectedExercise?.id,
+                      sessionId,
+                      setGroupId: newSetGroup[0].id,
+                    })
+                    const extendedSetGroup: SetGroupWithExerciseAndSets = {
+                      ...newSetGroup[0],
+                      exercise: selectedExercise,
+                      sets: newSet,
+                    }
+                    if (onSubmit) {
+                      onSubmit(extendedSetGroup)
+                    }
+                    setOpen(false)
                   }
-                  if (onSubmit) {
-                    onSubmit(extendedSetGroup)
-                  }
-                  setOpen(false)
                 }
-              }
-            }}
-          >
-            Submit {selectedExercise?.name}
-          </Button>
-          <DrawerClose>
-            <Button variant='outline'>Cancel</Button>
-          </DrawerClose>
+              }}
+            >
+              Add {selectedExercise?.name}
+            </Button>
+            <DrawerClose asChild>
+              <Button variant='outline' className='w-full'>
+                Cancel
+              </Button>
+            </DrawerClose>
+          </div>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

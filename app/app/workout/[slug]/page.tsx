@@ -11,7 +11,6 @@ import SetGroupBlock from 'components/workout/setGroupBlock'
 import {
   deleteSession,
   getSession,
-  getSetGroupsForSession,
   updateSession,
   updateSetGroup,
 } from 'app/app/actions'
@@ -117,12 +116,11 @@ export default function Home({ params }: { params: { slug: string } }) {
     async function fetchData() {
       const session = await getSession(params.slug)
       setSession(session)
-      console.log({ session })
     }
     fetchData()
   }, [params.slug])
 
-  // handle added setgroup without having to reload the page
+  // handle added setGroup without having to reload the page
   const handleAddSetGroup = (setGroup: SetGroupWithExerciseAndSets) => {
     setSession((prev: any) => {
       return {
@@ -352,9 +350,11 @@ export default function Home({ params }: { params: { slug: string } }) {
       </div>
 
       {/* unless session is locked */}
-      <div className='flex flex-col'>
+      <div className='mt-8 flex flex-col space-y-4 w-full items-center'>
         <AddExerciseButton session={session} onSubmit={handleAddSetGroup} />
         <Button
+          variant='secondary'
+          className='w-fit'
           onClick={async () => {
             await updateSession({ id: session.id, completed: true })
             router.push('/app/workout')

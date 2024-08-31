@@ -15,7 +15,7 @@ export default function AddExerciseButton({
     <>
       {session && (
         <PickExerciseDrawer sessionId={session.id} onSubmit={onSubmit}>
-          <Button>Add Exercise</Button>
+          <Button className='w-fit'>Add Exercise</Button>
         </PickExerciseDrawer>
       )}
     </>
