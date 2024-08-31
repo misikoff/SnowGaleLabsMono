@@ -3,13 +3,18 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { UserButton } from '@clerk/clerk-react'
-import { Disclosure } from '@headlessui/react'
+import { SignedIn, SignOutButton, UserButton, UserProfile } from '@clerk/nextjs'
+import {
+  Disclosure,
+  DisclosureButton,
+  DisclosurePanel,
+} from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { clsx } from 'clsx'
 import { motion } from 'framer-motion'
 import { ChevronLeft } from 'lucide-react'
 
+import { Button } from '@/components/ui/button'
 import Logo from 'public/icon.png'
 
 type NavigationItem = {
@@ -77,7 +82,7 @@ export default function Navbar({ className = '' }) {
             <>
               <div className='mx-auto max-w-7xl px-4 sm:px-6 md:mx-0 lg:px-8'>
                 <div className='flex h-16 justify-between'>
-                  <div className='flex'>
+                  <div className='flex items-center justify-between w-full'>
                     <div className='flex items-center'>
                       {enableBack ? (
                         <Link href={backRoute}>
@@ -98,6 +103,7 @@ export default function Navbar({ className = '' }) {
                               <span className='text-lg font-bold text-gray-600 transition-colors duration-200 group-hover:text-blue-500'>
                                 centurion
                               </span>
+
                               {hoverBar('/')}
                             </div>
                           </div>
@@ -105,7 +111,6 @@ export default function Navbar({ className = '' }) {
                       )}
                     </div>
                     <div className='hidden items-center sm:-my-px sm:ml-6 sm:flex sm:space-x-8 md:flex'>
-                      <UserButton afterSignOutUrl='/' />
                       {navigation.map((item) => (
                         <div className='group' key={item.name}>
                           <Link
@@ -124,11 +129,20 @@ export default function Navbar({ className = '' }) {
                         </div>
                       ))}
                     </div>
+
+                    <SignedIn>
+                      <div className='flex space-x-4'>
+                        <UserButton />
+                        <SignOutButton>
+                          <Button>Sign Out</Button>
+                        </SignOutButton>
+                      </div>
+                    </SignedIn>
                   </div>
 
                   <div className='-mr-2 flex items-center sm:hidden'>
                     {/* Mobile menu button */}
-                    <Disclosure.Button className='inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'>
+                    <DisclosureButton className='inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'>
                       <span className='sr-only'>Open main menu</span>
                       {open ? (
                         <XMarkIcon
@@ -141,15 +155,15 @@ export default function Navbar({ className = '' }) {
                           aria-hidden='true'
                         />
                       )}
-                    </Disclosure.Button>
+                    </DisclosureButton>
                   </div>
                 </div>
               </div>
 
-              <Disclosure.Panel className='sm:hidden'>
+              <DisclosurePanel className='sm:hidden'>
                 <div className='space-y-1 pb-3 pt-2'>
                   {navigation.map((item) => (
-                    <Disclosure.Button
+                    <DisclosureButton
                       key={item.name}
                       as='a'
                       href={item.href}
@@ -162,10 +176,10 @@ export default function Navbar({ className = '' }) {
                       aria-current={item.current ? 'page' : undefined}
                     >
                       {item.name}
-                    </Disclosure.Button>
+                    </DisclosureButton>
                   ))}
                 </div>
-              </Disclosure.Panel>
+              </DisclosurePanel>
             </>
           )}
         </Disclosure>

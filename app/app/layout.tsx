@@ -1,3 +1,5 @@
+import { RedirectToSignIn, SignedOut } from '@clerk/nextjs'
+
 import Footer from './footer'
 
 export const metadata = {
@@ -13,6 +15,9 @@ export default function RootLayout({
   return (
     <>
       <div>{children}</div>
+      <SignedOut>
+        <RedirectToSignIn />
+      </SignedOut>
       <Footer className='fixed h-24 bg-blue-200 bottom-0 w-full left-0 right-0 rounded-t-xl shadow dark:bg-gray-800' />
     </>
   )
