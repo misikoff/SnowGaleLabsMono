@@ -12,7 +12,7 @@ export default function CreateSessionButton() {
       onClick={async () => {
         const newSessionId = await createSession({})
         if (newSessionId) {
-          router.push(`workout/${newSessionId}`)
+          router.push(`session/${newSessionId}`)
         }
       }}
     >

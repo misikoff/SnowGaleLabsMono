@@ -74,7 +74,7 @@ export default function Home() {
               href={`/app/session/${session.id}/preview`}
               className={clsx(
                 'group-hover:text-gray-700 w-full flex justify-between  text-xl items-center transition-colors duration-150',
-                // workout.completed ? 'text-gray-600' : 'text-gray-800',
+                // session.completed ? 'text-gray-600' : 'text-gray-800',
               )}
             >
               <div>{session.name}</div>

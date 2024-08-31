@@ -173,7 +173,7 @@ export default function PerformanceButton({
           </div>
         </div>
         <div className='flex w-full gap-x-4'>
-          <SheetClose className='w-full'>
+          <SheetClose asChild className='w-full'>
             <Button
               onClick={clear}
               className='justify-self-end w-full uppercase font-mono text-gray-400'
@@ -181,7 +181,7 @@ export default function PerformanceButton({
               Clear
             </Button>
           </SheetClose>
-          <SheetClose className='w-full'>
+          <SheetClose asChild className='w-full'>
             <Button
               onClick={save}
               className='justify-self-end w-full uppercase font-mono text-white bg-green-400'

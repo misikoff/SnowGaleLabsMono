@@ -32,8 +32,6 @@ export default function SwapButton({
     async function fetchData() {
       const exs = await getExercises()
       setExercises(exs)
-      console.log({ exs })
-      console.log({ setEx: setGroup.exerciseId })
       const ex = exs.find((e) => {
         return e.id === setGroup.exerciseId
       })

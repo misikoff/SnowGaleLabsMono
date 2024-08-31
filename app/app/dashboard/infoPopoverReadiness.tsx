@@ -81,7 +81,7 @@ export default function InfoPopoverReadiness({ children }: { children: any }) {
             If you{"'"}re consistently at or higher than 20 after your second
             block (i.e. the system has recalibrated your full lifter profile)
             then review your RPEs ratings and maxes as they may be too light. If
-            you simply want easier workouts then stay as you are.
+            you simply want easier sessions then stay as you are.
           </li>
           <li>
             If you{"'"}re below 10 you are likely heavily fatigued and should

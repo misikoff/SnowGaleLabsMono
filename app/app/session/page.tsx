@@ -25,7 +25,7 @@ export default function SessionPage() {
     <div>
       <h1>Sessions</h1>
       <CreateSessionButton />
-      {/* list all the most recent workouts or scheduled workouts here */}
+      {/* list all the most recent sessions or scheduled sessions here */}
       <div className='flex flex-col space-y-4'>
         {sessions.map((s) => (
           <div key={`session-${s.id}`} className='flex space-x-4 items-center'>

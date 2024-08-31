@@ -22,8 +22,8 @@ import AddExerciseButton from './addExerciseButton'
 //   preferredUnits: 'lbs',
 // }
 
-// const workout = {
-//   name: 'Workout 1',
+// const session = {
+//   name: 'Session 1',
 //   exercises: [
 //     {
 //       name: 'Squat',
@@ -360,7 +360,7 @@ export default function Home({ params }: { params: { slug: string } }) {
             router.push('/app/session')
           }}
         >
-          Finish Workout
+          Finish Session
         </Button>
       </div>
     </div>

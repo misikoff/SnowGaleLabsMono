@@ -13,6 +13,7 @@ export default function RemoveSetButton({
 }) {
   return (
     <Button
+      variant='destructive'
       onClick={async () => {
         const deletedSet = await deleteSet(set.id)
         console.log({ deletedSet })

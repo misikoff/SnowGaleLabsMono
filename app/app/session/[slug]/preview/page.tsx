@@ -13,8 +13,8 @@ import { SessionWithSetGroupWithExerciseAndSets } from 'db/schema'
 // //   preferredUnits: 'lbs',
 // // }
 
-// const workout = {
-//   name: 'Workout 1',
+// const session = {
+//   name: 'Session 1',
 //   id: '1',
 //   exercises: [
 //     {

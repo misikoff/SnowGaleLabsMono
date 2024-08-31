@@ -13,6 +13,7 @@ export default function RemoveSetGroupButton({
 }) {
   return (
     <Button
+      variant='destructive'
       onClick={async () => {
         const deletedSetGroup = await deleteSetGroup(setGroup.id)
         console.log({ deletedSetGroup })
