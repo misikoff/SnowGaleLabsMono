@@ -362,7 +362,10 @@ export async function deleteSet(id: Set['id']) {
 
 export async function getSessions() {
   noStore()
-  return await db.select().from(sessions)
+  return await db
+    .select()
+    .from(sessions)
+    .where(eq(sessions.userId, await currentUserId()))
 }
 
 export async function updateSet({

@@ -10,7 +10,7 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
-  // SheetDescription,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -28,18 +28,30 @@ export default function PerformanceButton({
   onSubmit?: (set: Set) => void
 }) {
   const [open, setOpen] = useState(false)
-  const [weightValue, setWeightValue] = useState(set.weight ?? 0)
-  const [repValue, setRepValue] = useState(set.reps ?? 0)
+  const [weightValue, setWeightValue] = useState(
+    set.weight ?? set.prescribedWeight ?? 0,
+  )
+  const [repValue, setRepValue] = useState(set.reps ?? set.prescribedReps ?? 0)
   // TODO: handle other dififculty methodologies, like RIR
-  const [difficultyValue, setDifficultyValue] = useState(set.RPE ?? 5)
-
+  const [difficultyValue, setDifficultyValue] = useState(
+    set.RPE ?? set.prescribedRPE ?? 5,
+  )
+  console.log({ set })
   useEffect(() => {
     if (!open) {
-      setWeightValue(set.weight ?? 0)
-      setRepValue(set.reps ?? 0)
-      setDifficultyValue(set.RPE ?? 5)
+      setWeightValue(set.weight ?? set.prescribedWeight ?? 0)
+      setRepValue(set.reps ?? set.prescribedReps ?? 0)
+      setDifficultyValue(set.RPE ?? set.prescribedRPE ?? 5)
     }
-  }, [open, set.RPE, set.reps, set.weight])
+  }, [
+    open,
+    set.RPE,
+    set.prescribedRPE,
+    set.prescribedReps,
+    set.prescribedWeight,
+    set.reps,
+    set.weight,
+  ])
 
   const weightAdjustment = 5
   function decrementWeight() {
@@ -121,11 +133,9 @@ export default function PerformanceButton({
       <SheetContent side='bottom'>
         <SheetHeader>
           <SheetTitle>Performance</SheetTitle>
-          {/* <SheetDescription>
-          This action cannot be undone. This will permanently
-          delete your account and remove your data from our
-          servers.
-        </SheetDescription> */}
+          <SheetDescription>
+            This is where you input the results of your set.
+          </SheetDescription>
         </SheetHeader>
         <div className='py-4'>
           <div className='flex flex-col'>
@@ -174,20 +184,12 @@ export default function PerformanceButton({
         </div>
         <div className='flex w-full gap-x-4'>
           <SheetClose asChild className='w-full'>
-            <Button
-              onClick={clear}
-              className='justify-self-end w-full uppercase font-mono text-gray-400'
-            >
+            <Button variant='destructive' onClick={clear}>
               Clear
             </Button>
           </SheetClose>
           <SheetClose asChild className='w-full'>
-            <Button
-              onClick={save}
-              className='justify-self-end w-full uppercase font-mono text-white bg-green-400'
-            >
-              Done
-            </Button>
+            <Button onClick={save}>Done</Button>
           </SheetClose>
         </div>
       </SheetContent>

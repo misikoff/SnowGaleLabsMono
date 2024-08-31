@@ -17,6 +17,10 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang='en'>
+        <meta
+          name='viewport'
+          content='width=device-width, initial-scale=1, maximum-scale=1'
+        />
         <body className='flex min-h-screen overflow-x-hidden flex-col bg-white'>
           <Navbar />
           <main className='flex-grow p-4 mb-24 mt-24'>{children}</main>

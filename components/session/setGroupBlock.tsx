@@ -11,6 +11,24 @@ import RemoveSetButton from './removeSetButton'
 import RemoveSetGroupButton from './removeSetGroupButton'
 import SwapButton from './swapPopover'
 
+function getSetLabel(set: Set) {
+  if (set.prescribedWeight && set.prescribedReps && set.prescribedRPE) {
+    return `${set.prescribedWeight}# x ${set.prescribedReps} @ RPE ${set.prescribedRPE}`
+  } else if (set.prescribedWeight && set.prescribedReps) {
+    return `${set.prescribedWeight}# x ${set.prescribedReps}`
+  } else if (set.prescribedWeight && set.prescribedRPE) {
+    return `${set.prescribedWeight}# @ RPE ${set.prescribedRPE}`
+  } else if (set.prescribedReps && set.prescribedRPE) {
+    return `${set.prescribedReps} @ RPE ${set.prescribedRPE}`
+  } else if (set.prescribedWeight) {
+    return `${set.prescribedWeight}#`
+  } else if (set.prescribedReps) {
+    return `${set.prescribedReps} reps`
+  } else if (set.prescribedRPE) {
+    return `RPE ${set.prescribedRPE}`
+  }
+}
+
 export default function SetGroupBlock({
   className = '',
   setGroup,
@@ -54,9 +72,9 @@ export default function SetGroupBlock({
               <span className='flex h-8 w-8 flex-shrink-0 items-center text-blue-400 justify-center rounded-full border-2 bg-black border-black'>
                 <span className='text-indigo-600'>{index + 1}</span>
               </span>
-              {set.prescribedWeight} x {set.prescribedReps}
+              {getSetLabel(set)}
               <br />
-              {set.weight !== 0 && set.reps !== 0 && set.RPE !== 0 && (
+              {set.weight && set.reps && set.RPE && (
                 <>
                   Performed {set.weight} x {set.reps} @ RPE {set.RPE}
                 </>
