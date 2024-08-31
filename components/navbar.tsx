@@ -33,8 +33,8 @@ export default function Navbar({ className = '' }) {
 
   const enableBack = pathname.split('/').length > 2
   let backRoute = pathname.split('/').slice(0, -1).join('/')
-  // handle workout pages
-  if (pathname.startsWith('/workout')) {
+  // handle session pages
+  if (pathname.startsWith('/session')) {
     if (pathname.endsWith('/preview')) {
       backRoute = '/dashboard'
     } else if (pathname.endsWith('/check-in')) {

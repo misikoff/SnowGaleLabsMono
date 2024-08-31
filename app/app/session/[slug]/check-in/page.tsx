@@ -62,8 +62,8 @@ const bodyQuestions: question[] = [
   },
 ]
 
-const workout = {
-  name: 'Workout 1',
+const session = {
+  name: 'Session 1',
   id: '1',
   exercises: [
     {
@@ -152,7 +152,7 @@ const workout = {
 export default function Home() {
   return (
     <div>
-      <div>{workout.name}</div>
+      <div>{session.name}</div>
 
       <div className='flex flex-col gap-y-4'>
         {generalQuestions.map((question) => (
@@ -171,10 +171,10 @@ export default function Home() {
         ))}
       </div>
       <Link
-        href={`/app/workout/${workout.id}`}
+        href={`/app/session/${session.id}`}
         className='flex gap-3 bg-green-400 rounded-md'
       >
-        Start Workout <ArrowRightIcon />
+        Start Session <ArrowRightIcon />
       </Link>
     </div>
   )

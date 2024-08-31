@@ -6,8 +6,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ArrowDownNarrowWide, ArrowUpNarrowWide } from 'lucide-react'
 
+import SetGroupBlock from 'components/session/setGroupBlock'
 import { Button } from 'components/ui/button'
-import SetGroupBlock from 'components/workout/setGroupBlock'
 import {
   deleteSession,
   getSession,
@@ -232,7 +232,7 @@ export default function Home({ params }: { params: { slug: string } }) {
         onClick={async () => {
           // TODO add confirmation
           await deleteSession(session.id)
-          router.push('/app/workout')
+          router.push('/app/session')
         }}
       >
         Delete Session
@@ -357,7 +357,7 @@ export default function Home({ params }: { params: { slug: string } }) {
           className='w-fit'
           onClick={async () => {
             await updateSession({ id: session.id, completed: true })
-            router.push('/app/workout')
+            router.push('/app/session')
           }}
         >
           Finish Workout

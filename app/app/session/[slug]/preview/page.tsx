@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRightIcon } from 'lucide-react'
 
-import SetGroupBlock from 'components/workout/setGroupBlock'
+import SetGroupBlock from '@/components/session/setGroupBlock'
 import { getSession } from 'app/app/actions'
 import { SessionWithSetGroupWithExerciseAndSets } from 'db/schema'
 
@@ -118,7 +118,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     <div>
       <div>{session?.name}</div>
       <Link
-        href={`/app/workout/${session?.id}/check-in`}
+        href={`/app/session/${session?.id}/check-in`}
         className='flex gap-3 bg-green-400 rounded-md'
       >
         Start Training <ArrowRightIcon />

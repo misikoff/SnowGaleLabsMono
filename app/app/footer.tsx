@@ -8,7 +8,7 @@ import { AxeIcon, CogIcon, DnaIcon, GemIcon } from 'lucide-react'
 
 const navigation = [
   { name: 'Dashboard', href: '/app/dashboard', icon: AxeIcon, current: false },
-  { name: 'Workout', href: '/app/workout', icon: GemIcon, current: false },
+  { name: 'Session', href: '/app/session', icon: GemIcon, current: false },
   { name: 'History', href: '/app//history', icon: DnaIcon, current: false },
   { name: 'Tools', href: '/app//tools', icon: CogIcon, current: false },
 ]

@@ -11,7 +11,7 @@ import { Session } from 'db/schema'
 
 import CreateSessionButton from './createSessionButton'
 
-export default function Workout() {
+export default function SessionPage() {
   const [sessions, setSessions] = useState<Session[]>([])
   useEffect(() => {
     async function setData() {
@@ -23,16 +23,16 @@ export default function Workout() {
 
   return (
     <div>
-      <h1>Workouts</h1>
+      <h1>Sessions</h1>
       <CreateSessionButton />
       {/* list all the most recent workouts or scheduled workouts here */}
-      <div className='flex flex-col'>
+      <div className='flex flex-col space-y-4'>
         {sessions.map((s) => (
-          <div key={`session-${s.id}`} className='flex space-x-4'>
-            <Link href={`workout/${s.id}`} className='block'>
+          <div key={`session-${s.id}`} className='flex space-x-4 items-center'>
+            <Link href={`session/${s.id}`} className='block'>
               {s.id}
             </Link>
-            {s.completed && <Badge>complete</Badge>}
+            {s.completed && <Badge variant='outline'>complete</Badge>}
             <Button
               onClick={async () => {
                 await deleteSession(s.id)
