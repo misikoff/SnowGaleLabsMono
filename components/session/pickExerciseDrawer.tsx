@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Button } from 'components/ui/button'
 import {
@@ -17,6 +17,14 @@ import { createSet, createSetGroup, getExercises } from 'app/app/actions'
 import { Exercise, Session, SetGroupWithExerciseAndSets } from 'db/schema'
 
 import ExerciseSuperScroller from './exerciseSuperScroller'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTrigger,
+} from '../ui/dialog'
 import SuperScroller from '../ui/superScroller'
 
 export default function PickExerciseDrawer({
@@ -49,13 +57,13 @@ export default function PickExerciseDrawer({
   }, [open])
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>{children}</DrawerTrigger>
-      <DrawerContent>
-        <DrawerHeader>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
           <DrawerTitle>Pick Exercise</DrawerTitle>
           <DrawerDescription>This is the exercise to pick</DrawerDescription>
-        </DrawerHeader>
+        </DialogHeader>
         <ExerciseSuperScroller
           options={exercises}
           onSelect={(exerciseId: string) => {
@@ -66,7 +74,7 @@ export default function PickExerciseDrawer({
             )
           }}
         />
-        <DrawerFooter>
+        <DialogFooter>
           <div className='flex w-full space-x-4'>
             <Button
               disabled={!selectedExercise}
@@ -99,14 +107,14 @@ export default function PickExerciseDrawer({
             >
               Add {selectedExercise?.name}
             </Button>
-            <DrawerClose asChild>
+            <DialogClose asChild>
               <Button variant='outline' className='w-full'>
                 Cancel
               </Button>
-            </DrawerClose>
+            </DialogClose>
           </div>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

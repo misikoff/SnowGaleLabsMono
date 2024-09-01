@@ -133,7 +133,7 @@ export default function ExerciseSuperScroller({
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           aria-label='Search exercises'
-          className='w-full'
+          className='w-full text-lg'
         />
       </div>
       <div className='flex flex-1 overflow-hidden'>
