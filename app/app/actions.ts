@@ -36,19 +36,26 @@ const currentUserId = async () => {
   return user.id
 }
 
-export async function createUser() {
-  const clerkUser = await currentUser()
-
-  // store the user in the main database
-  await db.insert(users).values({
-    name: clerkUser?.fullName,
-    clerkId: clerkUser?.id || '',
-  })
+export async function createUser(clerkId: User['clerkId'], name: User['name']) {
+  return await db
+    .insert(users)
+    .values({
+      name: name,
+      clerkId: clerkId,
+    })
+    .returning()
 }
 
-export async function deleteUser(id: User['id']) {
-  noStore()
-  await db.delete(users).where(eq(users.id, id))
+export async function deleteUser(clerkId: User['clerkId']) {
+  return await db.delete(users).where(eq(users.clerkId, clerkId as string))
+}
+
+export async function updateUser(clerkId: User['clerkId'], name: User['name']) {
+  return await db
+    .update(users)
+    .set({ name })
+    .where(eq(users.clerkId, clerkId as string))
+    .returning()
 }
 
 export async function getUsers() {

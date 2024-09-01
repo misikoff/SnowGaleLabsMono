@@ -143,7 +143,9 @@ export default function ExerciseSuperScroller({
               const exercisesForLetter = filteredExercises.filter(
                 (exercise) => exercise.letter === letter,
               )
-              if (exercisesForLetter.length === 0) return null
+              if (exercisesForLetter.length === 0) {
+                return null
+              }
               return (
                 <div key={letter} id={letter}>
                   <div className='sticky top-0 bg-background px-4 py-1 text-sm font-semibold'>

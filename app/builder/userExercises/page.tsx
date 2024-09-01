@@ -33,14 +33,6 @@ export default function Home() {
         value={userName}
       />
       {userName}
-      <Button
-        onClick={async () => {
-          await createUser()
-          setUsers((await getUsers()) as any)
-        }}
-      >
-        create user
-      </Button>
 
       {users.map((u) => (
         <div key={u.name}>{u.name}</div>
