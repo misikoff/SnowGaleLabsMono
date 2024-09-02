@@ -29,6 +29,13 @@
       "when": 1725117872413,
       "tag": "0003_smooth_cassandra_nova",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1725306356675,
+      "tag": "0004_next_maverick",
+      "breakpoints": true
     }
   ]
 }

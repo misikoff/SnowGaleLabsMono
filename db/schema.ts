@@ -39,6 +39,7 @@ export const users = pgTable(
       .notNull()
       .defaultNow()
       .$onUpdate(() => new Date()),
+    prod: boolean('prod').default(false),
   },
   (table) => ({
     clerkIdIndex: index('clerk_id_idx').on(table.clerkId),

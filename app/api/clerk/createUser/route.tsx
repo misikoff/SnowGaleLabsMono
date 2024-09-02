@@ -20,7 +20,10 @@ export async function POST(request: Request) {
   }
   const name = [data.first_name, data.last_name].join(' ')
 
-  const user = await createUser(id, name)
+  // This is a custom header that we added to the webhook in Clerk
+  const prod = request.headers.get('prod') === 'true'
+
+  const user = await createUser(id, name, prod)
   console.log({ user })
   if (!user) {
     return new Response('Failed to create user', { status: 500 })

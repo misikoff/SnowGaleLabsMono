@@ -36,12 +36,17 @@ const currentUserId = async () => {
   return user.id
 }
 
-export async function createUser(clerkId: User['clerkId'], name: User['name']) {
+export async function createUser(
+  clerkId: User['clerkId'],
+  name: User['name'],
+  prod: User['prod'],
+) {
   return await db
     .insert(users)
     .values({
-      name: name,
-      clerkId: clerkId,
+      name,
+      clerkId,
+      prod,
     })
     .returning()
 }
