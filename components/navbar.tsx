@@ -90,7 +90,7 @@ export default function Navbar({ className = '' }) {
                         </Link>
                       ) : (
                         <Link href='/' className='group flex flex-shrink-0'>
-                          <div className='flex space-x-2'>
+                          <div className='flex space-x-2 items-center'>
                             <Image
                               className='block h-8 w-auto'
                               src={Logo}
@@ -106,6 +106,17 @@ export default function Navbar({ className = '' }) {
 
                               {hoverBar('/')}
                             </div>
+
+                            {process.env.NEXT_PUBLIC_VERCEL_ENV ===
+                            'production' ? (
+                              <div className='font-bold bg-green-400 rounded-md p-2'>
+                                prod
+                              </div>
+                            ) : (
+                              <div className='font-bold bg-red-400 rounded-md p-2'>
+                                preview
+                              </div>
+                            )}
                           </div>
                         </Link>
                       )}
