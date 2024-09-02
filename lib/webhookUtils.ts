@@ -1,0 +1,16 @@
+import { headers } from 'next/headers'
+import { WebhookEvent } from '@clerk/nextjs/server'
+import { Webhook } from 'svix'
+
+export async function validateRequest(request: Request, webhookSecret: string) {
+  const payloadString = await request.text()
+  const headerPayload = headers()
+
+  const svixHeaders = {
+    'svix-id': headerPayload.get('svix-id')!,
+    'svix-timestamp': headerPayload.get('svix-timestamp')!,
+    'svix-signature': headerPayload.get('svix-signature')!,
+  }
+  const wh = new Webhook(webhookSecret)
+  return wh.verify(payloadString, svixHeaders) as WebhookEvent
+}

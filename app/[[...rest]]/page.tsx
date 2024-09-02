@@ -29,7 +29,7 @@ export default function Home() {
       <div className='mt-12 text-4xl text-blue-400 font-bold font-serif'>
         Centurion
       </div>
-      <div className='mt-12 text-3xl text-gray-900 font-mono'>
+      <div className='mt-12 text-3xl text-gray-900 font-mono text-center'>
         Open Source Exercise
       </div>
 

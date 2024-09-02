@@ -1,9 +1,15 @@
 import { UserJSON, UserWebhookEvent } from '@clerk/nextjs/server'
 
 import { updateUser } from '@/app/app/actions'
+import { validateRequest } from '@/lib/webhookUtils'
+
+const webhookSecret = process.env.CLERK_WEBHOOK_SECRET_DELETE_USER || ``
 
 export async function POST(request: Request) {
-  const payload: UserWebhookEvent = await request.json()
+  const payload = (await validateRequest(
+    request,
+    webhookSecret,
+  )) as UserWebhookEvent
   console.log(payload)
   const data = payload.data as UserJSON
 
