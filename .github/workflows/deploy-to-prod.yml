@@ -1,0 +1,62 @@
+name: 'Deploy To Production'
+
+on:
+  workflow_dispatch
+
+jobs:
+  deploy-prod:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Sync prod branch with main
+        run: |
+          git checkout prod -f && git reset --hard origin/main && git push -f origin prod
+
+  update-version:
+    needs: deploy-prod
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - id: fetch
+        uses: pozetroninc/github-action-get-latest-release@v0.8.0
+        with:
+          repository: ${{ github.repository }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - id: determine
+        env:
+          release: ${{ steps.fetch.outputs.release }}
+        run: |
+          # Get current date in YYYY.MM.DD format
+          current_date=$(date +%Y.%m.%d)
+
+          # Extract the date and number from the input string
+          input_date=$(echo "$release" | cut -d'-' -f1 | cut -d'v' -f2)
+          input_number=$(echo "$release" | cut -d'-' -f2)
+
+          # Compare the input date with the current date
+          if [ "$input_date" == "$current_date" ]; then
+              # Increment the input number
+              input_number=$((10#${input_number} + 1))
+
+              echo $input_number
+
+              # Pad the input number to three digits with leading zeros
+              padded_input_number=$(printf "%03d" $input_number)
+
+              # Create the updated version string
+              next_version_string="v$input_date-$padded_input_number"
+              echo "The input string has the same date as the current date."
+              echo "The new string is: $next_version_string"
+          else
+              echo "The input string does not have the same date as the current date."
+              next_version_string="v$current_date-001"
+              echo "The new string is: $next_version_string"
+          fi
+          echo "version_string=$next_version_string" >> "$GITHUB_OUTPUT"
+      - uses: ncipollo/release-action@v1
+        with:
+          name: ${{steps.determine.outputs.version_string}}
+          tag: ${{steps.determine.outputs.version_string}}
