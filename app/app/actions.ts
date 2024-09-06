@@ -373,6 +373,7 @@ export async function deleteSet(id: Set['id']) {
 }
 
 export async function getSessions() {
+  console.log('getting sessions')
   noStore()
   return await db
     .select()
