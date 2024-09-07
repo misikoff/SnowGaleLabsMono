@@ -6,6 +6,7 @@ import { ArrowDownNarrowWide, ArrowUpNarrowWide } from 'lucide-react'
 
 import SetGroupBlock from 'components/session/setGroupBlock'
 import { Button } from 'components/ui/button'
+import AddExerciseButtonDrawer from '@/components/session/addExerciseButtonDrawer'
 import {
   deleteSession,
   getSession,
@@ -257,7 +258,9 @@ export default function Home({ params }: { params: { slug: string } }) {
       <div className='mt-8 flex flex-col space-y-4 w-full items-center'>
         {session && (
           <>
-            <AddExerciseButton session={session} />
+            <AddExerciseButtonDrawer session={session}>
+              <Button className='w-fit'>Add Exercise</Button>
+            </AddExerciseButtonDrawer>
             <Button
               variant='secondary'
               className='w-fit'

@@ -9,6 +9,7 @@ import InfoPopoverExercise from './infoPopoverExercise'
 import PerformanceButton from './performancePopover'
 import RemoveSetButton from './removeSetButton'
 import RemoveSetGroupButton from './removeSetGroupButton'
+import SwapExerciseButtonDrawer from './swapExerciseButtonDrawer'
 import SwapButton from './swapPopover'
 
 function getSetLabel(set: Set) {
@@ -48,14 +49,14 @@ export default function SetGroupBlock({
     <div className={clsx(className, 'bg-gray-800 rounded-xl p-4')}>
       <div className='flex justify-between'>
         <div className='text-2xl text-white'>{setGroup.exercise.name}</div>
-        <div className='flex gap-x-3'>
+        <div className='flex gap-x-3 items-center'>
           <RemoveSetGroupButton setGroup={setGroup} />
           <InfoPopoverExercise exercise={setGroup.exercise}>
             <InfoIcon className='w-6 h-6 text-gray-400' />
           </InfoPopoverExercise>
-          <SwapButton setGroup={setGroup}>
-            <ArrowRightLeftIcon className='w-6 h-6 text-gray-400' />
-          </SwapButton>
+          <SwapExerciseButtonDrawer setGroup={setGroup}>
+            <ArrowRightLeftIcon className='hover:cursor-pointer w-6 h-6 text-gray-400' />
+          </SwapExerciseButtonDrawer>
         </div>
       </div>
       <div className='ml-1 mt-2 flex flex-col gap-y-2 mb-4'>

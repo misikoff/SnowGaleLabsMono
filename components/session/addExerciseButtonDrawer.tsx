@@ -16,12 +16,7 @@ import {
   // DrawerTrigger,
 } from 'components/ui/drawer'
 import { createSet, createSetGroup, getExercises } from 'app/app/actions'
-import {
-  Exercise,
-  Session,
-  SessionWithSetGroupWithExerciseAndSets,
-  SetGroupWithExerciseAndSets,
-} from 'db/schema'
+import { Exercise, SessionWithSetGroupWithExerciseAndSets } from 'db/schema'
 
 import ExerciseSuperScroller from './exerciseSuperScroller'
 import {
@@ -33,7 +28,7 @@ import {
   DialogTrigger,
 } from '../ui/dialog'
 
-export default function PickExerciseDrawer({
+export default function AddExerciseButtonDrawer({
   session,
   children,
 }: {
@@ -76,7 +71,6 @@ export default function PickExerciseDrawer({
         order: nextOrder,
       }),
     onSuccess: async (newSetGroup) => {
-      console.log('session created')
       if (newSetGroup.length > 0) {
         // maybe useful for optimistic updates
         // const newSet =
