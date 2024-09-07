@@ -1,16 +1,17 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
+
 import { Button } from 'components/ui/button'
 import { deleteSetGroup } from 'app/app/actions'
 import { SetGroupWithExerciseAndSets } from 'db/schema'
 
 export default function RemoveSetGroupButton({
   setGroup,
-  onSetGroupRemoved,
 }: {
   setGroup: SetGroupWithExerciseAndSets
-  onSetGroupRemoved?: (id: string) => void
 }) {
+  const queryClient = useQueryClient()
   return (
     <Button
       variant='destructive'
@@ -18,9 +19,9 @@ export default function RemoveSetGroupButton({
         const deletedSetGroup = await deleteSetGroup(setGroup.id)
         console.log({ deletedSetGroup })
         if (deletedSetGroup.length > 0) {
-          if (onSetGroupRemoved) {
-            onSetGroupRemoved(deletedSetGroup[0].deletedId)
-          }
+          queryClient.invalidateQueries({
+            queryKey: ['session', setGroup.sessionId],
+          })
         }
       }}
     >

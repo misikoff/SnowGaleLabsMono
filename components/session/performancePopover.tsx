@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { MinusIcon, PlusIcon } from 'lucide-react'
 
 import AnimatedNumber from 'components/animatedNumber'
@@ -21,12 +22,12 @@ import { Set } from 'db/schema'
 export default function PerformanceButton({
   children,
   set,
-  onSubmit,
 }: {
   children: React.ReactNode
   set: Set
-  onSubmit?: (set: Set) => void
 }) {
+  const queryClient = useQueryClient()
+
   const [open, setOpen] = useState(false)
   const [weightValue, setWeightValue] = useState(
     set.weight ?? set.prescribedWeight ?? 0,
@@ -36,7 +37,6 @@ export default function PerformanceButton({
   const [difficultyValue, setDifficultyValue] = useState(
     set.RPE ?? set.prescribedRPE ?? 5,
   )
-  console.log({ set })
   useEffect(() => {
     if (!open) {
       setWeightValue(set.weight ?? set.prescribedWeight ?? 0)
@@ -98,17 +98,21 @@ export default function PerformanceButton({
     weight: number
     RPE: number
   }) => {
+    // currently this updates the last set in the group rather than the current one
     const newSet = await updateSet({
       id: set.id,
       reps,
       weight,
       RPE,
     })
-    if (onSubmit) {
-      if (newSet.length > 0) {
-        onSubmit(newSet[0])
-      }
+    // if (onSubmit) {
+    if (newSet.length > 0) {
+      // onSubmit(newSet[0])
+      queryClient.invalidateQueries({
+        queryKey: ['session', set.sessionId],
+      })
     }
+    // }
   }
 
   const save = async () => {

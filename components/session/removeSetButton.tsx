@@ -1,16 +1,14 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
+
 import { Button } from 'components/ui/button'
 import { deleteSet } from 'app/app/actions'
 import { Set } from 'db/schema'
 
-export default function RemoveSetButton({
-  set,
-  onSetRemoved,
-}: {
-  set: Set
-  onSetRemoved?: (id: string) => void
-}) {
+export default function RemoveSetButton({ set }: { set: Set }) {
+  const queryClient = useQueryClient()
+
   return (
     <Button
       variant='destructive'
@@ -18,9 +16,9 @@ export default function RemoveSetButton({
         const deletedSet = await deleteSet(set.id)
         console.log({ deletedSet })
         if (deletedSet.length > 0) {
-          if (onSetRemoved) {
-            onSetRemoved(deletedSet[0].deletedId)
-          }
+          queryClient.invalidateQueries({
+            queryKey: ['session', set.sessionId],
+          })
         }
       }}
     >

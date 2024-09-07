@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+
 import { Button } from 'components/ui/button'
 import {
   Sheet,
@@ -18,32 +20,36 @@ import { Exercise, SetGroupWithExerciseAndSets } from 'db/schema'
 export default function SwapButton({
   setGroup,
   children,
-  onSubmit,
 }: {
   setGroup: SetGroupWithExerciseAndSets
   children: any
-  onSubmit?: (setGroup: SetGroupWithExerciseAndSets) => void
 }) {
+  const queryClient = useQueryClient()
   const [open, setOpen] = useState(false)
-  const [exercises, setExercises] = useState<Exercise[]>([])
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>()
 
+  const {
+    data: exercises,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ['exercises'],
+    queryFn: () => getExercises(),
+  })
+
   useEffect(() => {
-    async function fetchData() {
-      const exs = await getExercises()
-      setExercises(exs)
-      const ex = exs.find((e) => {
+    if (exercises) {
+      const ex = exercises.find((e) => {
         return e.id === setGroup.exerciseId
       })
       if (ex) {
         setSelectedExercise(ex)
       }
     }
-    fetchData()
-  }, [setGroup.exerciseId])
+  }, [exercises, setGroup.exerciseId])
 
   useEffect(() => {
-    if (!open) {
+    if (!open && exercises) {
       setSelectedExercise(
         exercises.find((e) => {
           return e.id === setGroup.exerciseId
@@ -64,22 +70,27 @@ export default function SwapButton({
           servers.
         </SheetDescription> */}
         </SheetHeader>
-        <select
-          value={selectedExercise?.id}
-          onChange={(e) => {
-            setSelectedExercise(
-              exercises.find((exercise) => {
-                return exercise.id === e.target.value
-              }),
-            )
-          }}
-        >
-          {exercises.map((exercise) => (
-            <option key={exercise.id} value={exercise.id}>
-              {exercise.name}
-            </option>
-          ))}
-        </select>
+        {isLoading && <div>Loading...</div>}
+        {isError && <div>Error</div>}
+        {exercises && exercises.length === 0 && <div>No exercises</div>}
+        {exercises && exercises.length > 0 && (
+          <select
+            value={selectedExercise?.id}
+            onChange={(e) => {
+              setSelectedExercise(
+                exercises.find((exercise) => {
+                  return exercise.id === e.target.value
+                }),
+              )
+            }}
+          >
+            {exercises.map((exercise) => (
+              <option key={exercise.id} value={exercise.id}>
+                {exercise.name}
+              </option>
+            ))}
+          </select>
+        )}
 
         <div className='flex w-full gap-x-4'>
           <SheetClose className='w-full'>
@@ -93,6 +104,7 @@ export default function SwapButton({
                 const newSetGroup = await updateSetGroup({
                   id: setGroup.id,
                   exerciseId: selectedExercise?.id,
+                  order: setGroup.order,
                 })
                 if (newSetGroup.length > 0) {
                   // update exercise id of all sets
@@ -105,16 +117,15 @@ export default function SwapButton({
                     }),
                   )
                 }
-                const newSetGroupWithSetsAndExercise = {
-                  ...newSetGroup[0],
-                  exercise: selectedExercise,
-                  sets: setGroup.sets,
-                }
-                if (onSubmit) {
-                  onSubmit(
-                    newSetGroupWithSetsAndExercise as SetGroupWithExerciseAndSets,
-                  )
-                }
+                // maybe useful for optimistic updates
+                // const newSetGroupWithSetsAndExercise = {
+                //   ...newSetGroup[0],
+                //   exercise: selectedExercise,
+                //   sets: setGroup.sets,
+                // }
+                queryClient.invalidateQueries({
+                  queryKey: ['session', setGroup.sessionId],
+                })
               }}
               className='justify-self-end w-full uppercase font-mono text-white bg-green-400'
             >

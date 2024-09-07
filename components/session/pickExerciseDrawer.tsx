@@ -2,19 +2,26 @@
 
 import { useEffect, useState } from 'react'
 
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
 import { Button } from 'components/ui/button'
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
+  // Drawer,
+  // DrawerClose,
+  // DrawerContent,
   DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
+  // DrawerFooter,
+  // DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
+  // DrawerTrigger,
 } from 'components/ui/drawer'
 import { createSet, createSetGroup, getExercises } from 'app/app/actions'
-import { Exercise, Session, SetGroupWithExerciseAndSets } from 'db/schema'
+import {
+  Exercise,
+  Session,
+  SessionWithSetGroupWithExerciseAndSets,
+  SetGroupWithExerciseAndSets,
+} from 'db/schema'
 
 import ExerciseSuperScroller from './exerciseSuperScroller'
 import {
@@ -25,30 +32,70 @@ import {
   DialogHeader,
   DialogTrigger,
 } from '../ui/dialog'
-import SuperScroller from '../ui/superScroller'
 
 export default function PickExerciseDrawer({
-  sessionId,
-  onSubmit,
+  session,
   children,
 }: {
-  sessionId: Session['id']
-  onSubmit?: (setGroup: SetGroupWithExerciseAndSets) => void
+  session: SessionWithSetGroupWithExerciseAndSets
   children: React.ReactNode
 }) {
+  const queryClient = useQueryClient()
   const [open, setOpen] = useState(false)
-  const [exercises, setExercises] = useState<Exercise[]>([])
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>()
+  const [nextOrder, setNextOrder] = useState(0)
+  const {
+    data: exercises,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ['exercises'],
+    queryFn: () => getExercises(),
+  })
 
   useEffect(() => {
-    async function fetchData() {
-      const exs = await getExercises()
-      setExercises(exs)
-      console.log({ exs })
-      setSelectedExercise(exs[0])
+    if (session) {
+      let newMax =
+        session.setGroups.length > 0
+          ? Math.max(
+              ...session.setGroups.map((setGroup) => setGroup.order || 0),
+            ) + 1
+          : 0
+
+      setNextOrder(newMax)
     }
-    fetchData()
-  }, [])
+  }, [session])
+
+  console.log({ nextOrder })
+
+  const createSetGroupMutation = useMutation({
+    mutationFn: () =>
+      createSetGroup({
+        exerciseId: selectedExercise?.id,
+        sessionId: session.id,
+        order: nextOrder,
+      }),
+    onSuccess: async (newSetGroup) => {
+      console.log('session created')
+      if (newSetGroup.length > 0) {
+        // maybe useful for optimistic updates
+        // const newSet =
+        await createSet({
+          exerciseId: selectedExercise?.id || '',
+          sessionId: session.id,
+          setGroupId: newSetGroup[0].id,
+        })
+        // maybe useful for optimistic updates
+        // const extendedSetGroup: SetGroupWithExerciseAndSets = {
+        //   ...newSetGroup[0],
+        //   exercise: selectedExercise,
+        //   sets: newSet,
+        // }
+      }
+      queryClient.invalidateQueries({ queryKey: ['session', session.id] })
+      setOpen(false)
+    },
+  })
 
   useEffect(() => {
     if (!open) {
@@ -64,44 +111,30 @@ export default function PickExerciseDrawer({
           <DrawerTitle>Pick Exercise</DrawerTitle>
           <DrawerDescription>This is the exercise to pick</DrawerDescription>
         </DialogHeader>
-        <ExerciseSuperScroller
-          options={exercises}
-          onSelect={(exerciseId: string) => {
-            setSelectedExercise(
-              exercises.find((e) => {
-                return e.id === exerciseId
-              }),
-            )
-          }}
-        />
+        {isLoading && <div>Loading...</div>}
+        {isError && <div>Error</div>}
+        {exercises && exercises.length === 0 && <div>No exercises</div>}
+        {exercises && exercises.length > 0 && (
+          <ExerciseSuperScroller
+            options={exercises}
+            onSelect={(exerciseId: string) => {
+              setSelectedExercise(
+                exercises.find((e) => {
+                  return e.id === exerciseId
+                }),
+              )
+            }}
+          />
+        )}
         <DialogFooter>
           <div className='flex w-full space-x-4'>
             <Button
               disabled={!selectedExercise}
               className='w-full'
               onClick={async () => {
-                console.log({ sessionId })
+                console.log({ sessionId: session.id })
                 if (selectedExercise) {
-                  const newSetGroup = await createSetGroup({
-                    exerciseId: selectedExercise?.id,
-                    sessionId,
-                  })
-                  if (newSetGroup.length > 0) {
-                    const newSet = await createSet({
-                      exerciseId: selectedExercise?.id,
-                      sessionId,
-                      setGroupId: newSetGroup[0].id,
-                    })
-                    const extendedSetGroup: SetGroupWithExerciseAndSets = {
-                      ...newSetGroup[0],
-                      exercise: selectedExercise,
-                      sets: newSet,
-                    }
-                    if (onSubmit) {
-                      onSubmit(extendedSetGroup)
-                    }
-                    setOpen(false)
-                  }
+                  createSetGroupMutation.mutateAsync()
                 }
               }}
             >
