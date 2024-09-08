@@ -1,7 +1,9 @@
+import { useMutationState } from '@tanstack/react-query'
 import clsx from 'clsx'
 import { InfoIcon, ArrowRightLeftIcon } from 'lucide-react'
 
 import { Button } from 'components/ui/button'
+import { createDummySet } from '@/lib/dummyFunctions'
 import { Set, SetGroupWithExerciseAndSets } from 'db/schema'
 
 import AddSetButton from './addSetButton'
@@ -10,7 +12,6 @@ import PerformanceButton from './performancePopover'
 import RemoveSetButton from './removeSetButton'
 import RemoveSetGroupButton from './removeSetGroupButton'
 import SwapExerciseButtonDrawer from './swapExerciseButtonDrawer'
-import SwapButton from './swapPopover'
 
 function getSetLabel(set: Set) {
   if (set.prescribedWeight && set.prescribedReps && set.prescribedRPE) {
@@ -43,7 +44,50 @@ export default function SetGroupBlock({
   setGroup: SetGroupWithExerciseAndSets
   locked?: boolean
 }) {
+  // access variables somewhere else
+  const mutationStates: any = useMutationState<string>({
+    filters: { mutationKey: ['addSet'], status: 'pending' },
+    select: (mutation) => mutation.state as any, //.variables,
+  })
+  console.log({ x: '', mutationStates })
+
   const firstEmptySetId = setGroup.sets.find((set) => isSetEmpty(set))?.id
+
+  function setRow(set: Set, index: number, isDummy = false) {
+    return (
+      <div
+        key={`${setGroup.id}-${index}`}
+        className={clsx(isDummy && 'animate-bounce')}
+      >
+        <div className='flex gap-x-2 items-center text-white'>
+          <div className='flex h-8 w-8 flex-shrink-0 items-center text-blue-400 justify-center rounded-full border-2 bg-black border-black'>
+            <span className='text-indigo-600'>{index + 1}</span>
+          </div>
+          <div className='flex'>{getSetLabel(set)}</div>
+          <br />
+          {set.weight && set.reps && set.RPE && (
+            <div>
+              Performed {set.weight} x {set.reps} @ RPE {set.RPE}
+            </div>
+          )}
+          {/* {getSetType(set)} */}
+          <div className='flex-grow' />
+          {setGroup.sets.length > 1 && <RemoveSetButton set={set} />}
+          <PerformanceButton set={set}>
+            <Button
+              disabled={isSetEmpty(set) && set.id !== firstEmptySetId}
+              className={clsx(
+                'justify-self-end rounded-full text-blue-400 disabled:opacity-50',
+                set.id === firstEmptySetId && 'animate-pulse',
+              )}
+            >
+              Performance
+            </Button>
+          </PerformanceButton>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={clsx(className, 'bg-gray-800 rounded-xl p-4')}>
@@ -59,37 +103,34 @@ export default function SetGroupBlock({
           </SwapExerciseButtonDrawer>
         </div>
       </div>
+
       <div className='ml-1 mt-2 flex flex-col gap-y-2 mb-4'>
-        {setGroup.sets.map((set: Set, index) => (
-          <div key={`${setGroup.id}-${index}`}>
-            <div className='flex gap-x-2 items-center text-white'>
-              <div className='flex h-8 w-8 flex-shrink-0 items-center text-blue-400 justify-center rounded-full border-2 bg-black border-black'>
-                <span className='text-indigo-600'>{index + 1}</span>
-              </div>
-              <div className='flex'>{getSetLabel(set)}</div>
-              <br />
-              {set.weight && set.reps && set.RPE && (
-                <div>
-                  Performed {set.weight} x {set.reps} @ RPE {set.RPE}
+        {setGroup.sets.map((set: Set, index) => setRow(set, index))}
+        {/* TODO better type for mutationState */}
+        {mutationStates
+          .filter((mutationState: any) => {
+            return mutationState.variables.setGroupId === setGroup.id
+          })
+          .map((mutationState: any, index: number) => {
+            if (mutationState.status === 'error') {
+              return (
+                <div key={index} className='text-red-500'>
+                  Error adding set
                 </div>
-              )}
-              {/* {getSetType(set)} */}
-              <div className='flex-grow' />
-              {setGroup.sets.length > 1 && <RemoveSetButton set={set} />}
-              <PerformanceButton set={set}>
-                <Button
-                  disabled={isSetEmpty(set) && set.id !== firstEmptySetId}
-                  className={clsx(
-                    'justify-self-end rounded-full text-blue-400 disabled:opacity-50',
-                    set.id === firstEmptySetId && 'animate-pulse',
-                  )}
-                >
-                  Performance
-                </Button>
-              </PerformanceButton>
-            </div>
-          </div>
-        ))}
+              )
+            }
+            if (mutationState.status === 'pending') {
+              console.log({ mutationState })
+              const dummySet = createDummySet(mutationState.variables)
+              console.log({ dummySet })
+              return (
+                // <div key={index} className='text-white'>
+                //   Adding set...{mutationState.variables}
+                // </div>
+                setRow(dummySet, index + setGroup.sets.length, true)
+              )
+            }
+          })}
       </div>
       {!locked && <AddSetButton setGroup={setGroup} />}
     </div>

@@ -61,8 +61,6 @@ export default function AddExerciseButtonDrawer({
     }
   }, [session])
 
-  console.log({ nextOrder })
-
   const createSetGroupMutation = useMutation({
     mutationFn: () =>
       createSetGroup({

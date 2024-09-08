@@ -339,31 +339,44 @@ export async function deleteSetGroup(id: SetGroup['id']) {
 
 // Set Functions
 export async function createSet({
+  id,
   order,
+  userId,
   programId,
   microcycleId,
   sessionId,
   exerciseId,
   setGroupId,
 }: {
+  id?: Set['id']
   order?: Set['order']
+  userId?: Set['userId']
   programId?: Set['programId']
   microcycleId?: Set['microcycleId']
   sessionId: Set['sessionId']
   exerciseId: Set['exerciseId']
   setGroupId: Set['setGroupId']
 }) {
+  // only chose to add user id to give function the same signature as the dummy function
+  // check that userId matches current user
+  if (userId && userId !== (await currentUserId())) {
+    throw new Error('UserId does not match current user')
+  }
+  if (!userId) {
+    userId = await currentUserId()
+  }
   noStore()
   return await db
     .insert(sets)
     .values({
+      id,
       programId,
       microcycleId,
       order,
       sessionId,
       exerciseId,
       setGroupId,
-      userId: await currentUserId(),
+      userId,
     })
     .returning()
 }

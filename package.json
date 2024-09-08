@@ -40,11 +40,13 @@
     "svix": "^1.32.0",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
+    "uuid": "^10.0.0",
     "vaul": "^0.9.2"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^19.4.1",
     "@types/react": "^18.3.5",
+    "@types/uuid": "^10.0.0",
     "autoprefixer": "^10.4.19",
     "commitlint": "^19.4.1",
     "drizzle-kit": "^0.24.2",

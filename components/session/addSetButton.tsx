@@ -1,10 +1,13 @@
 'use client'
 
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { v4 as uuidv4 } from 'uuid'
 
 import { Button } from 'components/ui/button'
 import { createSet } from 'app/app/actions'
 import { SetGroupWithExerciseAndSets } from 'db/schema'
+
+type createSetParams = Parameters<typeof createSet>[0]
 
 export default function AddSetButton({
   setGroup,
@@ -12,6 +15,30 @@ export default function AddSetButton({
   setGroup: SetGroupWithExerciseAndSets
 }) {
   const queryClient = useQueryClient()
+  const createSetMutation = useMutation({
+    mutationFn: ({
+      id,
+      order,
+      userId,
+      exerciseId,
+      sessionId,
+      setGroupId,
+    }: createSetParams) =>
+      createSet({
+        id,
+        order,
+        userId,
+        exerciseId,
+        sessionId,
+        setGroupId,
+      }),
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({
+        queryKey: ['session', setGroup.sessionId],
+      })
+    },
+    mutationKey: ['addSet'],
+  })
 
   const newMax =
     setGroup.sets.length > 0
@@ -20,19 +47,14 @@ export default function AddSetButton({
   return (
     <Button
       onClick={async () => {
-        const newSet = await createSet({
+        await createSetMutation.mutateAsync({
+          id: uuidv4(),
           order: newMax,
-          exerciseId: setGroup.exerciseId!, // TODO: figure out how to simplify
-          // setGroup exercise type is exerciseId: number | null instead of exerciseId: number | undefined
+          userId: setGroup.userId,
+          exerciseId: setGroup.exerciseId!,
           sessionId: setGroup.sessionId!,
           setGroupId: setGroup.id,
-          // TODO: better error handling if exercise or session is null
         })
-        if (newSet) {
-          queryClient.invalidateQueries({
-            queryKey: ['session', setGroup.sessionId],
-          })
-        }
       }}
     >
       Add Set
