@@ -385,7 +385,7 @@ export async function deleteSet(id: Set['id']) {
   noStore()
   return await db
     .delete(sets)
-    .where(eq(sets.id, id))
+    .where(and(eq(sets.id, id), eq(sets.userId, await currentUserId())))
     .returning({ deletedId: sets.id })
 }
 

@@ -1,9 +1,7 @@
-import { useMutationState } from '@tanstack/react-query'
 import clsx from 'clsx'
 import { InfoIcon, ArrowRightLeftIcon } from 'lucide-react'
 
 import { Button } from 'components/ui/button'
-import { createDummySet } from '@/lib/dummyFunctions'
 import { Set, SetGroupWithExerciseAndSets } from 'db/schema'
 
 import AddSetButton from './addSetButton'
@@ -44,13 +42,6 @@ export default function SetGroupBlock({
   setGroup: SetGroupWithExerciseAndSets
   locked?: boolean
 }) {
-  // access variables somewhere else
-  const mutationStates: any = useMutationState<string>({
-    filters: { mutationKey: ['addSet'], status: 'pending' },
-    select: (mutation) => mutation.state as any, //.variables,
-  })
-  console.log({ x: '', mutationStates })
-
   const firstEmptySetId = setGroup.sets.find((set) => isSetEmpty(set))?.id
 
   function setRow(set: Set, index: number, isDummy = false) {
@@ -106,31 +97,6 @@ export default function SetGroupBlock({
 
       <div className='ml-1 mt-2 flex flex-col gap-y-2 mb-4'>
         {setGroup.sets.map((set: Set, index) => setRow(set, index))}
-        {/* TODO better type for mutationState */}
-        {mutationStates
-          .filter((mutationState: any) => {
-            return mutationState.variables.setGroupId === setGroup.id
-          })
-          .map((mutationState: any, index: number) => {
-            if (mutationState.status === 'error') {
-              return (
-                <div key={index} className='text-red-500'>
-                  Error adding set
-                </div>
-              )
-            }
-            if (mutationState.status === 'pending') {
-              console.log({ mutationState })
-              const dummySet = createDummySet(mutationState.variables)
-              console.log({ dummySet })
-              return (
-                // <div key={index} className='text-white'>
-                //   Adding set...{mutationState.variables}
-                // </div>
-                setRow(dummySet, index + setGroup.sets.length, true)
-              )
-            }
-          })}
       </div>
       {!locked && <AddSetButton setGroup={setGroup} />}
     </div>
