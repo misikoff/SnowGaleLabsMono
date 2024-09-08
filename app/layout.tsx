@@ -1,11 +1,10 @@
 import { ClerkProvider } from '@clerk/nextjs'
 import { Analytics } from '@vercel/analytics/react'
 
-import { ReactQueryClientProvider } from '@/components/ReactQueryClientProvider'
 import Navbar from 'components/navbar'
+import { ReactQueryClientProvider } from '@/components/ReactQueryClientProvider'
 
 import '../assets/globals.css'
-import Providers from './providers'
 
 export const metadata = {
   title: 'Next.js',

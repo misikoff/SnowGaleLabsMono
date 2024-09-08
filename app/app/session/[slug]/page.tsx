@@ -15,8 +15,6 @@ import {
 } from 'app/app/actions'
 import { SetGroupWithExerciseAndSets } from 'db/schema'
 
-import AddExerciseButton from './addExerciseButton'
-
 export default function Home({ params }: { params: { slug: string } }) {
   const queryClient = useQueryClient()
   const router = useRouter()
