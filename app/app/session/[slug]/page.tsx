@@ -72,13 +72,13 @@ export default function Home({ params }: { params: { slug: string } }) {
   // }
 
   const updateSetGroupOrderMutation = useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       index1,
       index2,
     }: {
       index1: number
       index2: number
-    }): any => {
+    }) => {
       const curSession = session!
       const setGroup1 = curSession.setGroups[index1]
       const setGroup2 = curSession.setGroups[index2]
@@ -89,13 +89,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     },
     // When mutate is called:
     // TODO: better typing with a simple set or dummy set, but still may require casting
-    onMutate: async ({
-      index1,
-      index2,
-    }: {
-      index1: number
-      index2: number
-    }) => {
+    onMutate: async (indices) => {
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
@@ -105,10 +99,10 @@ export default function Home({ params }: { params: { slug: string } }) {
       // Snapshot the previous value
       const previousSession = queryClient.getQueryData(['session', params.slug])
       const nextSession = produce(previousSession, (draft: any) => {
-        const order1 = draft.setGroups[index1].order
-        const order2 = draft.setGroups[index2].order
-        draft.setGroups[index1].order = order2
-        draft.setGroups[index2].order = order1
+        const order1 = draft.setGroups[indices.index1].order
+        const order2 = draft.setGroups[indices.index2].order
+        draft.setGroups[indices.index1].order = order2
+        draft.setGroups[indices.index2].order = order1
         draft.setGroups = draft.setGroups.sort(
           (a: SetGroupWithExerciseAndSets, b: SetGroupWithExerciseAndSets) => {
             // handle a.order being undefined
