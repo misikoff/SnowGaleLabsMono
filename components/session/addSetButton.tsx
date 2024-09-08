@@ -1,5 +1,3 @@
-'use client'
-
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { produce } from 'immer'
 import { v4 as uuidv4 } from 'uuid'
@@ -69,7 +67,7 @@ export default function AddSetButton({
       console.log({ newSet, context })
       queryClient.setQueryData(
         ['session', setGroup.sessionId],
-        context.previousSession,
+        context?.previousSession,
       )
     },
     onSuccess: () => {

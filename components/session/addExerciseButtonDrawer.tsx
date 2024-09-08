@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { produce } from 'immer'
+import { v4 as uuidv4 } from 'uuid'
 
 import { Button } from 'components/ui/button'
 import {
@@ -16,7 +18,13 @@ import {
   // DrawerTrigger,
 } from 'components/ui/drawer'
 import { createSet, createSetGroup, getExercises } from 'app/app/actions'
-import { Exercise, SessionWithSetGroupWithExerciseAndSets } from 'db/schema'
+import {
+  Exercise,
+  SessionWithSetGroupWithExerciseAndSets,
+  Set,
+  SetGroup,
+  SetGroupWithExerciseAndSets,
+} from 'db/schema'
 
 import ExerciseSuperScroller from './exerciseSuperScroller'
 import {
@@ -62,30 +70,143 @@ export default function AddExerciseButtonDrawer({
   }, [session])
 
   const createSetGroupMutation = useMutation({
-    mutationFn: () =>
+    mutationFn: ({
+      id,
+      exerciseId,
+      sessionId,
+      order,
+    }: Parameters<typeof createSetGroup>[0]) =>
       createSetGroup({
-        exerciseId: selectedExercise?.id,
-        sessionId: session.id,
-        order: nextOrder,
+        id,
+        exerciseId,
+        sessionId,
+        order,
       }),
-    onSuccess: async (newSetGroup) => {
-      if (newSetGroup.length > 0) {
-        // maybe useful for optimistic updates
-        // const newSet =
-        await createSet({
-          exerciseId: selectedExercise?.id || '',
-          sessionId: session.id,
-          setGroupId: newSetGroup[0].id,
-        })
-        // maybe useful for optimistic updates
-        // const extendedSetGroup: SetGroupWithExerciseAndSets = {
-        //   ...newSetGroup[0],
-        //   exercise: selectedExercise,
-        //   sets: newSet,
-        // }
-      }
-      queryClient.invalidateQueries({ queryKey: ['session', session.id] })
+    // When mutate is called:
+    // TODO: better typing with a simple set or dummy set, but still may require casting
+    onMutate: async (newSetGroup: any) => {
+      // Cancel any outgoing refetches
+      // (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({
+        queryKey: ['session', session.id],
+      })
+
+      // Snapshot the previous value
+      const previousSession = queryClient.getQueryData(['session', session.id])
+      const nextSession = produce(previousSession, (draft: any) => {
+        // fill in missing fields
+        // TODO: this is a bit of a hack, but it works for now
+        // figure out how to automatically fill in missing fields
+        newSetGroup.sets = []
+        newSetGroup.exercise = selectedExercise
+        draft.setGroups.push(newSetGroup as SetGroup)
+      })
+      console.log('creating new set', {
+        exerciseId: selectedExercise!.id || '',
+        sessionId: session.id,
+        setGroupId: newSetGroup.id,
+      })
+      createSetMutation.mutateAsync({
+        id: uuidv4(),
+        exerciseId: selectedExercise!.id || '',
+        sessionId: session.id,
+        setGroupId: newSetGroup.id,
+      })
+      // Optimistically update to the new value
+      queryClient.setQueryData(['session', session.id], nextSession)
+
+      // setOpen(false)
+
+      // Return a context object with the snapshotted value
+      return { previousSession }
+    },
+    // If the mutation fails,
+    // use the context returned from onMutate to roll back
+    onError: (err, newSetGroup, context) => {
+      console.log('error')
+      console.log({ err })
+      console.log({ newSetGroup, context })
+      queryClient.setQueryData(
+        ['session', session.id],
+        context?.previousSession,
+      )
+    },
+    onSuccess: () => {
+      console.log('success')
+      // need to do another mutation to add the first set to the set group
+    },
+    // Always refetch after error or success:
+    onSettled: () => {
+      console.log('settled')
+      queryClient.invalidateQueries({
+        queryKey: ['session', session.id],
+      })
+    },
+  })
+
+  const createSetMutation = useMutation({
+    mutationFn: ({
+      id,
+      exerciseId,
+      sessionId,
+      setGroupId,
+    }: Parameters<typeof createSet>[0]) =>
+      createSet({
+        id,
+        exerciseId,
+        sessionId,
+        setGroupId,
+      }),
+    // When mutate is called:
+    // TODO: better typing with a simple set or dummy set, but still may require casting
+    onMutate: async (newSet: any) => {
+      // Cancel any outgoing refetches
+      // (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({
+        queryKey: ['session', session.id],
+      })
+
+      // Snapshot the previous value
+      const previousSession = queryClient.getQueryData(['session', session.id])
+      const nextSession = produce(previousSession, (draft: any) => {
+        draft.setGroups = draft.setGroups.map(
+          (curSetGroup: SetGroupWithExerciseAndSets) => {
+            if (curSetGroup.id === newSet.setGroupId) {
+              curSetGroup.sets.push(newSet as Set)
+            }
+            return curSetGroup
+          },
+        )
+      })
+      // Optimistically update to the new value
+      queryClient.setQueryData(['session', session.id], nextSession)
+
       setOpen(false)
+
+      // Return a context object with the snapshotted value
+      return { previousSession }
+    },
+    // If the mutation fails,
+    // use the context returned from onMutate to roll back
+    onError: (err, newSet, context) => {
+      console.log('error')
+      console.log({ err })
+      console.log({ newSet, context })
+      queryClient.setQueryData(
+        ['session', session.id],
+        context?.previousSession,
+      )
+    },
+    onSuccess: () => {
+      console.log('success')
+      // need to do another mutation to add the first set to the set group
+    },
+    // Always refetch after error or success:
+    onSettled: () => {
+      console.log('settled')
+      queryClient.invalidateQueries({
+        queryKey: ['session', session.id],
+      })
     },
   })
 
@@ -126,7 +247,12 @@ export default function AddExerciseButtonDrawer({
               onClick={async () => {
                 console.log({ sessionId: session.id })
                 if (selectedExercise) {
-                  createSetGroupMutation.mutateAsync()
+                  createSetGroupMutation.mutateAsync({
+                    id: uuidv4(),
+                    exerciseId: selectedExercise?.id,
+                    sessionId: session.id,
+                    order: nextOrder,
+                  })
                 }
               }}
             >

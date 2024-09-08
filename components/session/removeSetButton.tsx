@@ -1,5 +1,3 @@
-'use client'
-
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { produce } from 'immer'
 
@@ -46,13 +44,13 @@ export default function RemoveSetButton({ set }: { set: Set }) {
     },
     // If the mutation fails,
     // use the context returned from onMutate to roll back
-    onError: (err, context) => {
+    onError: (err, deletedSet, context) => {
       console.log('error')
       console.log({ err })
       console.log({ context })
       queryClient.setQueryData(
         ['session', set.sessionId],
-        context.previousSession,
+        context?.previousSession,
       )
     },
     onSuccess: () => {

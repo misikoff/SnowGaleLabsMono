@@ -277,12 +277,14 @@ export async function getSetGroupWithSets(setGroupId: SetGroup['id']) {
 }
 
 export async function createSetGroup({
+  id,
   order,
   programId,
   microcycleId,
   sessionId,
   exerciseId,
 }: {
+  id?: SetGroup['id']
   order?: SetGroup['order']
   programId?: Program['id']
   microcycleId?: Microcycle['id']
@@ -293,6 +295,7 @@ export async function createSetGroup({
   return await db
     .insert(setGroups)
     .values({
+      id,
       programId,
       microcycleId,
       order,
@@ -333,7 +336,9 @@ export async function deleteSetGroup(id: SetGroup['id']) {
   // delete all sets associated with the set group
   return await db
     .delete(setGroups)
-    .where(eq(setGroups.id, id))
+    .where(
+      and(eq(setGroups.id, id), eq(setGroups.userId, await currentUserId())),
+    )
     .returning({ deletedId: setGroups.id })
 }
 
