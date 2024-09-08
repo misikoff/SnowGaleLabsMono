@@ -2,6 +2,7 @@ import { ClerkProvider } from '@clerk/nextjs'
 import { Analytics } from '@vercel/analytics/react'
 
 import Navbar from 'components/navbar'
+import { ReactQueryClientProvider } from '@/components/ReactQueryClientProvider'
 
 import '../assets/globals.css'
 
@@ -17,13 +18,15 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang='en'>
-        <body className='flex min-h-screen overflow-x-hidden flex-col bg-white'>
-          <Navbar />
-          <main className='flex-grow p-4 mb-24 mt-24'>{children}</main>
-          <Analytics />
-        </body>
-      </html>
+      <ReactQueryClientProvider>
+        <html lang='en'>
+          <body className='flex min-h-screen overflow-x-hidden flex-col bg-white'>
+            <Navbar />
+            <main className='flex-grow p-4 mb-24 mt-24'>{children}</main>
+            <Analytics />
+          </body>
+        </html>
+      </ReactQueryClientProvider>
     </ClerkProvider>
   )
 }

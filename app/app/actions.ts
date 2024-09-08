@@ -20,6 +20,7 @@ import {
   exercises,
   programs,
   SetGroup,
+  SessionWithSetGroupWithExerciseAndSets,
 } from 'db/schema'
 
 const currentUserId = async () => {
@@ -194,7 +195,8 @@ export async function getSession(id: Session['id']) {
   //   await db.select().from(sessions).where(eq(sessions.id, id)).limit(1)
   // )[0]
   const userId = await currentUserId()
-  return await db.query.sessions.findFirst({
+  // TODO: why is explicit type needed here?
+  return (await db.query.sessions.findFirst({
     where: and(eq(sessions.id, id), eq(sessions.userId, userId)),
     with: {
       setGroups: {
@@ -205,7 +207,7 @@ export async function getSession(id: Session['id']) {
         orderBy: [asc(setGroups.order)],
       },
     },
-  })
+  })) as SessionWithSetGroupWithExerciseAndSets
 }
 
 export async function updateSession({
@@ -320,7 +322,9 @@ export async function updateSetGroup({
   return await db
     .update(setGroups)
     .set({ exerciseId, order })
-    .where((eq(setGroups.id, id), eq(setGroups.userId, await currentUserId())))
+    .where(
+      and(eq(setGroups.id, id), eq(setGroups.userId, await currentUserId())),
+    )
     .returning()
 }
 
@@ -335,31 +339,44 @@ export async function deleteSetGroup(id: SetGroup['id']) {
 
 // Set Functions
 export async function createSet({
+  id,
   order,
+  userId,
   programId,
   microcycleId,
   sessionId,
   exerciseId,
   setGroupId,
 }: {
+  id?: Set['id']
   order?: Set['order']
+  userId?: Set['userId']
   programId?: Set['programId']
   microcycleId?: Set['microcycleId']
   sessionId: Set['sessionId']
   exerciseId: Set['exerciseId']
   setGroupId: Set['setGroupId']
 }) {
+  // only chose to add user id to give function the same signature as the dummy function
+  // check that userId matches current user
+  if (userId && userId !== (await currentUserId())) {
+    throw new Error('UserId does not match current user')
+  }
+  if (!userId) {
+    userId = await currentUserId()
+  }
   noStore()
   return await db
     .insert(sets)
     .values({
+      id,
       programId,
       microcycleId,
       order,
       sessionId,
       exerciseId,
       setGroupId,
-      userId: await currentUserId(),
+      userId,
     })
     .returning()
 }
@@ -373,6 +390,7 @@ export async function deleteSet(id: Set['id']) {
 }
 
 export async function getSessions() {
+  console.log('getting sessions')
   noStore()
   return await db
     .select()
@@ -399,7 +417,7 @@ export async function updateSet({
   return await db
     .update(sets)
     .set({ reps, RPE, RIR, weight, exerciseId })
-    .where((eq(sets.id, id), eq(sets.userId, await currentUserId())))
+    .where(and(eq(sets.id, id), eq(sets.userId, await currentUserId())))
     .returning()
 }
 

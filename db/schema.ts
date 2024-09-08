@@ -132,7 +132,7 @@ export const macrocycles = pgTable(
     // TODO: should deletes cascade?,
     programId: uuid('program_id').references(() => programs.id),
     name: text('name'),
-    order: smallint('order'),
+    order: smallint('order').default(0),
   },
   (table) => ({
     userIdIndex: index('macro_cycle_user_id_idx').on(table.userId),
@@ -160,7 +160,7 @@ export const microcycles = pgTable(
     programId: uuid('program_id').references(() => programs.id),
     macrocycleId: uuid('macrocycle_id').references(() => macrocycles.id),
     name: text('name'),
-    order: smallint('order'),
+    order: smallint('order').default(0),
   },
   (table) => ({
     userIdIndex: index('microcyle_user_id_idx').on(table.userId),
@@ -188,7 +188,7 @@ export const sessions = pgTable(
     programId: uuid('program_id').references(() => programs.id),
     macrocycleId: uuid('macrocycle_id').references(() => macrocycles.id),
     microcycleId: uuid('microcycle_id').references(() => microcycles.id),
-    order: smallint('order'),
+    order: smallint('order').default(0),
     completed: boolean('completed').default(false),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at')
@@ -236,7 +236,7 @@ export const setGroups = pgTable(
     type: text('type', { enum: setGroupType }).default('normal'),
     // if type is not normal then set exerciseId to null, but dont generate the id automatically
     exerciseId: uuid('exercise_id').references(() => exercises.id),
-    order: smallint('order'),
+    order: smallint('order').default(0),
   },
   (table) => ({
     userIdIndex: index('set_group_user_id_idx').on(table.userId),
@@ -300,7 +300,7 @@ export const sets = pgTable(
     RPE: real('RPE'),
     RIR: integer('RIR'),
     weight: real('weight'),
-    order: smallint('order'),
+    order: smallint('order').default(0),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at')
       .notNull()

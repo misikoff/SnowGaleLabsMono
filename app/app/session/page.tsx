@@ -1,25 +1,42 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-
 import Link from 'next/link'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { Badge } from 'components/ui/badge'
 import { Button } from 'components/ui/button'
+import { Session } from '@/db/schema'
 import { deleteSession, getSessions } from 'app/app/actions'
-import { Session } from 'db/schema'
 
 import CreateSessionButton from './createSessionButton'
 
 export default function SessionPage() {
-  const [sessions, setSessions] = useState<Session[]>([])
-  useEffect(() => {
-    async function setData() {
-      const sessions = await getSessions()
-      setSessions(sessions)
-    }
-    setData()
-  }, [])
+  const queryClient = useQueryClient()
+
+  const deleteSessionMutation = useMutation({
+    mutationFn: (id: Session['id']) => deleteSession(id),
+    onSuccess: () => {
+      console.log('session deleted')
+      queryClient.invalidateQueries({ queryKey: ['sessions'] })
+    },
+  })
+
+  const {
+    data: sessions,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ['sessions'],
+    queryFn: () => getSessions(),
+  })
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
+
+  if (isError || !sessions) {
+    return <div>Error</div>
+  }
 
   return (
     <div>
@@ -35,8 +52,7 @@ export default function SessionPage() {
             {s.completed && <Badge variant='outline'>complete</Badge>}
             <Button
               onClick={async () => {
-                await deleteSession(s.id)
-                setSessions(sessions.filter((session) => session.id !== s.id))
+                await deleteSessionMutation.mutate(s.id)
               }}
             >
               delete
