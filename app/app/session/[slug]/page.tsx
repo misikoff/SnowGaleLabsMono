@@ -29,23 +29,6 @@ export default function Home({ params }: { params: { slug: string } }) {
     queryFn: () => getSession(params.slug),
   })
 
-  // const onSetGroupUpdated = (setGroup: SetGroupWithExerciseAndSets) => {
-  //   setSession((prev: any) => {
-  //     const newSetGroups = prev.setGroups.map(
-  //       (g: SetGroupWithExerciseAndSets) => {
-  //         if (g.id === setGroup.id) {
-  //           return setGroup
-  //         }
-  //         return g
-  //       },
-  //     )
-  //     return {
-  //       ...prev,
-  //       setGroups: newSetGroups,
-  //     }
-  //   })
-  // }
-
   // const onSetUpdated = (set: Set) => {
   //   setSession((prev: any) => {
   //     const newSetGroups = prev.setGroups.map(

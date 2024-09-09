@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react'
 
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { produce } from 'immer'
 import { MinusIcon, PlusIcon } from 'lucide-react'
 
 import AnimatedNumber from 'components/animatedNumber'
@@ -17,7 +18,7 @@ import {
   SheetTrigger,
 } from 'components/ui/sheet'
 import { updateSet } from 'app/app/actions'
-import { Set } from 'db/schema'
+import { Set, SetGroupWithExerciseAndSets } from 'db/schema'
 
 export default function PerformanceButton({
   children,
@@ -37,6 +38,74 @@ export default function PerformanceButton({
   const [difficultyValue, setDifficultyValue] = useState(
     set.RPE ?? set.prescribedRPE ?? 5,
   )
+
+  const updateSetMutation = useMutation({
+    mutationFn: ({ id, reps, weight, RPE }: Parameters<typeof updateSet>[0]) =>
+      updateSet({
+        id,
+        reps,
+        weight,
+        RPE,
+      }),
+    // When mutate is called:
+    // TODO: better typing with a simple set or dummy set, but still may require casting
+    onMutate: async (updatedSet) => {
+      // Cancel any outgoing refetches
+      // (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({
+        queryKey: ['session', set.sessionId],
+      })
+
+      // Snapshot the previous value
+      const previousSession = queryClient.getQueryData([
+        'session',
+        set.sessionId,
+      ])
+      const nextSession = produce(previousSession, (draft: any) => {
+        draft.setGroups = draft.setGroups.map(
+          (curSetGroup: SetGroupWithExerciseAndSets) => {
+            // TODO: better typing with a simple set or dummy set, but still may require casting
+            curSetGroup.sets = curSetGroup.sets.map((curSet: any) => {
+              if (curSet.id === set.id) {
+                curSet.reps = updatedSet.reps
+                curSet.weight = updatedSet.weight
+                curSet.RPE = updatedSet.RPE
+              }
+              return curSet
+            })
+            return curSetGroup
+          },
+        )
+      })
+      // Optimistically update to the new value
+      queryClient.setQueryData(['session', set.sessionId], nextSession)
+
+      // Return a context object with the snapshotted value
+      return { previousSession }
+    },
+    // If the mutation fails,
+    // use the context returned from onMutate to roll back
+    onError: (err, updatedSet, context) => {
+      console.log('error')
+      console.log({ err })
+      console.log({ updatedSet, context })
+      queryClient.setQueryData(
+        ['session', set.sessionId],
+        context?.previousSession,
+      )
+    },
+    onSuccess: () => {
+      console.log('success')
+    },
+    // Always refetch after error or success:
+    onSettled: () => {
+      console.log('settled')
+      queryClient.invalidateQueries({
+        queryKey: ['session', set.sessionId],
+      })
+    },
+  })
+
   useEffect(() => {
     if (!open) {
       setWeightValue(set.weight ?? set.prescribedWeight ?? 0)
@@ -89,34 +158,9 @@ export default function PerformanceButton({
     setDifficultyValue(newValue)
   }
 
-  const sendUpdate = async ({
-    reps,
-    weight,
-    RPE,
-  }: {
-    reps: number
-    weight: number
-    RPE: number
-  }) => {
-    // currently this updates the last set in the group rather than the current one
-    const newSet = await updateSet({
-      id: set.id,
-      reps,
-      weight,
-      RPE,
-    })
-    // if (onSubmit) {
-    if (newSet.length > 0) {
-      // onSubmit(newSet[0])
-      queryClient.invalidateQueries({
-        queryKey: ['session', set.sessionId],
-      })
-    }
-    // }
-  }
-
   const save = async () => {
-    await sendUpdate({
+    await updateSetMutation.mutateAsync({
+      id: set.id,
       reps: repValue,
       weight: weightValue,
       RPE: difficultyValue,
@@ -128,7 +172,12 @@ export default function PerformanceButton({
     setWeightValue(0)
     setDifficultyValue(0)
     // because the values haven't been updated yet, these have to be hardcoded as zeroes
-    await sendUpdate({ reps: 0, weight: 0, RPE: 0 })
+    await updateSetMutation.mutateAsync({
+      id: set.id,
+      reps: 0,
+      weight: 0,
+      RPE: 0,
+    })
   }
 
   return (
