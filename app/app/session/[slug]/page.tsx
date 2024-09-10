@@ -14,7 +14,7 @@ import {
   updateSession,
   updateSetGroup,
 } from 'app/app/actions'
-import { SetGroupWithExerciseAndSets } from 'db/schema'
+import { Session, SetGroupWithExerciseAndSets } from 'db/schema'
 
 export default function Home({ params }: { params: { slug: string } }) {
   const queryClient = useQueryClient()
@@ -125,6 +125,72 @@ export default function Home({ params }: { params: { slug: string } }) {
     },
   })
 
+  const deleteSessionMutation = useMutation({
+    mutationFn: (id: Session['id']) => deleteSession(id),
+    onMutate: async (id) => {
+      // Cancel any outgoing refetches
+      // (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({
+        queryKey: ['sessions'],
+      })
+
+      // Snapshot the previous value
+      const previousSessions = queryClient.getQueryData([
+        'sessions',
+      ]) as Session[]
+
+      const nextSessions = previousSessions.filter((s) => {
+        console.log({ a: id, b: s.id, res: s.id !== id })
+        return s.id !== id
+      })
+
+      console.log({ nextSessions })
+      // Optimistically update to the new value
+      queryClient.setQueryData(['sessions'], nextSessions)
+
+      // Return a context object with the snapshotted value
+      return { previousSessions }
+    },
+    onSuccess: () => {
+      console.log('session deleted')
+      queryClient.invalidateQueries({ queryKey: ['sessions'] })
+    },
+  })
+
+  const finishSessionMutation = useMutation({
+    mutationFn: (id: Session['id']) => updateSession({ id, completed: true }),
+    onMutate: async (id) => {
+      // Cancel any outgoing refetches
+      // (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({
+        queryKey: ['sessions'],
+      })
+
+      // Snapshot the previous value
+      const previousSessions = queryClient.getQueryData([
+        'sessions',
+      ]) as Session[]
+
+      const nextSessions = previousSessions.map((s) => {
+        if (s.id === id) {
+          return { ...s, completed: true }
+        }
+        return s
+      })
+
+      console.log({ nextSessions })
+      // Optimistically update to the new value
+      queryClient.setQueryData(['sessions'], nextSessions)
+
+      // Return a context object with the snapshotted value
+      return { previousSessions }
+    },
+    onSuccess: () => {
+      console.log('session finished')
+      queryClient.invalidateQueries({ queryKey: ['sessions'] })
+    },
+  })
+
   return (
     <div>
       <div>{session?.name}</div>
@@ -133,8 +199,7 @@ export default function Home({ params }: { params: { slug: string } }) {
         <Button
           onClick={async () => {
             // TODO add confirmation
-            await deleteSession(session.id)
-            queryClient.invalidateQueries({ queryKey: ['sessions'] })
+            await deleteSessionMutation.mutateAsync(session.id)
             router.push('/app/session')
           }}
         >
@@ -188,11 +253,9 @@ export default function Home({ params }: { params: { slug: string } }) {
               variant='secondary'
               className='w-fit'
               onClick={async () => {
-                await updateSession({ id: session.id, completed: true })
-                queryClient.invalidateQueries({
-                  queryKey: ['sessions'],
+                await finishSessionMutation.mutateAsync(session.id).then(() => {
+                  router.push('/app/session')
                 })
-                router.push('/app/session')
               }}
             >
               Finish Session

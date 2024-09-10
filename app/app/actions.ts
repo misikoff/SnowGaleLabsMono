@@ -159,25 +159,34 @@ export async function getMicrocycleWithSessions(
 }
 
 export async function createSession({
+  id,
   name,
   order,
   programId,
   microcycleId,
+  createdAt,
+  updatedAt,
 }: {
+  id?: Session['id']
   name?: Session['name']
   order?: Session['order']
   programId?: Program['id']
   microcycleId?: Microcycle['id']
+  createdAt?: Session['createdAt']
+  updatedAt?: Session['updatedAt']
 }) {
   noStore()
   const session = await db
     .insert(sessions)
     .values({
+      id,
       name,
       order,
       programId,
       microcycleId,
       userId: await currentUserId(),
+      createdAt,
+      updatedAt,
     })
     // .returning()
     .returning({ insertedId: sessions.id })
@@ -225,7 +234,7 @@ export async function updateSession({
   return await db
     .update(sessions)
     .set({ name, order, completed })
-    .where((eq(sessions.id, id), eq(sessions.userId, await currentUserId())))
+    .where(and(eq(sessions.id, id), eq(sessions.userId, await currentUserId())))
     .returning()
 }
 
@@ -401,6 +410,7 @@ export async function getSessions() {
     .select()
     .from(sessions)
     .where(eq(sessions.userId, await currentUserId()))
+    .orderBy(asc(sessions.createdAt))
 }
 
 export async function updateSet({

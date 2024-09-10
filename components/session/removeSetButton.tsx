@@ -10,7 +10,7 @@ export default function RemoveSetButton({ set }: { set: Set }) {
   const deleteSetMutation = useMutation({
     mutationFn: (id: Parameters<typeof deleteSet>[0]) => deleteSet(id),
     // When mutate is called:
-    onMutate: async () => {
+    onMutate: async (id) => {
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
@@ -28,7 +28,7 @@ export default function RemoveSetButton({ set }: { set: Set }) {
           (curSetGroup: SetGroupWithExerciseAndSets) => {
             if (curSetGroup.id === set.setGroupId) {
               curSetGroup.sets = curSetGroup.sets.filter(
-                (curSet) => curSet.id !== set.id,
+                (curSet) => curSet.id !== id,
               )
             }
             return curSetGroup
