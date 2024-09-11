@@ -55,8 +55,8 @@ export default function CreateSessionButton() {
         createSessionMutation
           .mutateAsync({
             id: newSessionId,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString,
+            createdAt: new Date(),
+            updatedAt: new Date(),
           })
           .then(() => {
             router.push(`session/${newSessionId}`)
