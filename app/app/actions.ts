@@ -159,25 +159,34 @@ export async function getMicrocycleWithSessions(
 }
 
 export async function createSession({
+  id,
   name,
   order,
   programId,
   microcycleId,
+  createdAt,
+  updatedAt,
 }: {
+  id?: Session['id']
   name?: Session['name']
   order?: Session['order']
   programId?: Program['id']
   microcycleId?: Microcycle['id']
+  createdAt?: Session['createdAt']
+  updatedAt?: Session['updatedAt']
 }) {
   noStore()
   const session = await db
     .insert(sessions)
     .values({
+      id,
       name,
       order,
       programId,
       microcycleId,
       userId: await currentUserId(),
+      createdAt,
+      updatedAt,
     })
     // .returning()
     .returning({ insertedId: sessions.id })
@@ -225,7 +234,7 @@ export async function updateSession({
   return await db
     .update(sessions)
     .set({ name, order, completed })
-    .where((eq(sessions.id, id), eq(sessions.userId, await currentUserId())))
+    .where(and(eq(sessions.id, id), eq(sessions.userId, await currentUserId())))
     .returning()
 }
 
@@ -277,12 +286,14 @@ export async function getSetGroupWithSets(setGroupId: SetGroup['id']) {
 }
 
 export async function createSetGroup({
+  id,
   order,
   programId,
   microcycleId,
   sessionId,
   exerciseId,
 }: {
+  id?: SetGroup['id']
   order?: SetGroup['order']
   programId?: Program['id']
   microcycleId?: Microcycle['id']
@@ -293,6 +304,7 @@ export async function createSetGroup({
   return await db
     .insert(setGroups)
     .values({
+      id,
       programId,
       microcycleId,
       order,
@@ -333,7 +345,9 @@ export async function deleteSetGroup(id: SetGroup['id']) {
   // delete all sets associated with the set group
   return await db
     .delete(setGroups)
-    .where(eq(setGroups.id, id))
+    .where(
+      and(eq(setGroups.id, id), eq(setGroups.userId, await currentUserId())),
+    )
     .returning({ deletedId: setGroups.id })
 }
 
@@ -385,7 +399,7 @@ export async function deleteSet(id: Set['id']) {
   noStore()
   return await db
     .delete(sets)
-    .where(eq(sets.id, id))
+    .where(and(eq(sets.id, id), eq(sets.userId, await currentUserId())))
     .returning({ deletedId: sets.id })
 }
 
@@ -396,6 +410,7 @@ export async function getSessions() {
     .select()
     .from(sessions)
     .where(eq(sessions.userId, await currentUserId()))
+    .orderBy(asc(sessions.createdAt))
 }
 
 export async function updateSet({

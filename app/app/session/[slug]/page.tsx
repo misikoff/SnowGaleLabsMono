@@ -1,7 +1,8 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { produce } from 'immer'
 import { ArrowDownNarrowWide, ArrowUpNarrowWide } from 'lucide-react'
 
 import SetGroupBlock from 'components/session/setGroupBlock'
@@ -13,7 +14,7 @@ import {
   updateSession,
   updateSetGroup,
 } from 'app/app/actions'
-import { SetGroupWithExerciseAndSets } from 'db/schema'
+import { Session, SetGroupWithExerciseAndSets } from 'db/schema'
 
 export default function Home({ params }: { params: { slug: string } }) {
   const queryClient = useQueryClient()
@@ -27,75 +28,6 @@ export default function Home({ params }: { params: { slug: string } }) {
     queryKey: ['session', params.slug],
     queryFn: () => getSession(params.slug),
   })
-
-  // const onSetRemoved = (id: string) => {
-  //   setSession((prev: any) => {
-  //     const newSetGroups = prev.setGroups.map(
-  //       (g: SetGroupWithExerciseAndSets) => {
-  //         // if (g.id === set.setGroupId) {
-  //         //   return {
-  //         //     ...g,
-  //         //     sets: g.sets.filter((s: Set) => s.id !== set.id),
-  //         //   }
-  //         // }
-  //         g.sets = g.sets.filter((s: Set) => s.id !== id)
-  //         return g
-  //       },
-  //     )
-  //     return {
-  //       ...prev,
-  //       setGroups: newSetGroups,
-  //     }
-  //   })
-  // }
-
-  // const onSetAdded = (set: Set) => {
-  //   setSession((prev: any) => {
-  //     const newSetGroups = prev.setGroups.map(
-  //       (g: SetGroupWithExerciseAndSets) => {
-  //         if (g.id === set.setGroupId) {
-  //           return {
-  //             ...g,
-  //             sets: [...g.sets, set],
-  //           }
-  //         }
-  //         return g
-  //       },
-  //     )
-  //     return {
-  //       ...prev,
-  //       setGroups: newSetGroups,
-  //     }
-  //   })
-  // }
-
-  // const onSetGroupRemoved = (id: string) => {
-  //   setSession((prev: any) => {
-  //     return {
-  //       ...prev,
-  //       setGroups: prev.setGroups.filter(
-  //         (g: SetGroupWithExerciseAndSets) => g.id !== id,
-  //       ),
-  //     }
-  //   })
-  // }
-
-  // const onSetGroupUpdated = (setGroup: SetGroupWithExerciseAndSets) => {
-  //   setSession((prev: any) => {
-  //     const newSetGroups = prev.setGroups.map(
-  //       (g: SetGroupWithExerciseAndSets) => {
-  //         if (g.id === setGroup.id) {
-  //           return setGroup
-  //         }
-  //         return g
-  //       },
-  //     )
-  //     return {
-  //       ...prev,
-  //       setGroups: newSetGroups,
-  //     }
-  //   })
-  // }
 
   // const onSetUpdated = (set: Set) => {
   //   setSession((prev: any) => {
@@ -122,6 +54,143 @@ export default function Home({ params }: { params: { slug: string } }) {
   //   })
   // }
 
+  const updateSetGroupOrderMutation = useMutation({
+    mutationFn: async ({
+      index1,
+      index2,
+    }: {
+      index1: number
+      index2: number
+    }) => {
+      const curSession = session!
+      const setGroup1 = curSession.setGroups[index1]
+      const setGroup2 = curSession.setGroups[index2]
+      const order1 = curSession.setGroups[index1].order
+      const order2 = curSession.setGroups[index2].order
+      updateSetGroup({ id: setGroup1.id, order: order2 })
+      updateSetGroup({ id: setGroup2.id, order: order1 })
+    },
+    // When mutate is called:
+    // TODO: better typing with a simple set or dummy set, but still may require casting
+    onMutate: async (indices) => {
+      // Cancel any outgoing refetches
+      // (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({
+        queryKey: ['session', params.slug],
+      })
+
+      // Snapshot the previous value
+      const previousSession = queryClient.getQueryData(['session', params.slug])
+      const nextSession = produce(previousSession, (draft: any) => {
+        const order1 = draft.setGroups[indices.index1].order
+        const order2 = draft.setGroups[indices.index2].order
+        draft.setGroups[indices.index1].order = order2
+        draft.setGroups[indices.index2].order = order1
+        draft.setGroups = draft.setGroups.sort(
+          (a: SetGroupWithExerciseAndSets, b: SetGroupWithExerciseAndSets) => {
+            // handle a.order being undefined
+            if (a.order === null || b.order === null) {
+              return -1
+            }
+            return a.order - b.order
+          },
+        )
+      })
+      // Optimistically update to the new value
+      queryClient.setQueryData(['session', params.slug], nextSession)
+
+      // Return a context object with the snapshotted value
+      return { previousSession }
+    },
+    // If the mutation fails,
+    // use the context returned from onMutate to roll back
+    onError: (err, newOrder, context) => {
+      console.log('error')
+      console.log({ err })
+      console.log({ newOrder, context })
+      queryClient.setQueryData(
+        ['session', params.slug],
+        context?.previousSession,
+      )
+    },
+    onSuccess: () => {
+      console.log('success')
+    },
+    // Always refetch after error or success:
+    onSettled: () => {
+      console.log('settled')
+      queryClient.invalidateQueries({
+        queryKey: ['session', params.slug],
+      })
+    },
+  })
+
+  const deleteSessionMutation = useMutation({
+    mutationFn: (id: Session['id']) => deleteSession(id),
+    onMutate: async (id) => {
+      // Cancel any outgoing refetches
+      // (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({
+        queryKey: ['sessions'],
+      })
+
+      // Snapshot the previous value
+      const previousSessions = queryClient.getQueryData([
+        'sessions',
+      ]) as Session[]
+
+      const nextSessions = previousSessions.filter((s) => {
+        console.log({ a: id, b: s.id, res: s.id !== id })
+        return s.id !== id
+      })
+
+      console.log({ nextSessions })
+      // Optimistically update to the new value
+      queryClient.setQueryData(['sessions'], nextSessions)
+
+      // Return a context object with the snapshotted value
+      return { previousSessions }
+    },
+    onSuccess: () => {
+      console.log('session deleted')
+      queryClient.invalidateQueries({ queryKey: ['sessions'] })
+    },
+  })
+
+  const finishSessionMutation = useMutation({
+    mutationFn: (id: Session['id']) => updateSession({ id, completed: true }),
+    onMutate: async (id) => {
+      // Cancel any outgoing refetches
+      // (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({
+        queryKey: ['sessions'],
+      })
+
+      // Snapshot the previous value
+      const previousSessions = queryClient.getQueryData([
+        'sessions',
+      ]) as Session[]
+
+      const nextSessions = previousSessions.map((s) => {
+        if (s.id === id) {
+          return { ...s, completed: true }
+        }
+        return s
+      })
+
+      console.log({ nextSessions })
+      // Optimistically update to the new value
+      queryClient.setQueryData(['sessions'], nextSessions)
+
+      // Return a context object with the snapshotted value
+      return { previousSessions }
+    },
+    onSuccess: () => {
+      console.log('session finished')
+      queryClient.invalidateQueries({ queryKey: ['sessions'] })
+    },
+  })
+
   return (
     <div>
       <div>{session?.name}</div>
@@ -130,8 +199,7 @@ export default function Home({ params }: { params: { slug: string } }) {
         <Button
           onClick={async () => {
             // TODO add confirmation
-            await deleteSession(session.id)
-            queryClient.invalidateQueries({ queryKey: ['sessions'] })
+            await deleteSessionMutation.mutateAsync(session.id)
             router.push('/app/session')
           }}
         >
@@ -149,50 +217,9 @@ export default function Home({ params }: { params: { slug: string } }) {
                 <Button
                   disabled={index === 0}
                   onClick={async () => {
-                    // shift this setgroup down by changing the order of all set groups
-                    const order = session.setGroups.map(
-                      (g: SetGroupWithExerciseAndSets) => g.id,
-                    )
-                    // move current setGroup up one
-                    const currentOrder = order[index]
-                    order[index] = order[index - 1]
-                    order[index - 1] = currentOrder
-                    console.log({ order })
-
-                    // sort setGroups by their id index in order
-                    const orderedSetGroups = session.setGroups.sort(
-                      (
-                        a: SetGroupWithExerciseAndSets,
-                        b: SetGroupWithExerciseAndSets,
-                      ) => order.indexOf(a.id) - order.indexOf(b.id),
-                    )
-                    console.log({ orderedSetGroups })
-                    // update the set groups that were moved
-                    orderedSetGroups.forEach(
-                      async (
-                        curGroup: SetGroupWithExerciseAndSets,
-                        i: number,
-                      ) => {
-                        console.log({
-                          exerciseName: curGroup.exercise.name,
-                          order: i,
-                        })
-                        const newSetGroup = await updateSetGroup({
-                          id: curGroup.id,
-                          order: i,
-                        })
-                        if (newSetGroup.length > 0) {
-                          console.log({ newSetGroup })
-                          // const newSetGroupWithSetsAndExercise = {
-                          //   ...newSetGroup[0],
-                          //   exercise: curGroup.exercise,
-                          //   sets: curGroup.sets,
-                          // }
-                        }
-                      },
-                    )
-                    queryClient.invalidateQueries({
-                      queryKey: ['session', params.slug],
+                    await updateSetGroupOrderMutation.mutateAsync({
+                      index1: index,
+                      index2: index - 1,
                     })
                   }}
                 >
@@ -201,46 +228,9 @@ export default function Home({ params }: { params: { slug: string } }) {
                 <Button
                   disabled={index === session.setGroups.length - 1}
                   onClick={async () => {
-                    // shift this setgroup down by changing the order of all set groups
-                    const order = session.setGroups.map(
-                      (g: SetGroupWithExerciseAndSets) => g.id,
-                    )
-                    // move current setGroup down one
-                    const currentOrder = order[index]
-                    order[index] = order[index + 1]
-                    order[index + 1] = currentOrder
-                    console.log({ order })
-
-                    // sort setGroups by their id index in order
-                    const orderedSetGroups = session.setGroups.sort(
-                      (
-                        a: SetGroupWithExerciseAndSets,
-                        b: SetGroupWithExerciseAndSets,
-                      ) => order.indexOf(a.id) - order.indexOf(b.id),
-                    )
-
-                    // update the set groups that were moved
-                    orderedSetGroups.forEach(
-                      async (
-                        curGroup: SetGroupWithExerciseAndSets,
-                        i: number,
-                      ) => {
-                        const newSetGroup = await updateSetGroup({
-                          id: curGroup.id,
-                          order: i,
-                        })
-                        if (newSetGroup.length > 0) {
-                          console.log({ newSetGroup })
-                          // const newSetGroupWithSetsAndExercise = {
-                          //   ...newSetGroup[0],
-                          //   exercise: curGroup.exercise,
-                          //   sets: curGroup.sets,
-                          // }
-                        }
-                      },
-                    )
-                    queryClient.invalidateQueries({
-                      queryKey: ['session', params.slug],
+                    await updateSetGroupOrderMutation.mutateAsync({
+                      index1: index,
+                      index2: index + 1,
                     })
                   }}
                 >
@@ -263,11 +253,9 @@ export default function Home({ params }: { params: { slug: string } }) {
               variant='secondary'
               className='w-fit'
               onClick={async () => {
-                await updateSession({ id: session.id, completed: true })
-                queryClient.invalidateQueries({
-                  queryKey: ['sessions'],
+                await finishSessionMutation.mutateAsync(session.id).then(() => {
+                  router.push('/app/session')
                 })
-                router.push('/app/session')
               }}
             >
               Finish Session
