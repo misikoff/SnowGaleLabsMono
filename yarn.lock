@@ -640,21 +640,21 @@
   resolved "https://registry.yarnpkg.com/@kurkle/color/-/color-0.3.2.tgz#5acd38242e8bde4f9986e7913c8fdf49d3aa199f"
   integrity sha512-fuscdXJ9G1qb7W8VdHi+IwRqij3lBkosAm4ydQtEmbY58OzHXqQhvlxqEkoz0yssNVn38bcpRWgA9PP+OGoisw==
 
-"@libsql/client@^0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@libsql/client/-/client-0.11.0.tgz#2e11ffd44ebd96087981409fff12160918b98b94"
-  integrity sha512-IkMxBFI43JXBRf4K57m6zeoa8M6u0FFEI11vHh4/ObTCZFk20wJNO9hRa1Zq1BeVDqABxMRf02HPAr02pC06bQ==
+"@libsql/client@^0.12.0":
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/@libsql/client/-/client-0.12.0.tgz#b820d158b6958a3c42218dcff8a032a841037003"
+  integrity sha512-Jt9ijfzlmswZzxRRksEv8Igbw7ER9IX/RSrwzEIRyzwwQLcpeZGGrnDQP9S7UPCJ90uFDiaICFiyhvwO+60DmA==
   dependencies:
-    "@libsql/core" "^0.11.0"
-    "@libsql/hrana-client" "^0.6.2"
+    "@libsql/core" "^0.12.0"
+    "@libsql/hrana-client" "^0.7.0"
     js-base64 "^3.7.5"
     libsql "^0.4.4"
     promise-limit "^2.7.0"
 
-"@libsql/core@^0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@libsql/core/-/core-0.11.0.tgz#a3619a708ca5d1100b2382a119407f30f1109c79"
-  integrity sha512-ksMxodOCXoU2tiQtlY7DzOLZ0xq8EWbXlmBk+56/8U7e7QMDrYmdt+XhOcCr4DAO5HSD9kMPqS4iVFBKGcWbBA==
+"@libsql/core@^0.12.0":
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/@libsql/core/-/core-0.12.0.tgz#141024ff12a42da55bcc9227d2c478fee5eba024"
+  integrity sha512-PZJF4qvPbDWZfXk0Tr+O5xaMhFoetA1gIVPgYLH6Bc6gAeyYxhGw268p+95SkADZDjB5CYPcVLvfQEjSVeR3Zw==
   dependencies:
     js-base64 "^3.7.5"
 
@@ -668,20 +668,20 @@
   resolved "https://registry.yarnpkg.com/@libsql/darwin-x64/-/darwin-x64-0.4.5.tgz#12931312f5b6975a29dfca6311404c606d34c934"
   integrity sha512-rZsEWj0H7oCqd5Y2pe0RzKmuQXC2OB1RbnFy4CvjeAjT6MP6mFp+Vx9mTCAUuJMhuoSVMsFPUJRpAQznl9E3Tg==
 
-"@libsql/hrana-client@^0.6.2":
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/@libsql/hrana-client/-/hrana-client-0.6.2.tgz#48aa08f21c099e93ca0abe2b881efa42ce61835c"
-  integrity sha512-MWxgD7mXLNf9FXXiM0bc90wCjZSpErWKr5mGza7ERy2FJNNMXd7JIOv+DepBA1FQTIfI8TFO4/QDYgaQC0goNw==
+"@libsql/hrana-client@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@libsql/hrana-client/-/hrana-client-0.7.0.tgz#c059d8106b9d40dd931217333710aff2ceb5216e"
+  integrity sha512-OF8fFQSkbL7vJY9rfuegK1R7sPgQ6kFMkDamiEccNUvieQ+3urzfDFI616oPl8V7T9zRmnTkSjMOImYCAVRVuw==
   dependencies:
-    "@libsql/isomorphic-fetch" "^0.2.1"
+    "@libsql/isomorphic-fetch" "^0.3.1"
     "@libsql/isomorphic-ws" "^0.1.5"
     js-base64 "^3.7.5"
     node-fetch "^3.3.2"
 
-"@libsql/isomorphic-fetch@^0.2.1":
-  version "0.2.5"
-  resolved "https://registry.yarnpkg.com/@libsql/isomorphic-fetch/-/isomorphic-fetch-0.2.5.tgz#4fdd82dc4967acf283f8678719955280b89e0d92"
-  integrity sha512-8s/B2TClEHms2yb+JGpsVRTPBfy1ih/Pq6h6gvyaNcYnMVJvgQRY7wAa8U2nD0dppbCuDU5evTNMEhrQ17ZKKg==
+"@libsql/isomorphic-fetch@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@libsql/isomorphic-fetch/-/isomorphic-fetch-0.3.1.tgz#42023816d5645a5a3f3a78bb3899bdc5814c7b88"
+  integrity sha512-6kK3SUK5Uu56zPq/Las620n5aS9xJq+jMBcNSOmjhNf/MUvdyji4vrMTqD7ptY7/4/CAVEAYDeotUz60LNQHtw==
 
 "@libsql/isomorphic-ws@^0.1.5":
   version "0.1.5"
