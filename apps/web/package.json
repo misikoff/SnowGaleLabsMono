@@ -47,7 +47,7 @@
     "vaul": "^0.9.4"
   },
   "devDependencies": {
-    "@types/react": "^18.3.7",
+    "@types/react": "^18.3.8",
     "@types/uuid": "^10.0.0",
     "autoprefixer": "^10.4.19",
     "commitlint": "^19.4.1",
