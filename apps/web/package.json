@@ -31,7 +31,7 @@
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.33.0",
-    "framer-motion": "^11.5.2",
+    "framer-motion": "^11.5.5",
     "immer": "^10.1.1",
     "lucide-react": "^0.441.0",
     "next": "^14.2.12",
