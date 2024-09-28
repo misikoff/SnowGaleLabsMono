@@ -1,17 +1,33 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true,
-    "jsx": "preserve",
+    "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ]
-    }
+      "@/*": ["*"]
+    },
+    "target": "es2016",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "incremental": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
   },
   "include": [
+    "fonts.d.ts",
+    "nativewind-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "nativewind-env.d.ts"
+    "**/*.ttf",
+    "**.js"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }

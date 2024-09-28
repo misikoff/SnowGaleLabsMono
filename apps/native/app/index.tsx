@@ -7,12 +7,27 @@
 // // the environment is set up appropriately
 // registerRootComponent(App)
 
-import { useFonts } from 'expo-font'
-import { View, StatusBar, Platform, Text } from 'react-native'
+import {
+  View,
+  //  StatusBar,
+  //  Platform,
+  Text,
+} from 'react-native'
 import { LogBox } from 'react-native'
-import { StyleSheet } from 'react-native';
-import { MotiView } from 'moti';
-import { Link } from 'expo-router';
+import { StyleSheet } from 'react-native'
+import { useFonts } from 'expo-font'
+import { Link } from 'expo-router'
+import { MotiView } from 'moti'
+
+import * as InterBold from '../src/assets/fonts/Inter-Bold.ttf'
+import * as InterMedium from '../src/assets/fonts/Inter-Medium.ttf'
+import * as InterRegular from '../src/assets/fonts/Inter-Regular.ttf'
+import * as InterSemiBold from '../src/assets/fonts/Inter-SemiBold.ttf'
+import * as MontserratBold from '../src/assets/fonts/Montserrat-Bold.ttf'
+import * as MontserratLight from '../src/assets/fonts/Montserrat-Light.ttf'
+import * as MontserratMedium from '../src/assets/fonts/Montserrat-Medium.ttf'
+import * as MontserratRegular from '../src/assets/fonts/Montserrat-Regular.ttf'
+import * as MontserratSemiBold from '../src/assets/fonts/Montserrat-SemiBold.ttf'
 
 function Shape() {
   return (
@@ -31,7 +46,7 @@ function Shape() {
       }}
       style={styles.shape}
     />
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -50,46 +65,44 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#9c1aff',
   },
-});
-
-
+})
 
 export default function App() {
   LogBox.ignoreLogs(['Warning: ...'])
   LogBox.ignoreAllLogs()
 
   const [loaded] = useFonts({
-    Bold: require('../src/assets/fonts/Inter-Bold.ttf'),
-    SemiBold: require('../src/assets/fonts/Inter-SemiBold.ttf'),
-    Medium: require('../src/assets/fonts/Inter-Medium.ttf'),
-    Regular: require('../src/assets/fonts/Inter-Regular.ttf'),
+    Bold: InterBold,
+    SemiBold: InterSemiBold,
+    Medium: InterMedium,
+    Regular: InterRegular,
 
-    MBold: require('../src/assets/fonts/Montserrat-Bold.ttf'),
-    MSemiBold: require('../src/assets/fonts/Montserrat-SemiBold.ttf'),
-    MMedium: require('../src/assets/fonts/Montserrat-Medium.ttf'),
-    MRegular: require('../src/assets/fonts/Montserrat-Regular.ttf'),
-    MLight: require('../src/assets/fonts/Montserrat-Light.ttf'),
+    MBold: MontserratBold,
+    MSemiBold: MontserratSemiBold,
+    MMedium: MontserratMedium,
+    MRegular: MontserratRegular,
+    MLight: MontserratLight,
   })
   if (!loaded) {
-    return false;
+    return false
   }
 
-  const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 50 : StatusBar.currentHeight
+  // const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 50 : StatusBar.currentHeight
 
   return (
     <View style={{ flex: 1 }}>
-      <View style={{ height: STATUS_BAR_HEIGHT, backgroundColor: '#0D87E1' }}>
+      {/* <View style={{ height: STATUS_BAR_HEIGHT, backgroundColor: '#0D87E1' }}>
         <StatusBar
           translucent
           backgroundColor={'#0D87E1'}
           barStyle='light-content'
         />
-      </View>
-      <Text>Onward1</Text>
-      <Link href="/home">home</Link>
+      </View> */}
+      <Text>Onward34343</Text>
+      <Link href='/home'>home</Link>
       <MotiView style={styles.container}>
-      <Shape />
-    </MotiView>
+        <Shape />
+      </MotiView>
     </View>
   )
 }
