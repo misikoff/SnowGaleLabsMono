@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native'
 import { Link } from 'expo-router'
 
-import TestComponent from '../components/test'
+import TestComponent from '@/components/test'
 
 export default function App() {
   return (

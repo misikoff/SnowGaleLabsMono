@@ -12,22 +12,22 @@ import {
   //  StatusBar,
   //  Platform,
   Text,
+  LogBox,
+  StyleSheet,
 } from 'react-native'
-import { LogBox } from 'react-native'
-import { StyleSheet } from 'react-native'
 import { useFonts } from 'expo-font'
 import { Link } from 'expo-router'
 import { MotiView } from 'moti'
 
-import * as InterBold from '../src/assets/fonts/Inter-Bold.ttf'
-import * as InterMedium from '../src/assets/fonts/Inter-Medium.ttf'
-import * as InterRegular from '../src/assets/fonts/Inter-Regular.ttf'
-import * as InterSemiBold from '../src/assets/fonts/Inter-SemiBold.ttf'
-import * as MontserratBold from '../src/assets/fonts/Montserrat-Bold.ttf'
-import * as MontserratLight from '../src/assets/fonts/Montserrat-Light.ttf'
-import * as MontserratMedium from '../src/assets/fonts/Montserrat-Medium.ttf'
-import * as MontserratRegular from '../src/assets/fonts/Montserrat-Regular.ttf'
-import * as MontserratSemiBold from '../src/assets/fonts/Montserrat-SemiBold.ttf'
+import InterBold from '@/src/assets/fonts/Inter-Bold.ttf'
+import InterMedium from '@/src/assets/fonts/Inter-Medium.ttf'
+import InterRegular from '@/src/assets/fonts/Inter-Regular.ttf'
+import InterSemiBold from '@/src/assets/fonts/Inter-SemiBold.ttf'
+import MontserratBold from '@/src/assets/fonts/Montserrat-Bold.ttf'
+import MontserratLight from '@/src/assets/fonts/Montserrat-Light.ttf'
+import MontserratMedium from '@/src/assets/fonts/Montserrat-Medium.ttf'
+import MontserratRegular from '@/src/assets/fonts/Montserrat-Regular.ttf'
+import MontserratSemiBold from '@/src/assets/fonts/Montserrat-SemiBold.ttf'
 
 function Shape() {
   return (
@@ -83,6 +83,7 @@ export default function App() {
     MRegular: MontserratRegular,
     MLight: MontserratLight,
   })
+  // not loading for some reason because of imports instead of requires
   if (!loaded) {
     return false
   }
