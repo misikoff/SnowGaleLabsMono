@@ -4999,10 +4999,10 @@ uuid@^8.3.2:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
   integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
 
-vaul@^0.9.9:
-  version "0.9.9"
-  resolved "https://registry.yarnpkg.com/vaul/-/vaul-0.9.9.tgz#ff075c3cba6193d4859bb6f1b09efcce049cf812"
-  integrity sha512-7afKg48srluhZwIkaU+lgGtFCUsYBSGOl8vcc8N/M3YQlZFlynHD15AE+pwrYdc826o7nrIND4lL9Y6b9WWZZQ==
+vaul@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/vaul/-/vaul-1.0.0.tgz#b2c84e626ffa417ee9352cdfc435b26e8f60f547"
+  integrity sha512-TegfMkwy86RSvSiIVREG6OqgRL7agqRsKYyWYacyVUAdpcIi34QoCOED476Mbf8J5d06e1hygSdvJhehlxEBhQ==
   dependencies:
     "@radix-ui/react-dialog" "^1.1.1"
 
