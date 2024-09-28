@@ -1,11 +1,16 @@
 // Learn more https://docs.expo.dev/guides/monorepos
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path')
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { getDefaultConfig } = require('expo/metro-config')
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { FileStore } = require('metro-cache')
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { withNativeWind } = require('nativewind/metro')
 
+// eslint-disable-next-line no-undef
 const projectRoot = __dirname
 const workspaceRoot = path.resolve(projectRoot, '../..')
 
