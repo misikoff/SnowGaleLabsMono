@@ -8,10 +8,10 @@
       ],
       // This is a hack for the monorepo since the nativewind.d.ts types should have been enough
       // https://github.com/nativewind/nativewind/issues/77#issuecomment-1913591952
-      "react-native": [
-        "../../node_modules/react-native",
-        "../../node_modules/nativewind"
-      ]
+      // "react-native": [
+      //   "../../node_modules/react-native",
+      //   "../../node_modules/nativewind"
+      // ]
     },
     "target": "es2016",
     "allowJs": true,
