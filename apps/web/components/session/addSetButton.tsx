@@ -2,9 +2,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { produce } from 'immer'
 import { v4 as uuidv4 } from 'uuid'
 
-import { Button } from 'components/ui/button'
+import { Set, SetGroupWithExerciseAndSets } from '@repo/db/schema'
+import { Button } from '@/components/ui/button'
 import { createSet } from 'app/app/actions'
-import { Set, SetGroupWithExerciseAndSets } from 'db/schema'
 
 export default function AddSetButton({
   setGroup,

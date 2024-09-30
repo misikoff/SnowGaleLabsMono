@@ -4,13 +4,13 @@ import { useEffect, useState } from 'react'
 
 import Link from 'next/link'
 
-import { Button } from 'components/ui/button'
+import { ProgramWithMicrocycles } from '@repo/db/schema'
+import { Button } from '@/components/ui/button'
 import {
   createMicrocycle,
   deleteMicrocycle,
   getProgramWithMicrocycles,
 } from 'app/app/actions'
-import { ProgramWithMicrocycles } from 'db/schema'
 
 // make sure button is not clickable when running
 export default function Home({ params }: { params: { slug: string } }) {

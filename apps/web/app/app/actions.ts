@@ -4,7 +4,7 @@ import { unstable_noStore as noStore } from 'next/cache'
 import { currentUser } from '@clerk/nextjs/server'
 import { and, asc, eq } from 'drizzle-orm'
 
-import { db } from 'db/index'
+import { db } from '@repo/db/index'
 import {
   users,
   User,
@@ -21,7 +21,7 @@ import {
   programs,
   SetGroup,
   SessionWithSetGroupWithExerciseAndSets,
-} from 'db/schema'
+} from '@repo/db/schema'
 
 const currentUserId = async () => {
   const clerkUser = await currentUser()

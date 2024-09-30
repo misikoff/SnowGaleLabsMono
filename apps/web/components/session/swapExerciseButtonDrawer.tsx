@@ -5,7 +5,8 @@ import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { produce } from 'immer'
 
-import { Button } from 'components/ui/button'
+import { Exercise, SetGroupWithExerciseAndSets } from '@repo/db/schema'
+import { Button } from '@/components/ui/button'
 import {
   // Drawer,
   // DrawerClose,
@@ -15,9 +16,8 @@ import {
   // DrawerHeader,
   DrawerTitle,
   // DrawerTrigger,
-} from 'components/ui/drawer'
+} from '@/components/ui/drawer'
 import { getExercises, updateSet, updateSetGroup } from 'app/app/actions'
-import { Exercise, SetGroupWithExerciseAndSets } from 'db/schema'
 
 import ExerciseSuperScroller from './exerciseSuperScroller'
 import {

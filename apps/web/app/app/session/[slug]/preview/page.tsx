@@ -5,9 +5,9 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRightIcon } from 'lucide-react'
 
+import { SessionWithSetGroupWithExerciseAndSets } from '@repo/db/schema'
+import { getSession } from '@/app/app/actions'
 import SetGroupBlock from '@/components/session/setGroupBlock'
-import { getSession } from 'app/app/actions'
-import { SessionWithSetGroupWithExerciseAndSets } from 'db/schema'
 
 // // const user = {
 // //   preferredUnits: 'lbs',

@@ -2,18 +2,18 @@
 
 import { useEffect, useState } from 'react'
 
-import { Button } from 'components/ui/button'
-import { Input } from 'components/ui/input'
-import { Label } from 'components/ui/label'
+import { User } from '@repo/db/schema'
+import { EquipmentType } from '@repo/db/schema'
+import { exercisesArray } from '@repo/db/seedData'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   createMainExercise,
   createUser,
   deleteAllMainExercises,
   getUsers,
 } from 'app/app/actions'
-import { User } from 'db/schema'
-import { EquipmentType } from 'db/schema'
-import { exercisesArray } from 'db/seedData'
 
 export default function Home() {
   const [userName, setUserName] = useState('')

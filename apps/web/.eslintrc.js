@@ -16,7 +16,12 @@ module.exports = {
           { pattern: 'next', group: 'external', position: 'before' },
           { pattern: 'next/**', group: 'external', position: 'before' },
           {
-            pattern: 'components/**',
+            pattern: '@repo/**',
+            group: 'internal',
+            position: 'before',
+          },
+          {
+            pattern: '@/**',
             group: 'internal',
             position: 'before',
           },
