@@ -3,10 +3,9 @@ import React, { useRef, useState, useCallback, useEffect } from 'react'
 import clsx from 'clsx'
 import { InfoIcon } from 'lucide-react'
 
+import InfoPopoverExercise from '@/components/session/infoPopoverExercise'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
-
-import InfoPopoverExercise from './infoPopoverExercise'
 
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 

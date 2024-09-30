@@ -6,7 +6,7 @@ import Link from 'next/link'
 import clsx from 'clsx'
 import { ChevronLeft, ChevronRight, InfoIcon } from 'lucide-react'
 
-import { Session } from 'db/schema'
+import { Session } from '@repo/db/schema'
 
 import InfoPopoverProgram from './infoPopoverProgram'
 import InfoPopoverReadiness from './infoPopoverReadiness'

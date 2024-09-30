@@ -11,7 +11,7 @@ import {
   useSignUp,
 } from '@clerk/nextjs'
 
-import { Button } from 'components/ui/button'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,

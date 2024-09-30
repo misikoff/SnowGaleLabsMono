@@ -5,16 +5,16 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { produce } from 'immer'
 import { ArrowDownNarrowWide, ArrowUpNarrowWide } from 'lucide-react'
 
-import SetGroupBlock from 'components/session/setGroupBlock'
-import { Button } from 'components/ui/button'
-import AddExerciseButtonDrawer from '@/components/session/addExerciseButtonDrawer'
+import { Session, SetGroupWithExerciseAndSets } from '@repo/db/schema'
 import {
   deleteSession,
   getSession,
   updateSession,
   updateSetGroup,
-} from 'app/app/actions'
-import { Session, SetGroupWithExerciseAndSets } from 'db/schema'
+} from '@/app/app/actions'
+import AddExerciseButtonDrawer from '@/components/session/addExerciseButtonDrawer'
+import SetGroupBlock from '@/components/session/setGroupBlock'
+import { Button } from '@/components/ui/button'
 
 export default function Home({ params }: { params: { slug: string } }) {
   const queryClient = useQueryClient()

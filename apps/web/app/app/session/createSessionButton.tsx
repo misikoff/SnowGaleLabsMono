@@ -5,8 +5,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { produce } from 'immer'
 import { v4 as uuidv4 } from 'uuid'
 
-import { Button } from 'components/ui/button'
-import { Session } from '@/db/schema'
+import { Session } from '@repo/db/schema'
+import { Button } from '@/components/ui/button'
 import { createSession } from 'app/app/actions'
 
 export default function CreateSessionButton() {

@@ -2,6 +2,7 @@ import { View, Text } from 'react-native'
 import { Link } from 'expo-router'
 import { useQuery } from '@tanstack/react-query'
 
+import { Exercise } from '@repo/db/schema'
 import TestComponent from '@/components/test'
 import { supabase } from '@/utils/supabase'
 
@@ -22,7 +23,7 @@ export default function App() {
         return []
       }
       console.log({ data, test: 'test' })
-      return data as { id: string; name: string }[]
+      return data as Exercise[]
     },
   })
 

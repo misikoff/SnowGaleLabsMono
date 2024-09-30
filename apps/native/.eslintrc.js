@@ -45,7 +45,12 @@ module.exports = {
           { pattern: 'expo/**', group: 'external', position: 'before' },
           { pattern: 'expo-**', group: 'external', position: 'before' },
           {
-            pattern: 'components/**',
+            pattern: '@repo/**',
+            group: 'internal',
+            position: 'before',
+          },
+          {
+            pattern: '@/**',
             group: 'internal',
             position: 'before',
           },

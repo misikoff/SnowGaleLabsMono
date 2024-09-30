@@ -6,8 +6,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { produce } from 'immer'
 import { MinusIcon, PlusIcon } from 'lucide-react'
 
-import AnimatedNumber from 'components/animatedNumber'
-import { Button } from 'components/ui/button'
+import { Set, SetGroupWithExerciseAndSets } from '@repo/db/schema'
+import AnimatedNumber from '@/components/animatedNumber'
+import { Button } from '@/components/ui/button'
 import {
   Sheet,
   SheetClose,
@@ -16,9 +17,8 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from 'components/ui/sheet'
+} from '@/components/ui/sheet'
 import { updateSet } from 'app/app/actions'
-import { Set, SetGroupWithExerciseAndSets } from 'db/schema'
 
 export default function PerformanceButton({
   children,

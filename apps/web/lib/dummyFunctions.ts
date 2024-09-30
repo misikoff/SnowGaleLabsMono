@@ -1,4 +1,4 @@
-import { Set } from 'db/schema'
+import { Set } from '@repo/db/schema'
 
 export function createDummySet({
   id, // required

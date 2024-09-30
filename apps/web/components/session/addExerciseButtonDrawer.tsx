@@ -6,7 +6,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { produce } from 'immer'
 import { v4 as uuidv4 } from 'uuid'
 
-import { Button } from 'components/ui/button'
+import {
+  Exercise,
+  SessionWithSetGroupWithExerciseAndSets,
+  Set,
+  SetGroup,
+  SetGroupWithExerciseAndSets,
+} from '@repo/db/schema'
+import { Button } from '@/components/ui/button'
 import {
   // Drawer,
   // DrawerClose,
@@ -16,15 +23,8 @@ import {
   // DrawerHeader,
   DrawerTitle,
   // DrawerTrigger,
-} from 'components/ui/drawer'
+} from '@/components/ui/drawer'
 import { createSet, createSetGroup, getExercises } from 'app/app/actions'
-import {
-  Exercise,
-  SessionWithSetGroupWithExerciseAndSets,
-  Set,
-  SetGroup,
-  SetGroupWithExerciseAndSets,
-} from 'db/schema'
 
 import ExerciseSuperScroller from './exerciseSuperScroller'
 import {

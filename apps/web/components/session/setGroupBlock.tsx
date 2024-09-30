@@ -1,8 +1,8 @@
 import clsx from 'clsx'
 import { InfoIcon, ArrowRightLeftIcon } from 'lucide-react'
 
-import { Button } from 'components/ui/button'
-import { Set, SetGroupWithExerciseAndSets } from 'db/schema'
+import { Set, SetGroupWithExerciseAndSets } from '@repo/db/schema'
+import { Button } from '@/components/ui/button'
 
 import AddSetButton from './addSetButton'
 import InfoPopoverExercise from './infoPopoverExercise'

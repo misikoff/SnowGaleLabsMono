@@ -4,12 +4,12 @@ import { useEffect, useState } from 'react'
 
 import Link from 'next/link'
 
-import { Button } from 'components/ui/button'
-import { Input } from 'components/ui/input'
-import { Label } from 'components/ui/label'
-import { Textarea } from 'components/ui/textarea'
+import { Program } from '@repo/db/schema'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { createProgram, getPrograms, getUsers } from 'app/app/actions'
-import { Program } from 'db/schema'
 
 export default function Home() {
   const [programName, setProgramName] = useState('')

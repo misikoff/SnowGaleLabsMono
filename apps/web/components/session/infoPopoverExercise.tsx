@@ -4,8 +4,9 @@ import { useState } from 'react'
 
 import { MinusIcon, PlusIcon } from 'lucide-react'
 
-import { Badge } from 'components/ui/badge'
-import { Button } from 'components/ui/button'
+import { Exercise } from '@repo/db/schema'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   Sheet,
   SheetClose,
@@ -14,8 +15,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from 'components/ui/sheet'
-import { Exercise } from 'db/schema'
+} from '@/components/ui/sheet'
 
 // const exercise = {
 //   name: 'Squat',
