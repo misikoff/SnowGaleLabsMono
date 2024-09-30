@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^5.6.2",
+    "@clerk/nextjs": "^5.6.3",
     "@headlessui/react": "^2.1.5",
     "@heroicons/react": "^2.1.1",
     "@repo/db": "*",
@@ -28,7 +28,7 @@
     "clsx": "^2.1.0",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
-    "framer-motion": "^11.8.0",
+    "framer-motion": "^11.9.0",
     "immer": "^10.1.1",
     "lucide-react": "^0.446.0",
     "next": "^14.2.13",
