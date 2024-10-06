@@ -1,34 +1,80 @@
 import '@/global.css'
-import { Text, View } from 'react-native'
-import { Link, Slot } from 'expo-router'
-import { StatusBar } from 'expo-status-bar'
+import { Platform, StatusBar, View } from 'react-native'
+import { Slot } from 'expo-router'
+import * as SecureStore from 'expo-secure-store'
+import { ClerkProvider, ClerkLoaded } from '@clerk/clerk-expo'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 
 export default function HomeLayout() {
+  const tokenCache = {
+    async getToken(key: string) {
+      try {
+        const item = await SecureStore.getItemAsync(key)
+        if (item) {
+          console.log(`${key} was used 🔐 \n`)
+        } else {
+          console.log('No values stored under key: ' + key)
+        }
+        return item
+      } catch (error) {
+        console.error('SecureStore get item error: ', error)
+        await SecureStore.deleteItemAsync(key)
+        return null
+      }
+    },
+    async saveToken(key: string, value: string) {
+      try {
+        return SecureStore.setItemAsync(key, value)
+      } catch (err) {
+        console.error('SecureStore save item error: ', err)
+        return
+      }
+    },
+    async clearToken(key: string) {
+      console.log('clear called!!')
+      console.log('key: ', key)
+      try {
+        await SecureStore.deleteItemAsync(key)
+        return
+      } catch (err) {
+        console.error('SecureStore delete item error: ', err)
+        return
+      }
+    },
+  }
+
+  // need to call this on sign out
+  // tokenCache.clearToken('__clerk_client_jwt')
+
+  const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!
+
+  if (!publishableKey) {
+    throw new Error(
+      'Missing Publishable Key. Please set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env',
+    )
+  }
   const queryClient = new QueryClient()
+  const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 50 : StatusBar.currentHeight
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <View className='flex-1 bg-gray-100'>
-        {/* Header */}
-        <View className='h-16 items-center justify-center bg-blue-600'>
-          <StatusBar style='auto' />
-          <Text className='text-lg font-bold text-white'>Header</Text>
-        </View>
-
-        {/* Dynamic Slot */}
-        <View className='flex-1 items-center justify-center p-4'>
+    <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
+      <ClerkLoaded>
+        <QueryClientProvider client={queryClient}>
+          <View
+            style={{ height: STATUS_BAR_HEIGHT, backgroundColor: '#0D87E1' }}
+          >
+            <StatusBar
+              translucent
+              backgroundColor={'#0D87E1'}
+              barStyle='light-content'
+            />
+          </View>
           <Slot />
-        </View>
-
-        {/* Footer */}
-        <View className='h-16 flex-row items-center justify-center bg-blue-600'>
-          <Text className='text-lg font-bold text-white'>Footer</Text>
-          <Link href='/' className='hover:text-red-500'>
-            root
-          </Link>
-        </View>
-      </View>
-    </QueryClientProvider>
+          {/* <Stack>
+            <Stack.Screen name='(home)' options={{ headerShown: false }} />
+          </Stack> */}
+        </QueryClientProvider>
+      </ClerkLoaded>
+    </ClerkProvider>
   )
 }

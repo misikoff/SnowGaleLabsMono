@@ -9,15 +9,14 @@
 
 import {
   View,
-  //  StatusBar,
-  //  Platform,
   Text,
   LogBox,
-  StyleSheet,
+  // StyleSheet,
+  Pressable,
 } from 'react-native'
 import { useFonts } from 'expo-font'
 import { Link } from 'expo-router'
-import { MotiView } from 'moti'
+import { SignedIn, SignedOut, useAuth, useUser } from '@clerk/clerk-expo'
 
 import InterBold from '@/assets/fonts/Inter-Bold.ttf'
 import InterMedium from '@/assets/fonts/Inter-Medium.ttf'
@@ -29,47 +28,56 @@ import MontserratMedium from '@/assets/fonts/Montserrat-Medium.ttf'
 import MontserratRegular from '@/assets/fonts/Montserrat-Regular.ttf'
 import MontserratSemiBold from '@/assets/fonts/Montserrat-SemiBold.ttf'
 
-function Shape() {
-  return (
-    <MotiView
-      from={{
-        translateY: -100,
-      }}
-      animate={{
-        translateY: 0,
-      }}
-      transition={{
-        loop: true,
-        type: 'timing',
-        duration: 1500,
-        delay: 100,
-      }}
-      style={styles.shape}
-    />
-  )
-}
+// function Shape() {
+//   return (
+//     <MotiView
+//       from={{
+//         translateY: -100,
+//       }}
+//       animate={{
+//         translateY: 0,
+//       }}
+//       transition={{
+//         loop: true,
+//         type: 'timing',
+//         duration: 1500,
+//         delay: 100,
+//       }}
+//       style={styles.shape}
+//     />
+//   )
+// }
 
-const styles = StyleSheet.create({
-  shape: {
-    justifyContent: 'center',
-    height: 250,
-    width: 250,
-    borderRadius: 25,
-    marginRight: 10,
-    backgroundColor: 'white',
-  },
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    backgroundColor: '#9c1aff',
-  },
-})
+// const styles = StyleSheet.create({
+//   shape: {
+//     justifyContent: 'center',
+//     height: 250,
+//     width: 250,
+//     borderRadius: 25,
+//     marginRight: 10,
+//     backgroundColor: 'white',
+//   },
+//   container: {
+//     flex: 1,
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     flexDirection: 'row',
+//     backgroundColor: '#9c1aff',
+//   },
+// })
 
 export default function App() {
   LogBox.ignoreLogs(['Warning: ...'])
   LogBox.ignoreAllLogs()
+
+  const { user } = useUser()
+  // const c = useClerk()
+  const auth = useAuth()
+
+  const signOut = async () => {
+    // await c.signOut()
+    await auth.signOut()
+  }
 
   const [loaded] = useFonts({
     Bold: InterBold,
@@ -88,22 +96,34 @@ export default function App() {
     return false
   }
 
-  // const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 50 : StatusBar.currentHeight
-
   return (
-    <View style={{ flex: 1 }}>
-      {/* <View style={{ height: STATUS_BAR_HEIGHT, backgroundColor: '#0D87E1' }}>
-        <StatusBar
-          translucent
-          backgroundColor={'#0D87E1'}
-          barStyle='light-content'
-        />
+    <View className='flex-1 items-center gap-8 p-8'>
+      <Text>Welcome to Centurion</Text>
+      <SignedIn>
+        <Text>Hello {user?.emailAddresses[0].emailAddress}</Text>
+        <Link
+          href='/app'
+          className='overflow-hidden rounded-lg bg-blue-400 px-2 py-3 font-extrabold text-white shadow-2xl'
+        >
+          Proceed To App
+        </Link>
+        <Pressable onPress={signOut}>
+          <Text>sign out 123</Text>
+        </Pressable>
+      </SignedIn>
+      <SignedOut>
+        <Link href='/(auth)/sign-in'>
+          <Text>Sign In</Text>
+        </Link>
+        <Link href='/(auth)/sign-up'>
+          <Text>Sign Up</Text>
+        </Link>
+      </SignedOut>
+      {/* <View className='h-24 w-24'>
+        <MotiView style={styles.container}>
+          <Shape />
+        </MotiView>
       </View> */}
-      <Text>Onward34343</Text>
-      <Link href='/home'>home</Link>
-      <MotiView style={styles.container}>
-        <Shape />
-      </MotiView>
     </View>
   )
 }
