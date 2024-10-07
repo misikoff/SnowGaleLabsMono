@@ -2,11 +2,11 @@
 
 import { useRouter } from 'next/navigation'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createSession } from 'app/app/actions'
 import { produce } from 'immer'
 import { v4 as uuidv4 } from 'uuid'
 
 import { Session } from '@repo/db/schema'
+import { createSession } from '@/app/app/actions'
 import { Button } from '@/components/ui/button'
 
 export default function CreateSessionButton() {
