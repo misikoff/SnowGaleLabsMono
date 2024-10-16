@@ -107,8 +107,11 @@ export default function App() {
         >
           Proceed To App
         </Link>
-        <Pressable onPress={signOut}>
-          <Text>sign out 123</Text>
+        <Pressable
+          onPress={signOut}
+          className='overflow-hidden rounded-lg bg-gray-400 px-2 py-3 shadow-2xl'
+        >
+          <Text className='font-extrabold text-white'>sign out</Text>
         </Pressable>
       </SignedIn>
       <SignedOut>

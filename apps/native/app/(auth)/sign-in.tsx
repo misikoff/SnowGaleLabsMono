@@ -10,7 +10,7 @@ export default function Page() {
 
   const [emailAddress, setEmailAddress] = useState('')
   const [password, setPassword] = useState('')
-
+  // TODO: on sign out invalidate cache, or add user id to query keys
   const onSignInPress = useCallback(async () => {
     if (!isLoaded) {
       return

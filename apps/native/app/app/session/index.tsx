@@ -6,8 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { produce } from 'immer'
 
 import { Session } from '@repo/db/schema'
-import TestComponent from '@/components/test'
-import { createSession, getSessions } from '@/lib/dbFunctions'
+import { createSession, deleteSession, getSessions } from '@/lib/dbFunctions'
 
 export default function App() {
   const user = useUser()
@@ -61,11 +60,42 @@ export default function App() {
     },
   })
 
+  const deleteSessionMutation = useMutation({
+    mutationFn: (id: Session['id']) => deleteSession(id),
+    onMutate: async (id) => {
+      // Cancel any outgoing refetches
+      // (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({
+        queryKey: ['sessions'],
+      })
+
+      // Snapshot the previous value
+      const previousSessions = queryClient.getQueryData([
+        'sessions',
+      ]) as Session[]
+
+      const nextSessions = previousSessions.filter((s) => {
+        console.log({ a: id, b: s.id, res: s.id !== id })
+        return s.id !== id
+      })
+
+      console.log({ nextSessions })
+      // Optimistically update to the new value
+      queryClient.setQueryData(['sessions'], nextSessions)
+
+      // Return a context object with the snapshotted value
+      return { previousSessions }
+    },
+    onSuccess: () => {
+      console.log('session deleted')
+      queryClient.invalidateQueries({ queryKey: ['sessions'] })
+    },
+  })
+
   return (
     <View className='w-full flex-1'>
       <Text>Sessions</Text>
       <Link href='/'>/</Link>
-      <TestComponent name='Home3' />
       <Pressable
         onPress={async () => {
           console.log('create session')
@@ -89,9 +119,17 @@ export default function App() {
       {isError && <Text>Error</Text>}
 
       {sessions?.map((session) => (
-        <Link key={session.id} href={`/app/session/${session.id}`}>
-          <Text>{session.id}</Text>
-        </Link>
+        <View key={session.id} className='flex-row gap-4'>
+          <Link href={`/app/session/${session.id}`}>{session.id}</Link>
+          <Pressable
+            onPress={async () => {
+              console.log('delete session')
+              deleteSessionMutation.mutateAsync(session.id)
+            }}
+          >
+            <Text className='bg-red-500'>Delete</Text>
+          </Pressable>
+        </View>
       ))}
     </View>
   )

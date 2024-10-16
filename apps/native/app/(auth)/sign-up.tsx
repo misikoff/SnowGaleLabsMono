@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 import { TextInput, Button, View, Text } from 'react-native'
 import { Link, useRouter } from 'expo-router'
-import { useClerk, useSignUp } from '@clerk/clerk-expo'
+import { useSignUp } from '@clerk/clerk-expo'
 
 export default function SignUpScreen() {
   const { isLoaded, signUp, setActive } = useSignUp()
@@ -61,7 +61,7 @@ export default function SignUpScreen() {
   }
 
   return (
-    <View>
+    <View className='p-4'>
       <Text>pendingVerification: {pendingVerification}</Text>
       {!pendingVerification && (
         <>
@@ -77,7 +77,7 @@ export default function SignUpScreen() {
             secureTextEntry={true}
             onChangeText={(password) => setPassword(password)}
           />
-          <Button title='Sign Up123' onPress={onSignUpPress} />
+          <Button title='Sign Up' onPress={onSignUpPress} />
         </>
       )}
       {pendingVerification && (
