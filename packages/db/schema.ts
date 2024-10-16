@@ -280,7 +280,7 @@ export const sets = pgTable(
       }),
     microcycleId: uuid('microcycle_id').references(() => microcycles.id),
     programId: uuid('program_id').references(() => programs.id),
-    exerciseId: uuid('excercise_id')
+    exerciseId: uuid('exercise_id')
       .notNull()
       .references(() => exercises.id, {
         onDelete: 'cascade',
@@ -304,6 +304,7 @@ export const sets = pgTable(
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at')
       .notNull()
+      .defaultNow()
       .$onUpdate(() => new Date()),
   },
   (table) => ({
