@@ -2,8 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { produce } from 'immer'
 
 import { Set, SetGroupWithExerciseAndSets } from '@repo/db/schema'
+import { deleteSet } from '@/app/app/actions'
 import { Button } from '@/components/ui/button'
-import { deleteSet } from 'app/app/actions'
 
 export default function RemoveSetButton({ set }: { set: Set }) {
   const queryClient = useQueryClient()

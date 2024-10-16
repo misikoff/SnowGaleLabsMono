@@ -4,9 +4,9 @@ import Link from 'next/link'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { Session } from '@repo/db/schema'
+import { deleteSession, getSessions } from '@/app/app/actions'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { deleteSession, getSessions } from 'app/app/actions'
 
 import CreateSessionButton from './createSessionButton'
 

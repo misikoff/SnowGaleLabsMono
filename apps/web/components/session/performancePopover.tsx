@@ -7,6 +7,7 @@ import { produce } from 'immer'
 import { MinusIcon, PlusIcon } from 'lucide-react'
 
 import { Set, SetGroupWithExerciseAndSets } from '@repo/db/schema'
+import { updateSet } from '@/app/app/actions'
 import AnimatedNumber from '@/components/animatedNumber'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,7 +19,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { updateSet } from 'app/app/actions'
 
 export default function PerformanceButton({
   children,

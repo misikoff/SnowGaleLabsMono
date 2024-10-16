@@ -4,8 +4,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { produce } from 'immer'
 
 import { SetGroupWithExerciseAndSets } from '@repo/db/schema'
+import { deleteSetGroup } from '@/app/app/actions'
 import { Button } from '@/components/ui/button'
-import { deleteSetGroup } from 'app/app/actions'
 
 export default function RemoveSetGroupButton({
   setGroup,
@@ -13,7 +13,7 @@ export default function RemoveSetGroupButton({
   setGroup: SetGroupWithExerciseAndSets
 }) {
   const queryClient = useQueryClient()
-  const deleteSetMutation = useMutation({
+  const deleteSetGroupMutation = useMutation({
     mutationFn: (id: Parameters<typeof deleteSetGroup>[0]) =>
       deleteSetGroup(id),
     // When mutate is called:
@@ -71,7 +71,7 @@ export default function RemoveSetGroupButton({
     <Button
       variant='destructive'
       onClick={async () => {
-        await deleteSetMutation.mutateAsync(setGroup.id)
+        await deleteSetGroupMutation.mutateAsync(setGroup.id)
       }}
     >
       Remove Exercise

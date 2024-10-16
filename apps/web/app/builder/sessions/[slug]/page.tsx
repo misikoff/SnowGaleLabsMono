@@ -5,6 +5,12 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
 import { Exercise } from '@repo/db/schema'
+import {
+  createSetGroup,
+  deleteSetGroup,
+  getExercises,
+  getSessionWithSetGroups,
+} from '@/app/app/actions'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -15,12 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  createSetGroup,
-  deleteSetGroup,
-  getExercises,
-  getSessionWithSetGroups,
-} from 'app/app/actions'
 
 // https://stackoverflow.com/questions/59774572/how-to-get-the-return-type-of-async-function-in-typescript
 type AsyncReturnType<T extends (...args: any) => Promise<any>> = T extends (

@@ -1,8 +1,8 @@
 'use client'
 
 import { exercisesArray } from '@repo/db/seedData'
+import { createExercise, deleteAllExercises } from '@/app/app/actions'
 import { Button } from '@/components/ui/button'
-import { createExercise, deleteAllExercises } from 'app/app/actions'
 
 export default function Home() {
   return (
