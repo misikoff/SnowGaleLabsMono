@@ -9,7 +9,7 @@ import { Session } from '@repo/db/schema'
 import { createSession } from '@/app/app/actions'
 import { Button } from '@/components/ui/button'
 
-export default function CreateSessionButton() {
+export default function AddSessionButton() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const createSessionMutation = useMutation({

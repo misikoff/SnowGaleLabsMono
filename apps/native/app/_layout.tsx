@@ -1,5 +1,9 @@
 import '@/global.css'
-import { Platform, StatusBar, View } from 'react-native'
+import {
+  //  Platform,
+  //  StatusBar,
+  View,
+} from 'react-native'
 import { Slot } from 'expo-router'
 import * as SecureStore from 'expo-secure-store'
 import { ClerkProvider, ClerkLoaded } from '@clerk/clerk-expo'
@@ -43,7 +47,7 @@ const tokenCache = {
 }
 
 export const queryClient = new QueryClient()
-const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 50 : StatusBar.currentHeight
+// const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 50 : StatusBar.currentHeight
 
 // need to call this on sign out
 // tokenCache.clearToken('__clerk_client_jwt')
@@ -62,13 +66,13 @@ export default function HomeLayout() {
       <ClerkLoaded>
         <QueryClientProvider client={queryClient}>
           <View
-            style={{ height: STATUS_BAR_HEIGHT, backgroundColor: '#0D87E1' }}
+          // style={{ height: STATUS_BAR_HEIGHT, backgroundColor: '#0D87E1' }}
           >
-            <StatusBar
+            {/* <StatusBar
               translucent
               backgroundColor={'#0D87E1'}
               barStyle='light-content'
-            />
+            /> */}
           </View>
           <Slot />
           {/* <Stack>

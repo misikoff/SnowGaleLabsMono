@@ -423,8 +423,8 @@ export async function updateSet({
 }: {
   id: Set['id']
   reps?: Set['reps']
-  RPE?: Set['RPE']
-  RIR?: Set['RIR']
+  rpe?: Set['rpe']
+  RIR?: Set['rir']
   weight?: Set['weight']
   exerciseId?: Set['exerciseId']
 }) {

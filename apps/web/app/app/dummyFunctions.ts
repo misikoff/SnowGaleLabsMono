@@ -13,8 +13,8 @@ export function createDummySet({
   prescribedRir = null,
   prescribedWeight = null,
   reps = null,
-  rpe = null,
-  rir = null,
+  Rpe = null,
+  Rir = null,
   weight = null,
   order = null,
   createdAt = new Date(),
@@ -32,8 +32,8 @@ export function createDummySet({
   prescribedRir?: number | null
   prescribedWeight?: number | null
   reps?: number | null
-  rpe?: number | null
   rir?: number | null
+  rpe?: number | null
   weight?: number | null
   order?: number | null
   createdAt?: Date

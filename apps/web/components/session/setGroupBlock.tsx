@@ -2,35 +2,34 @@ import clsx from 'clsx'
 import { InfoIcon, ArrowRightLeftIcon } from 'lucide-react'
 
 import { Set, SetGroupWithExerciseAndSets } from '@repo/db/schema'
+import AddSetButton from '@/components/session/addSetButton'
+import InfoPopoverExercise from '@/components/session/infoPopoverExercise'
+import PerformanceButton from '@/components/session/performancePopover'
+import RemoveSetButton from '@/components/session/removeSetButton'
+import RemoveSetGroupButton from '@/components/session/removeSetGroupButton'
+import SwapExerciseButtonDrawer from '@/components/session/swapExerciseButtonDrawer'
 import { Button } from '@/components/ui/button'
 
-import AddSetButton from './addSetButton'
-import InfoPopoverExercise from './infoPopoverExercise'
-import PerformanceButton from './performancePopover'
-import RemoveSetButton from './removeSetButton'
-import RemoveSetGroupButton from './removeSetGroupButton'
-import SwapExerciseButtonDrawer from './swapExerciseButtonDrawer'
-
 function getSetLabel(set: Set) {
-  if (set.prescribedWeight && set.prescribedReps && set.prescribedRPE) {
-    return `${set.prescribedWeight}# x ${set.prescribedReps} @ RPE ${set.prescribedRPE}`
+  if (set.prescribedWeight && set.prescribedReps && set.prescribedRpe) {
+    return `${set.prescribedWeight}# x ${set.prescribedReps} @ RPE ${set.prescribedRpe}`
   } else if (set.prescribedWeight && set.prescribedReps) {
     return `${set.prescribedWeight}# x ${set.prescribedReps}`
-  } else if (set.prescribedWeight && set.prescribedRPE) {
-    return `${set.prescribedWeight}# @ RPE ${set.prescribedRPE}`
-  } else if (set.prescribedReps && set.prescribedRPE) {
-    return `${set.prescribedReps} @ RPE ${set.prescribedRPE}`
+  } else if (set.prescribedWeight && set.prescribedRpe) {
+    return `${set.prescribedWeight}# @ RPE ${set.prescribedRpe}`
+  } else if (set.prescribedReps && set.prescribedRpe) {
+    return `${set.prescribedReps} @ RPE ${set.prescribedRpe}`
   } else if (set.prescribedWeight) {
     return `${set.prescribedWeight}#`
   } else if (set.prescribedReps) {
     return `${set.prescribedReps} reps`
-  } else if (set.prescribedRPE) {
-    return `RPE ${set.prescribedRPE}`
+  } else if (set.prescribedRpe) {
+    return `RPE ${set.prescribedRpe}`
   }
 }
 
 function isSetEmpty(set: Set) {
-  return !set.weight && !set.reps && !set.RPE
+  return !set.weight && !set.reps && !set.rpe
 }
 
 export default function SetGroupBlock({
@@ -56,9 +55,9 @@ export default function SetGroupBlock({
           </div>
           <div className='flex'>{getSetLabel(set)}</div>
           <br />
-          {set.weight && set.reps && set.RPE && (
+          {set.weight && set.reps && set.rpe && (
             <div>
-              Performed {set.weight} x {set.reps} @ RPE {set.RPE}
+              Performed {set.weight} x {set.reps} @ RPE {set.rpe}
             </div>
           )}
           {/* {getSetType(set)} */}
@@ -90,7 +89,7 @@ export default function SetGroupBlock({
             <InfoIcon className='w-6 h-6 text-gray-400' />
           </InfoPopoverExercise>
           <SwapExerciseButtonDrawer setGroup={setGroup}>
-            <ArrowRightLeftIcon className='hover:cursor-pointer w-6 h-6 text-gray-400' />
+            <ArrowRightLeftIcon className='w-6 h-6 text-gray-400' />
           </SwapExerciseButtonDrawer>
         </div>
       </div>
