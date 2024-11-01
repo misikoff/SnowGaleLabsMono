@@ -22,6 +22,15 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name='settings'
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ color }) => (
+            <FontAwesome6 size={24} name='dumbbell' color={color} />
+          ),
+        }}
+      />
     </Tabs>
   )
 }

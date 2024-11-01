@@ -10,8 +10,10 @@ import { updateSession } from '@/lib/dbFunctions'
 
 export default function CompleteSessionButton({
   session,
+  children,
 }: {
   session: SessionWithSetGroupWithExerciseAndSets
+  children: React.ReactNode
 }) {
   const queryClient = useQueryClient()
   const [modalVisible, setModalVisible] = useState(false)
@@ -129,7 +131,7 @@ export default function CompleteSessionButton({
         </View> */}
       </Modal>
       <Pressable style={styles.button} onPress={() => setModalVisible(true)}>
-        <Text>Complete Session</Text>
+        {children}
       </Pressable>
     </View>
   )

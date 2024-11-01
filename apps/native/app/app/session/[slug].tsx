@@ -57,10 +57,20 @@ export default function Page() {
       )}
 
       <AddExerciseButton session={session}>
-        <Text>Add Exercise</Text>
+        <View className='rounded-md bg-teal-600 px-3 py-2 text-center'>
+          <Text className='text-center text-xl font-bold text-white'>
+            <Text>Add Exercise</Text>
+          </Text>
+        </View>
       </AddExerciseButton>
 
-      <CompleteSessionButton session={session} />
+      <CompleteSessionButton session={session}>
+        <View className='rounded-md bg-green-600 px-3 py-2 text-center'>
+          <Text className='text-center text-xl font-bold text-white'>
+            <Text>Complete Session</Text>
+          </Text>
+        </View>
+      </CompleteSessionButton>
     </ScrollView>
   )
 }
