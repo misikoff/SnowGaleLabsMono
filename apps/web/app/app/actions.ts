@@ -416,22 +416,22 @@ export async function getSessions() {
 export async function updateSet({
   id,
   reps,
-  RPE,
-  RIR,
+  rpe,
+  rir,
   weight,
   exerciseId,
 }: {
   id: Set['id']
   reps?: Set['reps']
   rpe?: Set['rpe']
-  RIR?: Set['rir']
+  rir?: Set['rir']
   weight?: Set['weight']
   exerciseId?: Set['exerciseId']
 }) {
   noStore()
   return await db
     .update(sets)
-    .set({ reps, RPE, RIR, weight, exerciseId })
+    .set({ reps, rpe, rir, weight, exerciseId })
     .where(and(eq(sets.id, id), eq(sets.userId, await currentUserId())))
     .returning()
 }

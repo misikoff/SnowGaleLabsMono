@@ -40,12 +40,12 @@ export default function PerformanceButton({
   )
 
   const updateSetMutation = useMutation({
-    mutationFn: ({ id, reps, weight, RPE }: Parameters<typeof updateSet>[0]) =>
+    mutationFn: ({ id, reps, weight, rpe }: Parameters<typeof updateSet>[0]) =>
       updateSet({
         id,
         reps,
         weight,
-        RPE,
+        rpe,
       }),
     // When mutate is called:
     // TODO: better typing with a simple set or dummy set, but still may require casting
@@ -163,7 +163,7 @@ export default function PerformanceButton({
       id: set.id,
       reps: repValue,
       weight: weightValue,
-      RPE: difficultyValue,
+      rpe: difficultyValue,
     })
   }
 
@@ -176,7 +176,7 @@ export default function PerformanceButton({
       id: set.id,
       reps: 0,
       weight: 0,
-      RPE: 0,
+      rpe: 0,
     })
   }
 
