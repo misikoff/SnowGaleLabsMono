@@ -6,10 +6,10 @@ import { produce } from 'immer'
 import { v4 as uuidv4 } from 'uuid'
 
 import { Session } from '@repo/db/schema'
+import { createSession } from '@/app/app/actions'
 import { Button } from '@/components/ui/button'
-import { createSession } from 'app/app/actions'
 
-export default function CreateSessionButton() {
+export default function AddSessionButton() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const createSessionMutation = useMutation({

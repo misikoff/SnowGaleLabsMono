@@ -5,12 +5,12 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
 import { ProgramWithMicrocycles } from '@repo/db/schema'
-import { Button } from '@/components/ui/button'
 import {
   createMicrocycle,
   deleteMicrocycle,
   getProgramWithMicrocycles,
-} from 'app/app/actions'
+} from '@/app/app/actions'
+import { Button } from '@/components/ui/button'
 
 // make sure button is not clickable when running
 export default function Home({ params }: { params: { slug: string } }) {

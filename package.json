@@ -20,7 +20,16 @@
     "prettier": "^3.1.1",
     "turbo": "^2.2.3"
   },
-  "packageManager": "yarn@1.22.19",
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "@babel/*",
+        "expo-modules-*",
+        "typescript"
+      ]
+    }
+  },
+  "packageManager": "pnpm@9.4.0",
   "engines": {
     "node": ">=18"
   }

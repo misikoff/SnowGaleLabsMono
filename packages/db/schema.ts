@@ -280,7 +280,7 @@ export const sets = pgTable(
       }),
     microcycleId: uuid('microcycle_id').references(() => microcycles.id),
     programId: uuid('program_id').references(() => programs.id),
-    exerciseId: uuid('excercise_id')
+    exerciseId: uuid('exercise_id')
       .notNull()
       .references(() => exercises.id, {
         onDelete: 'cascade',
@@ -293,17 +293,18 @@ export const sets = pgTable(
       }),
     // attributes
     prescribedReps: integer('prescribed_reps'),
-    prescribedRPE: real('prescribed_RPE'),
-    prescribedRIR: real('prescribed_RIR'),
+    prescribedRpe: real('prescribed_rpe'),
+    prescribedRir: real('prescribed_rir'),
     prescribedWeight: real('prescribed_weight'),
     reps: integer('reps'),
-    RPE: real('RPE'),
-    RIR: integer('RIR'),
+    rpe: real('rpe'),
+    rir: integer('rir'),
     weight: real('weight'),
     order: smallint('order').default(0),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at')
       .notNull()
+      .defaultNow()
       .$onUpdate(() => new Date()),
   },
   (table) => ({

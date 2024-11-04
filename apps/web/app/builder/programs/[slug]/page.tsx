@@ -4,12 +4,12 @@ import { useEffect, useState } from 'react'
 
 import Link from 'next/link'
 
-import { Button } from '@/components/ui/button'
 import {
   createMicrocycle,
   deleteMicrocycle,
   getProgramWithMicrocycles,
-} from 'app/app/actions'
+} from '@/app/app/actions'
+import { Button } from '@/components/ui/button'
 
 // https://stackoverflow.com/questions/59774572/how-to-get-the-return-type-of-async-function-in-typescript
 type AsyncReturnType<T extends (...args: any) => Promise<any>> = T extends (

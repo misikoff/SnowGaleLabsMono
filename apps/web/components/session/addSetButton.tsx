@@ -3,8 +3,8 @@ import { produce } from 'immer'
 import { v4 as uuidv4 } from 'uuid'
 
 import { Set, SetGroupWithExerciseAndSets } from '@repo/db/schema'
+import { createSet } from '@/app/app/actions'
 import { Button } from '@/components/ui/button'
-import { createSet } from 'app/app/actions'
 
 export default function AddSetButton({
   setGroup,

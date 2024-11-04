@@ -4,11 +4,10 @@ import Link from 'next/link'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { Session } from '@repo/db/schema'
+import { deleteSession, getSessions } from '@/app/app/actions'
+import AddSessionButton from '@/components/session/addSessionButton'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { deleteSession, getSessions } from 'app/app/actions'
-
-import CreateSessionButton from './createSessionButton'
 
 export default function SessionPage() {
   const queryClient = useQueryClient()
@@ -65,7 +64,7 @@ export default function SessionPage() {
   return (
     <div>
       <h1>Sessions</h1>
-      <CreateSessionButton />
+      <AddSessionButton />
       {/* list all the most recent sessions or scheduled sessions here */}
       <div className='flex flex-col space-y-4'>
         {sessions.map((s) => (

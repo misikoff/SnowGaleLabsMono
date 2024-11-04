@@ -9,12 +9,12 @@ export function createDummySet({
   setGroupId, // required
   sessionId, // required
   prescribedReps = null,
-  prescribedRPE = null,
-  prescribedRIR = null,
+  prescribedRpe = null,
+  prescribedRir = null,
   prescribedWeight = null,
   reps = null,
-  RPE = null,
-  RIR = null,
+  rpe = null,
+  rir = null,
   weight = null,
   order = null,
   createdAt = new Date(),
@@ -28,12 +28,12 @@ export function createDummySet({
   setGroupId: string
   sessionId: string
   prescribedReps?: number | null
-  prescribedRPE?: number | null
-  prescribedRIR?: number | null
+  prescribedRpe?: number | null
+  prescribedRir?: number | null
   prescribedWeight?: number | null
   reps?: number | null
-  RIR?: number | null
-  RPE?: number | null
+  rpe?: number | null
+  rir?: number | null
   weight?: number | null
   order?: number | null
   createdAt?: Date
@@ -48,12 +48,12 @@ export function createDummySet({
     setGroupId,
     sessionId,
     prescribedReps,
-    prescribedRPE,
-    prescribedRIR,
+    prescribedRpe,
+    prescribedRir,
     prescribedWeight,
     reps,
-    RPE,
-    RIR,
+    rpe,
+    rir,
     weight,
     order,
     createdAt,

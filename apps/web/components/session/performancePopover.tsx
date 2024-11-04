@@ -7,6 +7,7 @@ import { produce } from 'immer'
 import { MinusIcon, PlusIcon } from 'lucide-react'
 
 import { Set, SetGroupWithExerciseAndSets } from '@repo/db/schema'
+import { updateSet } from '@/app/app/actions'
 import AnimatedNumber from '@/components/animatedNumber'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,7 +19,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { updateSet } from 'app/app/actions'
 
 export default function PerformanceButton({
   children,
@@ -36,16 +36,16 @@ export default function PerformanceButton({
   const [repValue, setRepValue] = useState(set.reps ?? set.prescribedReps ?? 0)
   // TODO: handle other dififculty methodologies, like RIR
   const [difficultyValue, setDifficultyValue] = useState(
-    set.RPE ?? set.prescribedRPE ?? 5,
+    set.rpe ?? set.prescribedRpe ?? 5,
   )
 
   const updateSetMutation = useMutation({
-    mutationFn: ({ id, reps, weight, RPE }: Parameters<typeof updateSet>[0]) =>
+    mutationFn: ({ id, reps, weight, rpe }: Parameters<typeof updateSet>[0]) =>
       updateSet({
         id,
         reps,
         weight,
-        RPE,
+        rpe,
       }),
     // When mutate is called:
     // TODO: better typing with a simple set or dummy set, but still may require casting
@@ -69,7 +69,7 @@ export default function PerformanceButton({
               if (curSet.id === set.id) {
                 curSet.reps = updatedSet.reps
                 curSet.weight = updatedSet.weight
-                curSet.RPE = updatedSet.RPE
+                curSet.rpe = updatedSet.rpe
               }
               return curSet
             })
@@ -110,12 +110,12 @@ export default function PerformanceButton({
     if (!open) {
       setWeightValue(set.weight ?? set.prescribedWeight ?? 0)
       setRepValue(set.reps ?? set.prescribedReps ?? 0)
-      setDifficultyValue(set.RPE ?? set.prescribedRPE ?? 5)
+      setDifficultyValue(set.rpe ?? set.prescribedRpe ?? 5)
     }
   }, [
     open,
-    set.RPE,
-    set.prescribedRPE,
+    set.rpe,
+    set.prescribedRpe,
     set.prescribedReps,
     set.prescribedWeight,
     set.reps,
@@ -163,7 +163,7 @@ export default function PerformanceButton({
       id: set.id,
       reps: repValue,
       weight: weightValue,
-      RPE: difficultyValue,
+      rpe: difficultyValue,
     })
   }
 
@@ -176,7 +176,7 @@ export default function PerformanceButton({
       id: set.id,
       reps: 0,
       weight: 0,
-      RPE: 0,
+      rpe: 0,
     })
   }
 

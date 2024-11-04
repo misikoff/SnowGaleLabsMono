@@ -1,0 +1,1 @@
+ALTER TABLE "sets" RENAME COLUMN "prescribed_Rir" TO "prescribed_rir";

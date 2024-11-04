@@ -29,31 +29,6 @@ export default function Home({ params }: { params: { slug: string } }) {
     queryFn: () => getSession(params.slug),
   })
 
-  // const onSetUpdated = (set: Set) => {
-  //   setSession((prev: any) => {
-  //     const newSetGroups = prev.setGroups.map(
-  //       (g: SetGroupWithExerciseAndSets) => {
-  //         if (g.id === set.setGroupId) {
-  //           return {
-  //             ...g,
-  //             sets: g.sets.map((s: Set) => {
-  //               if (s.id === set.id) {
-  //                 return set
-  //               }
-  //               return s
-  //             }),
-  //           }
-  //         }
-  //         return g
-  //       },
-  //     )
-  //     return {
-  //       ...prev,
-  //       setGroups: newSetGroups,
-  //     }
-  //   })
-  // }
-
   const updateSetGroupOrderMutation = useMutation({
     mutationFn: async ({
       index1,
