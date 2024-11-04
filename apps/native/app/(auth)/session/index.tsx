@@ -22,12 +22,11 @@ export default function App() {
 
   return (
     <View className='w-full flex-1'>
-      <Link href='/'>/</Link>
       <View className='items-center'>
         <AddSessionButton
           userId={userId}
           onCreate={(newSessionId) =>
-            router.navigate(`/app/session/${newSessionId}`)
+            router.navigate(`/(auth)/session/${newSessionId}`)
           }
         >
           <View className='rounded-md bg-blue-600 px-3 py-2 text-center'>
@@ -44,7 +43,7 @@ export default function App() {
         <Text className='mb-4 font-bold'>Previous Sessions</Text>
         {sessions?.map((session) => (
           <View key={session.id} className='flex-row gap-4'>
-            <Link href={`/app/session/${session.id}`}>
+            <Link href={`/(auth)/session/${session.id}`}>
               {session.id.substring(0, 5)}
             </Link>
             {session.completed && <Text>Completed</Text>}

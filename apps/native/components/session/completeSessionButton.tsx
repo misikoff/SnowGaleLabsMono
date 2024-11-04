@@ -110,7 +110,7 @@ export default function CompleteSessionButton({
 
                   setModalVisible(!modalVisible)
 
-                  router.navigate(`/app/session`)
+                  router.navigate(`/(auth)/session`)
                 }}
               >
                 <Text className='text-center transition-colors group-disabled:text-white'>

@@ -9,14 +9,15 @@
 
 import {
   View,
-  Text,
+  // Text,
   LogBox,
   // StyleSheet,
-  Pressable,
+  // Pressable,
+  ActivityIndicator,
 } from 'react-native'
 import { useFonts } from 'expo-font'
-import { Link } from 'expo-router'
-import { SignedIn, SignedOut, useAuth, useUser } from '@clerk/clerk-expo'
+// import { Link } from 'expo-router'
+// import { SignedIn, SignedOut, useAuth, useUser } from '@clerk/clerk-expo'
 
 import InterBold from '@/assets/fonts/Inter-Bold.ttf'
 import InterMedium from '@/assets/fonts/Inter-Medium.ttf'
@@ -70,14 +71,14 @@ export default function App() {
   LogBox.ignoreLogs(['Warning: ...'])
   LogBox.ignoreAllLogs()
 
-  const { user } = useUser()
+  // const { user } = useUser()
   // const c = useClerk()
-  const auth = useAuth()
+  // const auth = useAuth()
 
-  const signOut = async () => {
-    // await c.signOut()
-    await auth.signOut()
-  }
+  // const signOut = async () => {
+  //   // await c.signOut()
+  //   await auth.signOut()
+  // }
 
   const [loaded] = useFonts({
     Bold: InterBold,
@@ -97,8 +98,9 @@ export default function App() {
   }
 
   return (
-    <View className='flex-1 items-center gap-8 p-8'>
-      <Text>Welcome to Centurion</Text>
+    <View className='flex-1 items-center justify-center gap-8 p-8'>
+      <ActivityIndicator size='large' color='#0000ff' />
+      {/* <Text>Welcome to Centurion</Text>
       <SignedIn>
         <Text>Hello {user?.emailAddresses[0].emailAddress}</Text>
         <Link
@@ -121,7 +123,7 @@ export default function App() {
         <Link href='/(auth)/sign-up'>
           <Text>Sign Up</Text>
         </Link>
-      </SignedOut>
+      </SignedOut> */}
       {/* <View className='h-24 w-24'>
         <MotiView style={styles.container}>
           <Shape />

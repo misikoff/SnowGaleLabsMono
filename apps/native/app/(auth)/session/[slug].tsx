@@ -25,7 +25,7 @@ export default function Page() {
 
   return (
     <ScrollView>
-      <Link href='/app/session'>Back</Link>
+      <Link href='/(auth)/session'>Back</Link>
       {isLoading && <Text>Loading...</Text>}
       {isError && <Text>Error</Text>}
       {session && (

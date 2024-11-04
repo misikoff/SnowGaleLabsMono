@@ -7,7 +7,6 @@ import {
   Text,
   Pressable,
   View,
-  SafeAreaView,
   TextInput,
 } from 'react-native'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -128,7 +127,7 @@ export default function PerformanceButton({
 
             <View className='flex-row justify-between gap-6'>
               {/* TODO */}
-              <SafeAreaView className='flex-row'>
+              <View className='flex-row'>
                 <View className='flex flex-col items-center'>
                   <Text>Weight</Text>
                   <TextInput
@@ -161,7 +160,7 @@ export default function PerformanceButton({
                     type='number'
                   />
                 </View>
-              </SafeAreaView>
+              </View>
             </View>
 
             <View className='flex w-full flex-row justify-between gap-6'>
