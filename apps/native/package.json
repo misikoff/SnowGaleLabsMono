@@ -41,7 +41,7 @@
     "react-dom": "~18.3.1",
     "react-native": "0.74.5",
     "react-native-loading-spinner-overlay": "^3.0.1",
-    "react-native-reanimated": "~3.10.1",
+    "react-native-reanimated": "~3.16.1",
     "react-native-safe-area-context": "4.14.0",
     "react-native-screens": "3.35.0",
     "react-native-svg": "15.2.0",
