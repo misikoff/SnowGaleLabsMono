@@ -66,7 +66,7 @@ const Login = () => {
           <Text>Forgot password?</Text>
         </Pressable>
       </Link>
-      <Link href='/register' asChild>
+      <Link href='/sign-up' asChild>
         <Pressable style={styles.button}>
           <Text>Create Account</Text>
         </Pressable>
