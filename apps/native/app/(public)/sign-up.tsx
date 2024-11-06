@@ -1,9 +1,11 @@
 import { useState } from 'react'
 
-import { Button, TextInput, View } from 'react-native'
+import { Button, Text, TextInput, View } from 'react-native'
 import { Stack } from 'expo-router'
 import { useSignUp } from '@clerk/clerk-expo'
 import Spinner from 'react-native-loading-spinner-overlay'
+
+import { LogoutButton } from '../(auth)/_layout'
 
 const Register = () => {
   const { isLoaded, signUp, setActive } = useSignUp()
@@ -34,6 +36,8 @@ const Register = () => {
       // change the UI to verify the email address
       setPendingVerification(true)
     } catch (err: any) {
+      console.log({ err })
+      console.log({ x: err[0] })
       alert(err.errors[0].message)
     } finally {
       setLoading(false)
@@ -64,6 +68,8 @@ const Register = () => {
     <View className='flex-1 content-center p-5'>
       <Stack.Screen options={{ headerBackVisible: !pendingVerification }} />
       <Spinner visible={loading} />
+
+      <Text>{isLoaded}wowowowo</Text>
 
       {!pendingVerification && (
         <>
@@ -103,6 +109,9 @@ const Register = () => {
           />
         </>
       )}
+      {/* debugging */}
+      {/* delete */}
+      <LogoutButton />
     </View>
   )
 }
