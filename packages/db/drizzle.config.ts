@@ -5,6 +5,7 @@ config({ path: '.env.local' })
 
 export default defineConfig({
   schema: './schema.ts',
+  casing: 'snake_case',
   out: './supabase/migrations',
   dialect: 'postgresql',
   dbCredentials: {
