@@ -15,7 +15,7 @@
     "@clerk/clerk-expo": "2.2.36",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-navigation/core": "^6.4.17",
-    "@react-navigation/elements": "^1.3.31",
+    "@react-navigation/elements": "^2.0.0",
     "@repo/db": "workspace:*",
     "@shopify/flash-list": "1.7.1",
     "@supabase/supabase-js": "^2.45.4",
