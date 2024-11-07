@@ -42,7 +42,7 @@ export const users = pgTable(
     prod: boolean().default(false),
   },
   (table) => ({
-    clerkIdIndex: index('clerk_id_idx').on(table.clerkId),
+    usersClerkIdIndex: index().on(table.clerkId),
   }),
 )
 
@@ -83,13 +83,9 @@ export const exercises = pgTable(
     notes: text(),
   },
   (table) => ({
-    isMainExerciseIndex: index('exercise_is_main_exercise_idx').on(
-      table.isMainExercise,
-    ),
-    userIdIndex: index('exercise_user_id_idx').on(table.userId),
-    clonedFromIdIndex: index('exercise_cloned_from_id_idx').on(
-      table.clonedFromId,
-    ),
+    exercisesIsMainExerciseIndex: index().on(table.isMainExercise),
+    exercisesUserIdIndex: index().on(table.userId),
+    exercisesClonedFromIdIndex: index().on(table.clonedFromId),
   }),
 )
 
@@ -106,7 +102,7 @@ export const programs = pgTable(
     description: text(),
   },
   (table) => ({
-    userIdIndex: index('program_user_id_idx').on(table.userId),
+    programsUserIdIndex: index().on(table.userId),
   }),
 )
 
@@ -131,7 +127,7 @@ export const macrocycles = pgTable(
     order: smallint('order').default(0),
   },
   (table) => ({
-    userIdIndex: index('macro_cycle_user_id_idx').on(table.userId),
+    macrocyclesUserIdIndex: index().on(table.userId),
   }),
 )
 
@@ -159,7 +155,7 @@ export const microcycles = pgTable(
     order: smallint().default(0),
   },
   (table) => ({
-    userIdIndex: index('microcyle_user_id_idx').on(table.userId),
+    microcyclesUserIdIndex: index().on(table.userId),
   }),
 )
 
@@ -195,7 +191,7 @@ export const sessions = pgTable(
     completedAt: timestamp(),
   },
   (table) => ({
-    userIdIndex: index('session_user_id_idx').on(table.userId),
+    sessionsUserIdIndex: index().on(table.userId),
   }),
 )
 
@@ -235,8 +231,8 @@ export const setGroups = pgTable(
     order: smallint().default(0),
   },
   (table) => ({
-    userIdIndex: index('set_group_user_id_idx').on(table.userId),
-    sessionIdIndex: index('set_group_session_id_idx').on(table.sessionId),
+    setGroupsUserIdIndex: index().on(table.userId),
+    setGroupsSessionIdIndex: index().on(table.sessionId),
   }),
 )
 
@@ -304,10 +300,10 @@ export const sets = pgTable(
       .$onUpdate(() => new Date()),
   },
   (table) => ({
-    userIdIndex: index('set_user_id_idx').on(table.userId),
-    sessionIdIndex: index('set_session_id_idx').on(table.sessionId),
-    exerciseIdIndex: index('set_exercise_id_idx').on(table.exerciseId),
-    setGroupIdIndex: index('set_set_group_id_idx').on(table.setGroupId),
+    setsUserIdIndex: index().on(table.userId),
+    setsSessionIdIndex: index().on(table.sessionId),
+    setsExerciseIdIndex: index().on(table.exerciseId),
+    setsSetGroupIdIndex: index().on(table.setGroupId),
   }),
 )
 
