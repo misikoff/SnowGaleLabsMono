@@ -29,17 +29,17 @@ export const setGroupType = ['superset', 'circuit', 'normal'] as const
 export const users = pgTable(
   'users',
   {
-    id: uuid('id')
+    id: uuid()
       .default(sql`gen_random_uuid()`)
       .primaryKey(),
-    name: text('name'),
-    clerkId: text('clerk_id'),
-    createdAt: timestamp('created_at').notNull().defaultNow(),
-    updatedAt: timestamp('updated_at')
+    name: text(),
+    clerkId: text(),
+    createdAt: timestamp().notNull().defaultNow(),
+    updatedAt: timestamp()
       .notNull()
       .defaultNow()
       .$onUpdate(() => new Date()),
-    prod: boolean('prod').default(false),
+    prod: boolean().default(false),
   },
   (table) => ({
     clerkIdIndex: index('clerk_id_idx').on(table.clerkId),
@@ -60,31 +60,31 @@ export type EquipmentType = (typeof equipmentEnum)[number]
 export const exercises = pgTable(
   'exercises',
   {
-    id: uuid('id')
+    id: uuid()
       .default(sql`gen_random_uuid()`)
       .primaryKey(),
-    userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
-    isMainExercise: boolean('is_main_exercise').default(false),
-    clonedFromId: uuid('cloned_from_id').references(
+    userId: uuid().references(() => users.id, { onDelete: 'cascade' }),
+    isMainExercise: boolean().default(false),
+    clonedFromId: uuid().references(
       (): AnyPgColumn => exercises.id,
     ),
-    name: text('name'),
-    description: text('description'),
-    equipmentType: text('equipment_type', { enum: equipmentEnum }),
-    defaultRepRange: text('default_rep_range', { enum: repStyleEnum }).default(
+    name: text(),
+    description: text(),
+    equipmentType: text({ enum: equipmentEnum }),
+    defaultRepRange: text({ enum: repStyleEnum }).default(
       'medium',
     ),
-    weightIncrement: real('weight_increment').default(5),
-    weightUnits: text('weight_units', {
+    weightIncrement: real().default(5),
+    weightUnits: text({
       enum: weightUnitsEnum,
     }).default('lbs'),
-    useWeight: boolean('use_weight').default(true),
-    useDistance: boolean('use_Distance').default(false),
-    distanceIncrement: real('distance_increment').default(5),
-    distanceUnits: text('distance_units', {
+    useWeight: boolean().default(true),
+    useDistance: boolean().default(false),
+    distanceIncrement: real().default(5),
+    distanceUnits: text({
       enum: distanceUnitsEnum,
     }).default('yards'),
-    notes: text('notes'),
+    notes: text(),
   },
   (table) => ({
     isMainExerciseIndex: index('exercise_is_main_exercise_idx').on(
@@ -100,14 +100,14 @@ export const exercises = pgTable(
 export const programs = pgTable(
   'programs',
   {
-    id: uuid('id')
+    id: uuid()
       .default(sql`gen_random_uuid()`)
       .primaryKey(),
-    userId: uuid('user_id').references(() => users.id, {
+    userId: uuid().references(() => users.id, {
       onDelete: 'cascade',
     }),
-    name: text('name'),
-    description: text('description'),
+    name: text(),
+    description: text(),
   },
   (table) => ({
     userIdIndex: index('program_user_id_idx').on(table.userId),
@@ -123,15 +123,15 @@ export const programsRelations = relations(programs, ({ one, many }) => ({
 export const macrocycles = pgTable(
   'macrocycles',
   {
-    id: uuid('id')
+    id: uuid()
       .default(sql`gen_random_uuid()`)
       .primaryKey(),
-    userId: uuid('user_id')
+    userId: uuid()
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     // TODO: should deletes cascade?,
-    programId: uuid('program_id').references(() => programs.id),
-    name: text('name'),
+    programId: uuid().references(() => programs.id),
+    name: text(),
     order: smallint('order').default(0),
   },
   (table) => ({
@@ -150,17 +150,17 @@ export const macrocyclesRelations = relations(macrocycles, ({ one, many }) => ({
 export const microcycles = pgTable(
   'microcycles',
   {
-    id: uuid('id')
+    id: uuid()
       .default(sql`gen_random_uuid()`)
       .primaryKey(),
-    userId: uuid('user_id')
+    userId: uuid()
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     // TODO: should deletes cascade?,
-    programId: uuid('program_id').references(() => programs.id),
-    macrocycleId: uuid('macrocycle_id').references(() => macrocycles.id),
-    name: text('name'),
-    order: smallint('order').default(0),
+    programId: uuid().references(() => programs.id),
+    macrocycleId: uuid().references(() => macrocycles.id),
+    name: text(),
+    order: smallint().default(0),
   },
   (table) => ({
     userIdIndex: index('microcyle_user_id_idx').on(table.userId),
@@ -178,25 +178,25 @@ export const microcyclesRelations = relations(microcycles, ({ one, many }) => ({
 export const sessions = pgTable(
   'sessions',
   {
-    id: uuid('id')
+    id: uuid()
       .default(sql`gen_random_uuid()`)
       .primaryKey(),
-    userId: uuid('user_id').references(() => users.id, {
+    userId: uuid().references(() => users.id, {
       onDelete: 'cascade',
     }),
-    name: text('name'),
-    programId: uuid('program_id').references(() => programs.id),
-    macrocycleId: uuid('macrocycle_id').references(() => macrocycles.id),
-    microcycleId: uuid('microcycle_id').references(() => microcycles.id),
-    order: smallint('order').default(0),
-    completed: boolean('completed').default(false),
-    createdAt: timestamp('created_at').notNull().defaultNow(),
-    updatedAt: timestamp('updated_at')
+    name: text(),
+    programId: uuid().references(() => programs.id),
+    macrocycleId: uuid().references(() => macrocycles.id),
+    microcycleId: uuid().references(() => microcycles.id),
+    order: smallint().default(0),
+    completed: boolean().default(false),
+    createdAt: timestamp().notNull().defaultNow(),
+    updatedAt: timestamp()
       .notNull()
       .defaultNow()
       .$onUpdate(() => new Date()),
     // set completed at when completed becomes true
-    completedAt: timestamp('completed_at'),
+    completedAt: timestamp(),
   },
   (table) => ({
     userIdIndex: index('session_user_id_idx').on(table.userId),
@@ -224,19 +224,19 @@ export const sessionsRelations = relations(sessions, ({ one, many }) => ({
 export const setGroups = pgTable(
   'setGroups',
   {
-    id: uuid('id')
+    id: uuid()
       .default(sql`gen_random_uuid()`)
       .primaryKey(),
-    userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
-    sessionId: uuid('session_id').references(() => sessions.id, {
+    userId: uuid().references(() => users.id, { onDelete: 'cascade' }),
+    sessionId: uuid().references(() => sessions.id, {
       onDelete: 'cascade',
     }),
-    microcycleId: uuid('microcycle_id').references(() => microcycles.id),
-    programId: uuid('program_id').references(() => programs.id),
-    type: text('type', { enum: setGroupType }).default('normal'),
+    microcycleId: uuid().references(() => microcycles.id),
+    programId: uuid().references(() => programs.id),
+    type: text({ enum: setGroupType }).default('normal'),
     // if type is not normal then set exerciseId to null, but dont generate the id automatically
-    exerciseId: uuid('exercise_id').references(() => exercises.id),
-    order: smallint('order').default(0),
+    exerciseId: uuid().references(() => exercises.id),
+    order: smallint().default(0),
   },
   (table) => ({
     userIdIndex: index('set_group_user_id_idx').on(table.userId),
@@ -268,41 +268,41 @@ export const setGroupsRelation = relations(setGroups, ({ one, many }) => ({
 export const sets = pgTable(
   'sets',
   {
-    id: uuid('id')
+    id: uuid()
       .default(sql`gen_random_uuid()`)
       .primaryKey(),
     // relations
-    userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
-    sessionId: uuid('session_id')
+    userId: uuid().references(() => users.id, { onDelete: 'cascade' }),
+    sessionId: uuid()
       .notNull()
       .references(() => sessions.id, {
         onDelete: 'cascade',
       }),
-    microcycleId: uuid('microcycle_id').references(() => microcycles.id),
-    programId: uuid('program_id').references(() => programs.id),
-    exerciseId: uuid('exercise_id')
+    microcycleId: uuid().references(() => microcycles.id),
+    programId: uuid().references(() => programs.id),
+    exerciseId: uuid()
       .notNull()
       .references(() => exercises.id, {
         onDelete: 'cascade',
       }),
     // TODO: think about this. Should we delete the set if the exercise is deleted?
-    setGroupId: uuid('set_group_id')
+    setGroupId: uuid()
       .notNull()
       .references(() => setGroups.id, {
         onDelete: 'cascade',
       }),
     // attributes
-    prescribedReps: integer('prescribed_reps'),
-    prescribedRpe: real('prescribed_rpe'),
-    prescribedRir: real('prescribed_rir'),
-    prescribedWeight: real('prescribed_weight'),
-    reps: integer('reps'),
-    rpe: real('rpe'),
-    rir: integer('rir'),
-    weight: real('weight'),
-    order: smallint('order').default(0),
-    createdAt: timestamp('created_at').notNull().defaultNow(),
-    updatedAt: timestamp('updated_at')
+    prescribedReps: integer(),
+    prescribedRpe: real(),
+    prescribedRir: real(),
+    prescribedWeight: real(),
+    reps: integer(),
+    rpe: real(),
+    rir: integer(),
+    weight: real(),
+    order: smallint().default(0),
+    createdAt: timestamp().notNull().defaultNow(),
+    updatedAt: timestamp()
       .notNull()
       .defaultNow()
       .$onUpdate(() => new Date()),
