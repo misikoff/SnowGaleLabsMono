@@ -52,6 +52,5 @@ module.exports = {
         distinctGroup: false,
       },
     ],
-    'react/self-closing-comp': 'error',
   },
 }

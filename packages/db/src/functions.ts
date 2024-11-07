@@ -1,10 +1,10 @@
 'use server'
 
-import { unstable_noStore as noStore } from 'next/cache'
-import { currentUser } from '@clerk/nextjs/server'
+// NOT USED ANYWHERE
+
 import { and, asc, eq } from 'drizzle-orm'
 
-import { db } from '@repo/db/index'
+import { db } from './index'
 import {
   users,
   User,
@@ -21,20 +21,23 @@ import {
   programs,
   SetGroup,
   SessionWithSetGroupWithExerciseAndSets,
-} from '@repo/db/schema'
+} from './schema'
 
-export const currentUserId = async () => {
-  const clerkUser = await currentUser()
-  if (!clerkUser) {
-    throw new Error('No clerk user found')
+async function validateUser(clerkId: string | null) {
+  console.log('checking')
+  console.log({ clerkId })
+  if (!clerkId) {
+    throw new Error('No clerkId provided')
+  } else {
+    const user = await db.query.users.findFirst({
+      where: eq(users.clerkId, clerkId),
+    })
+    if (!user) {
+      throw new Error('No user found')
+    } else {
+      return user.id
+    }
   }
-  const user = await db.query.users.findFirst({
-    where: eq(users.clerkId, clerkUser.id),
-  })
-  if (!user) {
-    throw new Error('No user found')
-  }
-  return user.id
 }
 
 export async function createUser(
@@ -53,51 +56,62 @@ export async function createUser(
 }
 
 export async function deleteUser(clerkId: User['clerkId']) {
-  return await db.delete(users).where(eq(users.clerkId, clerkId as string))
+  const userId = await validateUser(clerkId)
+  return await db.delete(users).where(eq(users.clerkId, userId))
 }
 
 export async function updateUser(clerkId: User['clerkId'], name: User['name']) {
+  const userId = await validateUser(clerkId)
   return await db
     .update(users)
     .set({ name })
-    .where(eq(users.clerkId, clerkId as string))
+    .where(eq(users.id, userId))
     .returning()
 }
 
 export async function createProgram({
   name,
   description,
+  clerkId,
 }: {
   name: Program['name']
   description: Program['description']
+  clerkId: User['clerkId']
 }) {
-  await db
-    .insert(programs)
-    .values({ name, description, userId: await currentUserId() })
+  const userId = await validateUser(clerkId)
+  await db.insert(programs).values({ name, description, userId })
 }
 
-export async function getPrograms() {
-  noStore()
-  return await db
-    .select()
-    .from(programs)
-    .where(eq(programs.userId, await currentUserId()))
+export async function getPrograms({ clerkId }: { clerkId: User['clerkId'] }) {
+  const userId = await validateUser(clerkId)
+  return await db.select().from(programs).where(eq(programs.userId, userId))
 }
 
-export async function getProgram(id: Program['id']) {
-  noStore()
+export async function getProgram({
+  id,
+  clerkId,
+}: {
+  id: Program['id']
+  clerkId: User['clerkId']
+}) {
+  const userId = await validateUser(clerkId)
   return (
     await db
       .select()
       .from(programs)
-      .where((eq(programs.id, id), eq(programs.userId, await currentUserId())))
+      .where((eq(programs.id, id), eq(programs.userId, userId)))
       .limit(1)
   )[0]
 }
 
-export async function getProgramWithMicrocycles(id: Program['id']) {
-  noStore()
-  const userId = await currentUserId()
+export async function getProgramWithMicrocycles({
+  id,
+  clerkId,
+}: {
+  id: Program['id']
+  clerkId: User['clerkId']
+}) {
+  const userId = await validateUser(clerkId)
   return await db.query.programs.findFirst({
     where: and(eq(programs.id, id), eq(programs.userId, userId)),
     with: {
@@ -114,32 +128,43 @@ export async function createMicrocycle({
   programId,
   order,
   name,
+  clerkId,
 }: {
   programId: Program['id']
   order: number
   name?: string
+  clerkId: User['clerkId']
 }) {
-  noStore()
+  const userId = await validateUser(clerkId)
   await db.insert(microcycles).values({
     name,
     programId,
     order,
-    userId: await currentUserId(),
+    userId,
   })
 }
 
-export async function deleteMicrocycle(id: Microcycle['id']) {
-  noStore()
+export async function deleteMicrocycle({
+  id,
+  clerkId,
+}: {
+  id: Microcycle['id']
+  clerkId: User['clerkId']
+}) {
+  const userId = await validateUser(clerkId)
   await db
     .delete(microcycles)
-    .where((eq(microcycles.id, id), eq(programs.userId, await currentUserId())))
+    .where((eq(microcycles.id, id), eq(programs.userId, userId)))
 }
 
-export async function getMicrocycleWithSessions(
-  microcycleId: Microcycle['id'],
-) {
-  noStore()
-  const userId = await currentUserId()
+export async function getMicrocycleWithSessions({
+  microcycleId,
+  clerkId,
+}: {
+  microcycleId: Microcycle['id']
+  clerkId: User['clerkId']
+}) {
+  const userId = await validateUser(clerkId)
   return await db.query.microcycles.findFirst({
     where: and(
       eq(microcycles.id, microcycleId),
@@ -161,6 +186,7 @@ export async function createSession({
   microcycleId,
   createdAt,
   updatedAt,
+  clerkId,
 }: {
   id?: Session['id']
   name?: Session['name']
@@ -169,8 +195,9 @@ export async function createSession({
   microcycleId?: Microcycle['id']
   createdAt?: Session['createdAt']
   updatedAt?: Session['updatedAt']
+  clerkId: User['clerkId']
 }) {
-  noStore()
+  const userId = await validateUser(clerkId)
   const session = await db
     .insert(sessions)
     .values({
@@ -179,7 +206,7 @@ export async function createSession({
       order,
       programId,
       microcycleId,
-      userId: await currentUserId(),
+      userId,
       createdAt,
       updatedAt,
     })
@@ -192,13 +219,18 @@ export async function createSession({
   return null
 }
 
-export async function getSession(id: Session['id']) {
-  noStore()
+export async function getSession({
+  id,
+  clerkId,
+}: {
+  id: Session['id']
+  clerkId: User['clerkId']
+}) {
+  const userId = await validateUser(clerkId)
   console.log({ id })
   // return (
   //   await db.select().from(sessions).where(eq(sessions.id, id)).limit(1)
   // )[0]
-  const userId = await currentUserId()
   // TODO: why is explicit type needed here?
   return (await db.query.sessions.findFirst({
     where: and(eq(sessions.id, id), eq(sessions.userId, userId)),
@@ -219,29 +251,36 @@ export async function updateSession({
   name,
   order,
   completed,
+  clerkId,
 }: {
   id: Session['id']
   name?: Session['name']
   order?: Session['order']
   completed?: Session['completed']
+  clerkId: User['clerkId']
 }) {
-  noStore()
+  const userId = await validateUser(clerkId)
   return await db
     .update(sessions)
     .set({ name, order, completed })
-    .where(and(eq(sessions.id, id), eq(sessions.userId, await currentUserId())))
+    .where(and(eq(sessions.id, id), eq(sessions.userId, userId)))
     .returning()
 }
 
 export async function deleteSession(id: Session['id']) {
   // deletes all set groups and sets associated with the session
-  noStore()
+
   await db.delete(sessions).where(eq(sessions.id, id))
 }
 
-export async function getSessionWithSetGroups(sessionId: Session['id']) {
-  noStore()
-  const userId = await currentUserId()
+export async function getSessionWithSetGroups({
+  sessionId,
+  clerkId,
+}: {
+  sessionId: Session['id']
+  clerkId: User['clerkId']
+}) {
+  const userId = await validateUser(clerkId)
   return await db.query.sessions.findFirst({
     where: and(eq(sessions.id, sessionId), eq(sessions.userId, userId)),
     with: {
@@ -253,9 +292,14 @@ export async function getSessionWithSetGroups(sessionId: Session['id']) {
   })
 }
 
-export async function getSetGroupsForSession(sessionId: Session['id']) {
-  noStore()
-  const userId = await currentUserId()
+export async function getSetGroupsForSession({
+  sessionId,
+  clerkId,
+}: {
+  sessionId: Session['id']
+  clerkId: User['clerkId']
+}) {
+  const userId = await validateUser(clerkId)
   return await db.query.setGroups.findMany({
     where: and(eq(sessions.id, sessionId), eq(sessions.userId, userId)),
     with: {
@@ -266,9 +310,14 @@ export async function getSetGroupsForSession(sessionId: Session['id']) {
   })
 }
 
-export async function getSetGroupWithSets(setGroupId: SetGroup['id']) {
-  noStore()
-  const userId = await currentUserId()
+export async function getSetGroupWithSets({
+  setGroupId,
+  clerkId,
+}: {
+  setGroupId: SetGroup['id']
+  clerkId: User['clerkId']
+}) {
+  const userId = await validateUser(clerkId)
   return await db.query.setGroups.findFirst({
     where: and(eq(setGroups.id, setGroupId), eq(setGroups.userId, userId)),
     with: {
@@ -287,6 +336,7 @@ export async function createSetGroup({
   microcycleId,
   sessionId,
   exerciseId,
+  clerkId,
 }: {
   id?: SetGroup['id']
   order?: SetGroup['order']
@@ -294,8 +344,9 @@ export async function createSetGroup({
   microcycleId?: Microcycle['id']
   sessionId?: Session['id']
   exerciseId?: Exercise['id']
+  clerkId: User['clerkId']
 }) {
-  noStore()
+  const userId = await validateUser(clerkId)
   return await db
     .insert(setGroups)
     .values({
@@ -305,7 +356,7 @@ export async function createSetGroup({
       order,
       sessionId,
       exerciseId,
-      userId: await currentUserId(),
+      userId,
     })
     .returning()
 }
@@ -317,6 +368,7 @@ export async function updateSetGroup({
   // programId,
   exerciseId,
   order,
+  clerkId,
 }: {
   id: Set['id']
   // sessionId?: Session['id']
@@ -324,25 +376,28 @@ export async function updateSetGroup({
   // programId?: Program['id']
   exerciseId?: Exercise['id']
   order?: SetGroup['order']
+  clerkId: User['clerkId']
 }) {
-  noStore()
+  const userId = await validateUser(clerkId)
   return await db
     .update(setGroups)
     .set({ exerciseId, order })
-    .where(
-      and(eq(setGroups.id, id), eq(setGroups.userId, await currentUserId())),
-    )
+    .where(and(eq(setGroups.id, id), eq(setGroups.userId, userId)))
     .returning()
 }
 
-export async function deleteSetGroup(id: SetGroup['id']) {
-  noStore()
+export async function deleteSetGroup({
+  id,
+  clerkId,
+}: {
+  id: SetGroup['id']
+  clerkId: User['clerkId']
+}) {
+  const userId = await validateUser(clerkId)
   // delete all sets associated with the set group
   return await db
     .delete(setGroups)
-    .where(
-      and(eq(setGroups.id, id), eq(setGroups.userId, await currentUserId())),
-    )
+    .where(and(eq(setGroups.id, id), eq(setGroups.userId, userId)))
     .returning({ deletedId: setGroups.id })
 }
 
@@ -350,7 +405,7 @@ export async function deleteSetGroup(id: SetGroup['id']) {
 export async function createSet({
   id,
   order,
-  userId,
+  clerkId,
   programId,
   microcycleId,
   sessionId,
@@ -359,22 +414,14 @@ export async function createSet({
 }: {
   id?: Set['id']
   order?: Set['order']
-  userId?: Set['userId']
+  clerkId: User['clerkId']
   programId?: Set['programId']
   microcycleId?: Set['microcycleId']
   sessionId: Set['sessionId']
   exerciseId: Set['exerciseId']
   setGroupId: Set['setGroupId']
 }) {
-  // only chose to add user id to give function the same signature as the dummy function
-  // check that userId matches current user
-  if (userId && userId !== (await currentUserId())) {
-    throw new Error('UserId does not match current user')
-  }
-  if (!userId) {
-    userId = await currentUserId()
-  }
-  noStore()
+  const userId = await validateUser(clerkId)
   return await db
     .insert(sets)
     .values({
@@ -390,21 +437,26 @@ export async function createSet({
     .returning()
 }
 
-export async function deleteSet(id: Set['id']) {
-  noStore()
+export async function deleteSet({
+  id,
+  clerkId,
+}: {
+  id: Set['id']
+  clerkId: User['clerkId']
+}) {
+  const userId = await validateUser(clerkId)
   return await db
     .delete(sets)
-    .where(and(eq(sets.id, id), eq(sets.userId, await currentUserId())))
+    .where(and(eq(sets.id, id), eq(sets.userId, userId)))
     .returning({ deletedId: sets.id })
 }
 
-export async function getSessions() {
-  console.log('getting sessions')
-  noStore()
+export async function getSessions({ clerkId }: { clerkId: User['clerkId'] }) {
+  const userId = await validateUser(clerkId)
   return await db
     .select()
     .from(sessions)
-    .where(eq(sessions.userId, await currentUserId()))
+    .where(eq(sessions.userId, userId))
     .orderBy(asc(sessions.createdAt))
 }
 
@@ -415,6 +467,7 @@ export async function updateSet({
   rir,
   weight,
   exerciseId,
+  clerkId,
 }: {
   id: Set['id']
   reps?: Set['reps']
@@ -422,32 +475,45 @@ export async function updateSet({
   rir?: Set['rir']
   weight?: Set['weight']
   exerciseId?: Set['exerciseId']
+  clerkId: User['clerkId']
 }) {
-  noStore()
+  const userId = await validateUser(clerkId)
   return await db
     .update(sets)
     .set({ reps, rpe, rir, weight, exerciseId })
-    .where(and(eq(sets.id, id), eq(sets.userId, await currentUserId())))
+    .where(and(eq(sets.id, id), eq(sets.userId, userId)))
     .returning()
 }
 
-export async function getSessionsForProgram(programId: Program['id']) {
-  noStore()
+export async function getSessionsForProgram({
+  programId,
+  clerkId,
+}: {
+  programId: Program['id']
+  clerkId: User['clerkId']
+}) {
+  const userId = await validateUser(clerkId)
   return await db
     .select()
     .from(sessions)
-    .where(
-      (eq(sessions.programId, programId),
-      eq(sessions.userId, await currentUserId())),
-    )
+    .where((eq(sessions.programId, programId), eq(sessions.userId, userId)))
 }
 
-export async function getSetsForSession(sessionId: Session['id']) {
-  noStore()
+export async function getSetsForSession({
+  sessionId,
+  clerkId,
+}: {
+  sessionId: SetGroup['sessionId']
+  clerkId: User['clerkId']
+}) {
+  const userId = await validateUser(clerkId)
   const rows = await db
     .select()
     .from(setGroups)
-    .where(eq(setGroups.sessionId, sessionId))
+    .where(
+      (eq(setGroups.sessionId, sessionId as string),
+      eq(setGroups.userId, userId)),
+    )
     .leftJoin(sets, eq(setGroups.id, sets.setGroupId))
 
   console.log(rows)
@@ -480,10 +546,19 @@ export async function getSetsForSession(sessionId: Session['id']) {
   return result2
 }
 
-export async function getExercises(force = false) {
-  if (force) {
-    noStore()
-  }
+export async function getExercises() {
+  return await db.select().from(exercises)
+}
 
-  return (await db.select().from(exercises)) as Exercise[]
+export async function createExercise({
+  name,
+  equipmentType,
+  clerkId,
+}: {
+  name: Exercise['name']
+  equipmentType: Exercise['equipmentType']
+  clerkId: User['clerkId']
+}) {
+  const userId = await validateUser(clerkId)
+  await db.insert(exercises).values({ name, equipmentType, userId })
 }
