@@ -7,10 +7,9 @@ import { EquipmentType } from '@repo/db/schema'
 import { exercisesArray } from '@repo/db/seedData'
 import {
   createMainExercise,
-  createUser,
   deleteAllMainExercises,
   getUsers,
-} from '@/app/app/actions'
+} from '@/app/app/adminActions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
