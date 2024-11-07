@@ -1,0 +1,1 @@
+ALTER TABLE "exercises" RENAME COLUMN "use_Distance" TO "use_distance";

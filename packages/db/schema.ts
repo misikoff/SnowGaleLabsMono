@@ -65,15 +65,11 @@ export const exercises = pgTable(
       .primaryKey(),
     userId: uuid().references(() => users.id, { onDelete: 'cascade' }),
     isMainExercise: boolean().default(false),
-    clonedFromId: uuid().references(
-      (): AnyPgColumn => exercises.id,
-    ),
+    clonedFromId: uuid().references((): AnyPgColumn => exercises.id),
     name: text(),
     description: text(),
     equipmentType: text({ enum: equipmentEnum }),
-    defaultRepRange: text({ enum: repStyleEnum }).default(
-      'medium',
-    ),
+    defaultRepRange: text({ enum: repStyleEnum }).default('medium'),
     weightIncrement: real().default(5),
     weightUnits: text({
       enum: weightUnitsEnum,
