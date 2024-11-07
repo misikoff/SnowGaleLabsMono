@@ -1,14 +1,10 @@
 'use server'
 
 import { unstable_noStore as noStore } from 'next/cache'
-import {  eq } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 
 import { db } from '@repo/db/index'
-import {
-  Exercise,
-  exercises,
-  users,
-} from '@repo/db/schema'
+import { Exercise, exercises, users } from '@repo/db/schema'
 import { currentUserId } from '@/app/app/actions'
 
 export async function getUsers() {
