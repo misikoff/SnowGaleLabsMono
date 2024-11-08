@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
 import { Program } from '@repo/db/schema'
-import { createProgram, getPrograms, getUsers } from '@/app/app/actions'
+import { createProgram, getPrograms } from '@/app/app/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
