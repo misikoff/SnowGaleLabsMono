@@ -31,7 +31,7 @@
     "expo-random": "~14.0.1",
     "expo-router": "~3.5.23",
     "expo-secure-store": "^13.0.2",
-    "expo-status-bar": "~1.12.1",
+    "expo-status-bar": "~2.0.0",
     "expo-web-browser": "^13.0.3",
     "immer": "^10.1.1",
     "lucide-react-native": "^0.456.0",
