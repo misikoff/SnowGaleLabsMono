@@ -77,6 +77,9 @@ export default function SetGroupBlock({
                   )}
                 >
                   Performance
+                  {
+                    // ' ' + set.setGroupId.substring(0, 5) + ' ' + set.id.substring(0, 5)
+                  }
                 </Text>
               )}
             </>
@@ -116,6 +119,9 @@ export default function SetGroupBlock({
           </SwapExerciseButton>
           <Text className='w-2/3 text-2xl text-white'>
             {setGroup.exercise.name}
+            {
+              // ': ' + setGroup.id.substring(0, 5)
+            }
           </Text>
           <DeleteSetGroupButton setGroup={setGroup}>
             <CircleXIcon color='red' size={24} />

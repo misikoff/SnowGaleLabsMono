@@ -19,16 +19,6 @@ export default function ReorderExerciseButton({
 }) {
   const queryClient = useQueryClient()
 
-  // use react query to fetch exercises
-  const {
-    data: exercises,
-    // isLoading,
-    // isError,
-  } = useQuery({
-    queryKey: ['exercises'],
-    queryFn: async () => getExercises(),
-  })
-
   const updateSetGroupMutation = useMutation({
     mutationFn: async ({
       id,

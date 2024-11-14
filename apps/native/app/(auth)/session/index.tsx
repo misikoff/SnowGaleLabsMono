@@ -44,7 +44,9 @@ export default function App() {
         {sessions?.map((session) => (
           <View key={session.id} className='flex-row gap-4'>
             <Link href={`/(auth)/session/${session.id}`}>
-              {session.id.substring(0, 5)}
+              {
+                session.id //.substring(0, 5)
+              }
             </Link>
             {session.completed && <Text>Completed</Text>}
             <DeleteSessionButton sessionId={session.id}>
