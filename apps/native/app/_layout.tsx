@@ -9,6 +9,7 @@ import {
   useAuth,
 } from '@clerk/clerk-expo'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY
 
@@ -78,11 +79,12 @@ export default function HomeLayout() {
       publishableKey={CLERK_PUBLISHABLE_KEY!}
       tokenCache={tokenCache}
     >
-      <InitialLayout />
-      {/* <ClerkLoaded> */}
-      {/* <QueryClientProvider client={queryClient}> */}
-      {/* <SafeAreaView className='flex-1'> */}
-      {/* <View
+      <GestureHandlerRootView>
+        <InitialLayout />
+        {/* <ClerkLoaded> */}
+        {/* <QueryClientProvider client={queryClient}> */}
+        {/* <SafeAreaView className='flex-1'> */}
+        {/* <View
           style={{ height: STATUS_BAR_HEIGHT, backgroundColor: '#0D87E1' }}
           >
           <StatusBar
@@ -91,13 +93,14 @@ export default function HomeLayout() {
           barStyle='light-content'
           />
           </View> */}
-      {/* <Slot /> */}
-      {/* <Stack>
+        {/* <Slot /> */}
+        {/* <Stack>
             <Stack.Screen name='(home)' options={{ headerShown: false }} />
             </Stack> */}
-      {/* </SafeAreaView> */}
-      {/* </QueryClientProvider> */}
-      {/* </ClerkLoaded> */}
+        {/* </SafeAreaView> */}
+        {/* </QueryClientProvider> */}
+        {/* </ClerkLoaded> */}
+      </GestureHandlerRootView>
     </ClerkProvider>
   )
 }

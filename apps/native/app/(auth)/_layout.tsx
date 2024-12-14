@@ -43,6 +43,17 @@ export default function TabLayout() {
         redirect={!isSignedIn}
       />
       <Tabs.Screen
+        name='calendar'
+        options={{
+          title: 'Calendar',
+          tabBarIcon: ({ color }) => (
+            <FontAwesome6 size={24} name='sliders' color={color} />
+          ),
+          // headerRight: () => <LogoutButton />,
+        }}
+        redirect={!isSignedIn}
+      />
+      <Tabs.Screen
         name='settings'
         options={{
           title: 'Settings',
