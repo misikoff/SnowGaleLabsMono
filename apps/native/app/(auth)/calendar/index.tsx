@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 
 import {
   Dimensions,
@@ -8,6 +8,8 @@ import {
   ScrollView,
   Button,
   ActionSheetIOS,
+  Pressable,
+  Alert,
 } from 'react-native'
 import * as Haptics from 'expo-haptics'
 import { useFocusEffect } from 'expo-router'
@@ -21,6 +23,7 @@ import {
   PlusSquareIcon,
   XIcon,
 } from 'lucide-react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { Session } from '@repo/db/schema'
 import AddSessionButton from '@/components/session/addSessionButton'
@@ -137,7 +140,8 @@ export default function Calendar() {
     },
   })
 
-  const onPress = (session: Session) =>
+  const onPress = (session: Session) => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: [
@@ -149,7 +153,6 @@ export default function Calendar() {
         ],
         destructiveButtonIndex: 3,
         cancelButtonIndex: 4,
-        // userInterfaceStyle: 'dark',
         title: new Date(session.date).toLocaleString('en-US', {
           weekday: 'long',
           month: 'long',
@@ -165,10 +168,30 @@ export default function Calendar() {
         } else if (buttonIndex === 2) {
           // setResult('🔮');
         } else if (buttonIndex === 3) {
-          deleteSessionMutation.mutateAsync(session.id)
+          Alert.alert(
+            'Delete Session?',
+            'If you delete this session, any logged values will also be deleted.',
+            [
+              {
+                text: 'No thanks',
+                onPress: () => console.log('Cancel Pressed'),
+                style: 'cancel',
+              },
+              {
+                text: 'Yes!',
+                onPress: () => {
+                  Haptics.notificationAsync(
+                    Haptics.NotificationFeedbackType.Success,
+                  )
+                  deleteSessionMutation.mutateAsync(session.id)
+                },
+              },
+            ],
+          )
         }
       },
     )
+  }
 
   const {
     data: sessions,
@@ -224,7 +247,7 @@ export default function Calendar() {
   )
 
   return (
-    <View className='flex-1 items-center'>
+    <SafeAreaView className='flex-1 items-center'>
       <View className='w-full flex-row justify-between p-4'>
         <Text className='text-2xl font-bold'>
           {new Date(weeks[curWeek][3]).toLocaleString('en-US', {
@@ -308,7 +331,7 @@ export default function Calendar() {
       {trainingDays.length > 0 && (
         <ScrollView
           horizontal={true}
-          className='bg-gray-500'
+          className='-mb-8 bg-gray-500'
           pagingEnabled={true}
           ref={subScrollViewRef}
           contentOffset={{ x: DeviceSize.width * 3, y: 0 }}
@@ -342,7 +365,6 @@ export default function Calendar() {
                 </View>
               ) : (
                 <ScrollView className='w-full'>
-                  <Text>{date.sessions.length}</Text>
                   <View className='w-full gap-2'>
                     {date.sessions.map((session) => (
                       <View
@@ -397,22 +419,36 @@ export default function Calendar() {
                 </View>
               ) : (
                 <>
-                  <View className='absolute inset-0 bg-gray-900 opacity-80' />
+                  <Pressable
+                    className='absolute inset-0 bg-gray-900 opacity-80'
+                    onPress={() => {
+                      Haptics.notificationAsync(
+                        Haptics.NotificationFeedbackType.Success,
+                      )
+                      console.log('stop adding ')
+                      setTrainingDays((prev) =>
+                        prev.map((d) => {
+                          if (d.day === date.day) {
+                            return { ...d, adding: false }
+                          }
+                          return d
+                        }),
+                      )
+                    }}
+                  />
                   <View className='absolute bottom-8 right-8 items-end gap-4'>
-                    <View>
-                      <AddSessionButton userId={userId} date={date.day}>
-                        <View className='flex-row gap-4'>
-                          <View className='items-center justify-center rounded-md bg-white px-2'>
-                            <Text className='text-xl font-bold'>
-                              Create Session
-                            </Text>
-                          </View>
-                          <View className='rounded-full bg-white p-4'>
-                            <PlusSquareIcon color='black' size={24} />
-                          </View>
+                    <AddSessionButton userId={userId} date={date.day}>
+                      <View className='flex-row gap-4'>
+                        <View className='items-center justify-center rounded-md bg-white px-2'>
+                          <Text className='text-xl font-bold'>
+                            Create Session
+                          </Text>
                         </View>
-                      </AddSessionButton>
-                    </View>
+                        <View className='rounded-full bg-white p-4'>
+                          <PlusSquareIcon color='black' size={24} />
+                        </View>
+                      </View>
+                    </AddSessionButton>
                     <View>
                       <TouchableOpacity
                         onPress={() => {
@@ -462,6 +498,6 @@ export default function Calendar() {
           ))}
         </ScrollView>
       )}
-    </View>
+    </SafeAreaView>
   )
 }

@@ -57,6 +57,10 @@ export default function AddSessionButton({
       console.log('session created')
       queryClient.invalidateQueries({ queryKey: ['sessions'] })
     },
+    onError: (error, variables, context) => {
+      console.error('error creating session', error)
+      queryClient.setQueryData(['sessions'], context.previousSessions)
+    },
   })
 
   return (

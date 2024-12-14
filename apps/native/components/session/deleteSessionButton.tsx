@@ -42,6 +42,10 @@ export default function DeleteSessionButton({
       console.log('session deleted')
       queryClient.invalidateQueries({ queryKey: ['sessions'] })
     },
+    onError: (error, variables, context) => {
+      console.error('error deleting session', error)
+      queryClient.setQueryData(['sessions'], context.previousSessions)
+    },
   })
 
   return (
