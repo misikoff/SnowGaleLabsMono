@@ -1,5 +1,6 @@
 import { TouchableOpacity } from 'react-native'
 import * as Crypto from 'expo-crypto'
+import * as Haptics from 'expo-haptics'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { produce } from 'immer'
 
@@ -61,6 +62,7 @@ export default function AddSessionButton({
   return (
     <TouchableOpacity
       onPress={async () => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
         console.log('create session')
         const newSessionId = Crypto.randomUUID()
         // TODO: make sure this shows loading or otherwise displays things instead of adding the session and then navigating

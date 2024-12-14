@@ -47,9 +47,8 @@ export default function TabLayout() {
         options={{
           title: 'Calendar',
           tabBarIcon: ({ color }) => (
-            <FontAwesome6 size={24} name='sliders' color={color} />
+            <FontAwesome6 size={24} name='calendar' color={color} />
           ),
-          // headerRight: () => <LogoutButton />,
         }}
         redirect={!isSignedIn}
       />

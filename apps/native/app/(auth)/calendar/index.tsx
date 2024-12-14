@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
   Dimensions,
@@ -9,6 +9,7 @@ import {
   Button,
   ActionSheetIOS,
 } from 'react-native'
+import * as Haptics from 'expo-haptics'
 import { useFocusEffect } from 'expo-router'
 import { useUser } from '@clerk/clerk-expo'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -215,7 +216,6 @@ export default function Calendar() {
         }
       })
       setTrainingDays(dates)
-      // Do something when the screen is focused
       return () => {
         // Do something when the screen is unfocused
         // Useful for cleanup functions
@@ -249,6 +249,7 @@ export default function Calendar() {
         showsHorizontalScrollIndicator={false}
         pagingEnabled={true}
         ref={scrollViewRef}
+        contentOffset={{ x: DeviceSize.width * 4, y: 0 }}
         onMomentumScrollEnd={(event) => {
           console.log(
             'event.nativeEvent.contentOffset.x:',
@@ -290,6 +291,13 @@ export default function Calendar() {
                   >
                     {date.split('-')[2]}
                   </Text>
+                  {/* show dots for number of sessions */}
+                  <Text className='text-center'>
+                    {trainingDays
+                      .find((d) => d.day === date)
+                      ?.sessions.slice(0, 3)
+                      .map(() => '•')}
+                  </Text>
                 </View>
               </TouchableOpacity>
             ))}
@@ -297,72 +305,82 @@ export default function Calendar() {
         ))}
       </ScrollView>
 
-      <ScrollView
-        ref={subScrollViewRef}
-        className='bg-gray-500'
-        horizontal={true}
-        pagingEnabled={true}
-        onMomentumScrollEnd={(event) => {
-          console.log(
-            'event.nativeEvent.contentOffset.x:',
-            event.nativeEvent.contentOffset.x,
-            DeviceSize.width,
-          )
-          const page = event.nativeEvent.contentOffset.x / DeviceSize.width
-          console.log('page:', page)
-          // setCurDay(days[Math.floor(page)])
-          setSelectedDate(trainingDays[Math.floor(page)].day)
-        }}
-      >
-        {trainingDays.map((date) => (
-          <View
-            key={date.day}
-            className='relative w-screen items-center justify-center'
-          >
-            {date.sessions.length === 0 ? (
-              <View className='w-64 justify-center gap-2'>
-                <Text className='text-center'>{date.day}</Text>
-                <Text className='text-center'>{date.quote}</Text>
-                <Text className='text-center font-bold'>{date.author}</Text>
-                <Button
-                  title='Refresh Calendar'
-                  onPress={() => console.log('Refresh Calendar')}
-                  color='yellow'
-                />
-              </View>
-            ) : (
-              <>
-                <Text>{date.sessions.length}</Text>
-                <View className='w-full gap-2'>
-                  {date.sessions.map((session) => (
-                    <View
-                      key={session.id}
-                      className='h-64 w-full gap-4 bg-red-300'
-                    >
-                      <View className='w-full flex-row gap-4'>
-                        <TouchableOpacity onPress={() => onPress(session)}>
-                          <View className='rounded-full bg-gray-400 p-4'>
-                            <EllipsisIcon color='black' size={24} />
+      {trainingDays.length > 0 && (
+        <ScrollView
+          horizontal={true}
+          className='bg-gray-500'
+          pagingEnabled={true}
+          ref={subScrollViewRef}
+          contentOffset={{ x: DeviceSize.width * 3, y: 0 }}
+          onMomentumScrollEnd={(event) => {
+            console.log(
+              'event.nativeEvent.contentOffset.x:',
+              event.nativeEvent.contentOffset.x,
+              DeviceSize.width,
+            )
+            const page = event.nativeEvent.contentOffset.x / DeviceSize.width
+            console.log('page:', page)
+            // setCurDay(days[Math.floor(page)])
+            setSelectedDate(trainingDays[Math.floor(page)].day)
+          }}
+        >
+          {trainingDays.map((date) => (
+            <View
+              key={date.day}
+              className='relative w-screen items-center justify-center'
+            >
+              {date.sessions.length === 0 ? (
+                <View className='w-64 justify-center gap-2'>
+                  <Text className='text-center'>{date.day}</Text>
+                  <Text className='text-center'>{date.quote}</Text>
+                  <Text className='text-center font-bold'>{date.author}</Text>
+                  <Button
+                    title='Refresh Calendar'
+                    onPress={() => console.log('Refresh Calendar')}
+                    color='yellow'
+                  />
+                </View>
+              ) : (
+                <ScrollView className='w-full'>
+                  <Text>{date.sessions.length}</Text>
+                  <View className='w-full gap-2'>
+                    {date.sessions.map((session) => (
+                      <View
+                        key={session.id}
+                        className='h-64 w-full gap-4 bg-red-300'
+                      >
+                        <View className='w-full flex-row gap-4'>
+                          <TouchableOpacity onPress={() => onPress(session)}>
+                            <View className='rounded-full bg-gray-400 p-4'>
+                              <EllipsisIcon color='black' size={24} />
+                            </View>
+                          </TouchableOpacity>
+                        </View>
+                        <TouchableOpacity
+                          onPress={() => {
+                            Haptics.notificationAsync(
+                              Haptics.NotificationFeedbackType.Success,
+                            )
+                          }}
+                        >
+                          <View className='mx-4 rounded-md bg-blue-400 p-4'>
+                            <Text className='mx-auto text-lg font-bold text-white'>
+                              Start Session
+                            </Text>
                           </View>
                         </TouchableOpacity>
                       </View>
-                      <TouchableOpacity onPress={() => {}}>
-                        <View className='mx-4 rounded-md bg-blue-400 p-4'>
-                          <Text className='mx-auto text-lg font-bold text-white'>
-                            Start Session
-                          </Text>
-                        </View>
-                      </TouchableOpacity>
-                    </View>
-                  ))}
-                </View>
-              </>
-            )}
-            {!date.adding ? (
-              <>
+                    ))}
+                  </View>
+                </ScrollView>
+              )}
+              {!date.adding ? (
                 <View className='absolute bottom-8 right-8 rounded-full bg-blue-500 p-4'>
                   <TouchableOpacity
                     onPress={() => {
+                      Haptics.notificationAsync(
+                        Haptics.NotificationFeedbackType.Success,
+                      )
                       console.log('Add Event')
                       setTrainingDays((prev) =>
                         prev.map((d) => {
@@ -377,64 +395,73 @@ export default function Calendar() {
                     <PlusIcon color='black' size={24} />
                   </TouchableOpacity>
                 </View>
-              </>
-            ) : (
-              <>
-                <View className='absolute inset-0 bg-gray-900 opacity-80' />
-                <View className='absolute bottom-8 right-8 items-end gap-4'>
-                  <View>
-                    <AddSessionButton userId={userId} date={date.day}>
-                      <View className='flex-row gap-4'>
-                        <View className='items-center justify-center rounded-md bg-white px-2'>
-                          <Text className='text-xl font-bold'>
-                            Create Session
-                          </Text>
+              ) : (
+                <>
+                  <View className='absolute inset-0 bg-gray-900 opacity-80' />
+                  <View className='absolute bottom-8 right-8 items-end gap-4'>
+                    <View>
+                      <AddSessionButton userId={userId} date={date.day}>
+                        <View className='flex-row gap-4'>
+                          <View className='items-center justify-center rounded-md bg-white px-2'>
+                            <Text className='text-xl font-bold'>
+                              Create Session
+                            </Text>
+                          </View>
+                          <View className='rounded-full bg-white p-4'>
+                            <PlusSquareIcon color='black' size={24} />
+                          </View>
                         </View>
-                        <View className='rounded-full bg-white p-4'>
-                          <PlusSquareIcon color='black' size={24} />
+                      </AddSessionButton>
+                    </View>
+                    <View>
+                      <TouchableOpacity
+                        onPress={() => {
+                          Haptics.notificationAsync(
+                            Haptics.NotificationFeedbackType.Success,
+                          )
+                        }}
+                      >
+                        <View className='flex-row gap-4'>
+                          <View className='items-center justify-center rounded-md bg-white px-2'>
+                            <Text className='text-xl font-bold'>
+                              Add From Library
+                            </Text>
+                          </View>
+                          <View className='rounded-full bg-white p-4'>
+                            <BookMarkedIcon color='black' size={24} />
+                          </View>
                         </View>
-                      </View>
-                    </AddSessionButton>
-                  </View>
-                  <View>
-                    <TouchableOpacity onPress={() => {}}>
-                      <View className='flex-row gap-4'>
-                        <View className='items-center justify-center rounded-md bg-white px-2'>
-                          <Text className='text-xl font-bold'>
-                            Add From Library
-                          </Text>
-                        </View>
-                        <View className='rounded-full bg-white p-4'>
-                          <BookMarkedIcon color='black' size={24} />
+                      </TouchableOpacity>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => {
+                        Haptics.notificationAsync(
+                          Haptics.NotificationFeedbackType.Success,
+                        )
+                        console.log('stop adding ')
+                        setTrainingDays((prev) =>
+                          prev.map((d) => {
+                            if (d.day === date.day) {
+                              return { ...d, adding: false }
+                            }
+                            return d
+                          }),
+                        )
+                      }}
+                    >
+                      <View className='w-auto flex-grow-0'>
+                        <View className='rounded-full bg-blue-500 p-4'>
+                          <XIcon color='black' size={24} />
                         </View>
                       </View>
                     </TouchableOpacity>
                   </View>
-                  <TouchableOpacity
-                    onPress={() => {
-                      console.log('stop adding ')
-                      setTrainingDays((prev) =>
-                        prev.map((d) => {
-                          if (d.day === date.day) {
-                            return { ...d, adding: false }
-                          }
-                          return d
-                        }),
-                      )
-                    }}
-                  >
-                    <View className='w-auto flex-grow-0'>
-                      <View className='rounded-full bg-blue-500 p-4'>
-                        <XIcon color='black' size={24} />
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              </>
-            )}
-          </View>
-        ))}
-      </ScrollView>
+                </>
+              )}
+            </View>
+          ))}
+        </ScrollView>
+      )}
     </View>
   )
 }
