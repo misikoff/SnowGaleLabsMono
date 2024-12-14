@@ -11,7 +11,7 @@ import {
 } from 'react-native'
 import { Link } from 'expo-router'
 import { useSignIn } from '@clerk/clerk-expo'
-import Spinner from 'react-native-loading-spinner-overlay'
+// import Spinner from 'react-native-loading-spinner-overlay'
 
 const Login = () => {
   const { signIn, setActive, isLoaded } = useSignIn()
@@ -42,7 +42,8 @@ const Login = () => {
 
   return (
     <View className='flex-1 content-center p-5'>
-      <Spinner visible={loading} />
+      {loading && <Text>Loading...</Text>}
+      {/* <Spinner visible={loading} /> */}
 
       <TextInput
         autoCapitalize='none'
@@ -51,6 +52,7 @@ const Login = () => {
         onChangeText={setEmailAddress}
         className='my-4 h-14 rounded-md border-2 border-purple-600 bg-white p-4'
       />
+      <Text>{emailAddress}</Text>
       <TextInput
         placeholder='password'
         value={password}
@@ -58,6 +60,7 @@ const Login = () => {
         secureTextEntry
         className='my-4 h-14 rounded-md border-2 border-purple-600 bg-white p-4'
       />
+      <Text>{password}</Text>
 
       <Button onPress={onSignInPress} title='Login' color={'#6c47ff'} />
 

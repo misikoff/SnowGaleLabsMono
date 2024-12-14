@@ -71,9 +71,10 @@ const Register = () => {
       <Stack.Screen
       // options={{ headerBackVisible: !pendingVerification }}
       />
+      {/* {loading && <Text>Loading...</Text>} */}
       <Spinner visible={loading} />
 
-      <Text>{isLoaded}wowowowo</Text>
+      <Text>{isLoaded}</Text>
 
       {/* {!pendingVerification && (
         <> */}

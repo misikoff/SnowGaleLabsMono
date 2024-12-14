@@ -109,7 +109,7 @@ export default function PerformanceButton({
   return (
     <View>
       <Modal
-        className='mt-12 items-center justify-center'
+        className='items-center justify-center'
         animationType='slide'
         transparent={true}
         visible={modalVisible}
@@ -127,10 +127,11 @@ export default function PerformanceButton({
 
             <View className='flex-row justify-between gap-6'>
               {/* TODO */}
-              <View className='flex-row'>
+              <View className='flex-col'>
                 <View className='flex flex-col items-center'>
                   <Text>Weight</Text>
                   <TextInput
+                    className='h-10 w-20'
                     style={styles.input}
                     onChangeText={setCurWeight}
                     value={curWeight}
@@ -142,6 +143,7 @@ export default function PerformanceButton({
                 <View className='flex flex-col items-center'>
                   <Text>Reps</Text>
                   <TextInput
+                    className='h-10 w-20'
                     style={styles.input}
                     onChangeText={setCurReps}
                     value={curReps}
@@ -153,6 +155,7 @@ export default function PerformanceButton({
                 <View className='flex flex-col items-center'>
                   <Text>RPE</Text>
                   <TextInput
+                    className='h-10 w-20'
                     style={styles.input}
                     onChangeText={setCurRpe}
                     value={curRpe}

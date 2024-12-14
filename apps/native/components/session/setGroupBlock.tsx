@@ -65,9 +65,10 @@ export default function SetGroupBlock({
             disabled={isSetEmpty(set) && set.id !== firstEmptySetId}
           >
             <>
-              {set.weight && set.reps && set.rpe ? (
+              {set.weight && set.reps ? (
                 <Text className='text-white'>
-                  Performed {set.weight} x {set.reps} @ RPE {set.rpe}
+                  {set.weight} x {set.reps}{' '}
+                  {set.rpe !== 0 && `@ RPE ${set.rpe}`}
                 </Text>
               ) : (
                 <Text
