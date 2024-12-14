@@ -60,6 +60,8 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <FontAwesome6 size={24} name='sliders' color={color} />
           ),
+          headerShown: false,
+
           // headerRight: () => <LogoutButton />,
         }}
         redirect={!isSignedIn}

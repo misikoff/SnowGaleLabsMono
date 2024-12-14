@@ -1,9 +1,9 @@
 import { View } from 'react-native'
 import { Slot } from 'expo-router'
 
-export default function SessionLayout() {
+export default function SettingsLayout() {
   return (
-    <View className='h-full px-4 py-2'>
+    <View className='h-full'>
       <Slot />
     </View>
   )
