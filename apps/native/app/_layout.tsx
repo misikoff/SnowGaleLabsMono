@@ -1,15 +1,24 @@
 import '@/global.css'
+import 'expo-dev-client'
+
 import { useEffect } from 'react'
 
 import { Slot, useRouter, useSegments } from 'expo-router'
 import * as SecureStore from 'expo-secure-store'
+import { StatusBar } from 'expo-status-bar'
 import {
   ClerkProvider,
   // ClerkLoaded,
   useAuth,
 } from '@clerk/clerk-expo'
+import { ThemeProvider as NavThemeProvider } from '@react-navigation/native'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 
+import {
+  useColorScheme,
+  // useInitialAndroidBarSync
+} from '@/lib/useColorScheme'
+import { NAV_THEME } from '@/theme'
 const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY
 
 // Cache the Clerk JWT
@@ -73,12 +82,21 @@ const InitialLayout = () => {
 }
 
 export default function HomeLayout() {
+  // useInitialAndroidBarSync();
+  const { colorScheme, isDarkColorScheme } = useColorScheme()
+
   return (
     <ClerkProvider
       publishableKey={CLERK_PUBLISHABLE_KEY!}
       tokenCache={tokenCache}
     >
-      <InitialLayout />
+      <StatusBar
+        key={`root-status-bar-${isDarkColorScheme ? 'light' : 'dark'}`}
+        style={isDarkColorScheme ? 'light' : 'dark'}
+      />
+      <NavThemeProvider value={NAV_THEME[colorScheme]}>
+        <InitialLayout />
+      </NavThemeProvider>
       {/* <ClerkLoaded> */}
       {/* <QueryClientProvider client={queryClient}> */}
       {/* <SafeAreaView className='flex-1'> */}
