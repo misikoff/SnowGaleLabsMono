@@ -2,6 +2,7 @@ import { relations, sql } from 'drizzle-orm'
 import {
   AnyPgColumn,
   boolean,
+  date,
   index,
   integer,
   pgTable,
@@ -182,6 +183,7 @@ export const sessions = pgTable(
     microcycleId: uuid().references(() => microcycles.id),
     order: smallint().default(0),
     completed: boolean().default(false),
+    date: date().notNull().defaultNow(),
     createdAt: timestamp().notNull().defaultNow(),
     updatedAt: timestamp()
       .notNull()

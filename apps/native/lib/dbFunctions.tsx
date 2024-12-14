@@ -166,6 +166,7 @@ export async function createSession(payload: {
   order?: Session['order']
   programId?: Program['id']
   microcycleId?: Microcycle['id']
+  date?: Session['date']
   createdAt?: Session['createdAt']
   updatedAt?: Session['updatedAt']
   userId?: Session['userId']

@@ -1,4 +1,4 @@
-import { Pressable } from 'react-native'
+import { TouchableOpacity } from 'react-native'
 import * as Crypto from 'expo-crypto'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { produce } from 'immer'
@@ -8,10 +8,12 @@ import { createSession } from '@/lib/dbFunctions'
 
 export default function AddSessionButton({
   userId,
+  date = '2-2-2022',
   children,
   onCreate,
 }: {
   userId: string
+  date?: string
   children: React.ReactNode
   onCreate?: (sessionId: string) => void
 }) {
@@ -25,11 +27,12 @@ export default function AddSessionButton({
     }: Parameters<typeof createSession>[0]) =>
       createSession({
         id,
+        date,
         createdAt,
         updatedAt,
         userId,
       }),
-    onMutate: async ({ id, createdAt, updatedAt }) => {
+    onMutate: async ({ id, date, createdAt, updatedAt }) => {
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
@@ -40,7 +43,7 @@ export default function AddSessionButton({
       const previousSessions = queryClient.getQueryData(['sessions'])
 
       const nextSessions = produce(previousSessions, (draft: Session[]) => {
-        draft.push({ id, createdAt, updatedAt } as Session)
+        draft.push({ id, date, createdAt, updatedAt } as Session)
       })
       // console.log({ nextSessions })
       // Optimistically update to the new value
@@ -56,13 +59,14 @@ export default function AddSessionButton({
   })
 
   return (
-    <Pressable
+    <TouchableOpacity
       onPress={async () => {
         console.log('create session')
         const newSessionId = Crypto.randomUUID()
         // TODO: make sure this shows loading or otherwise displays things instead of adding the session and then navigating
         await createSessionMutation.mutateAsync({
           id: newSessionId,
+          date,
           createdAt: new Date(),
           updatedAt: new Date(),
           userId,
@@ -73,6 +77,6 @@ export default function AddSessionButton({
       }}
     >
       {children}
-    </Pressable>
+    </TouchableOpacity>
   )
 }

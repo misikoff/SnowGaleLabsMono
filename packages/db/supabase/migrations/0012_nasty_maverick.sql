@@ -1,0 +1,1 @@
+ALTER TABLE "sessions" ADD COLUMN "date" date DEFAULT now() NOT NULL;
