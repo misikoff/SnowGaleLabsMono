@@ -188,6 +188,7 @@ export async function updateSession(payload: {
   name?: Session['name']
   order?: Session['order']
   completed?: Session['completed']
+  date?: Session['date']
   userId?: Session['userId']
 }) {
   payload = await toSupabaseUserPayload(payload)

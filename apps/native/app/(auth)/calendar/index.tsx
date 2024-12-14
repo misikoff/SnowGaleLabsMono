@@ -10,12 +10,16 @@ import {
   ActionSheetIOS,
   Pressable,
   Alert,
+  Modal,
+  StyleSheet,
 } from 'react-native'
 import * as Haptics from 'expo-haptics'
 import { useFocusEffect } from 'expo-router'
 import { useUser } from '@clerk/clerk-expo'
+import { Picker as SelectPicker } from '@react-native-picker/picker'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
+import { produce } from 'immer'
 import {
   BookMarkedIcon,
   EllipsisIcon,
@@ -27,7 +31,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { Session } from '@repo/db/schema'
 import AddSessionButton from '@/components/session/addSessionButton'
-import { deleteSession, getSessions } from '@/lib/dbFunctions'
+import { deleteSession, getSessions, updateSession } from '@/lib/dbFunctions'
 
 // get 9 weeks centered around today
 const getSortedChunks = () => {
@@ -107,6 +111,14 @@ export default function Calendar() {
   const user = useUser()
   const userId = user.user!.id
 
+  const [curWeek, setCurWeek] = useState(4)
+  // const [curDay, setCurDay] = useState(3)
+  const [selectedDate, setSelectedDate] = useState(weeks[4][3])
+  const [selectedWeek, setSelectedWeek] = useState(weeks[4])
+  const [showMoveModal, setShowMoveModal] = useState(false)
+  const [selectedMoveDate, setSelectedMoveDate] = useState('')
+  const [currentSession, setCurrentSession] = useState<Session | null>(null)
+
   const queryClient = useQueryClient()
   const deleteSessionMutation = useMutation({
     mutationFn: (id: Session['id']) => deleteSession(id),
@@ -140,8 +152,88 @@ export default function Calendar() {
     },
   })
 
+  const updateSessionMutation = useMutation({
+    mutationFn: ({ id, date }: Parameters<typeof updateSession>[0]) =>
+      updateSession({
+        id,
+        date,
+      }),
+    // When mutate is called:
+    // TODO: better typing with a simple set or dummy set, but still may require casting
+    onMutate: async ({ id, date }) => {
+      // // Cancel any outgoing refetches
+      // // (so they don't overwrite our optimistic update)
+      // await queryClient.cancelQueries({
+      //   queryKey: ['session', id],
+      // })
+      // // Snapshot the previous value
+      // const previousSession = queryClient.getQueryData(['session', id])
+      // const nextSession = produce(previousSession, (draft: any) => {
+      //   draft.completed = true
+      // })
+      // // Optimistically update to the new value
+      // queryClient.setQueryData(['session', id], nextSession)
+      // // setOpen(false)
+      // // Return a context object with the snapshotted value
+      // return { previousSession }
+
+      // Cancel any outgoing refetches
+      // (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({
+        queryKey: ['sessions'],
+      })
+
+      // Snapshot the previous value
+      const previousSessions = queryClient.getQueryData([
+        'sessions',
+      ]) as Session[]
+
+      const nextSessions = previousSessions.map((s) => {
+        if (s.id === id) {
+          return { ...s, date }
+        } else {
+          return s
+        }
+      })
+
+      console.log({ nextSessions })
+      // Optimistically update to the new value
+      queryClient.setQueryData(['sessions'], nextSessions)
+
+      // Return a context object with the snapshotted value
+      return { previousSessions }
+    },
+    // // If the mutation fails,
+    // // use the context returned from onMutate to roll back
+    // onError: (err, updatedSession, context) => {
+    //   console.log('error')
+    //   console.log({ err })
+    //   console.log({ updatedSession, context })
+    //   queryClient.setQueryData(
+    //     ['session', updatedSession.id],
+    //     context?.previousSession,
+    //   )
+    // },
+    // onSuccess: () => {
+    //   console.log('success')
+    //   // need to do another mutation to add the first set to the set group
+    // },
+    // // Always refetch after error or success:
+    // onSettled: () => {
+    //   console.log('settled')
+    //   // queryClient.invalidateQueries({
+    //   //   queryKey: ['session', session.id],
+    //   // })
+    // },
+    onSuccess: () => {
+      console.log('session updated')
+      queryClient.invalidateQueries({ queryKey: ['sessions'] })
+    },
+  })
+
   const onPress = (session: Session) => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+    setCurrentSession(session)
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: [
@@ -164,7 +256,9 @@ export default function Calendar() {
         if (buttonIndex === 0) {
           // cancel action
         } else if (buttonIndex === 1) {
-          // setResult(String(Math.floor(Math.random() * 100) + 1));
+          setShowMoveModal(true)
+          console.log('Move Session')
+          setSelectedMoveDate(session.date)
         } else if (buttonIndex === 2) {
           // setResult('🔮');
         } else if (buttonIndex === 3) {
@@ -208,10 +302,6 @@ export default function Calendar() {
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
   }
-  const [curWeek, setCurWeek] = useState(4)
-  // const [curDay, setCurDay] = useState(3)
-  const [selectedDate, setSelectedDate] = useState(weeks[4][3])
-  const [selectedWeek, setSelectedWeek] = useState(weeks[4])
 
   // match quotes to days
   const [trainingDays, setTrainingDays] = useState<
@@ -274,13 +364,7 @@ export default function Calendar() {
         ref={scrollViewRef}
         contentOffset={{ x: DeviceSize.width * 4, y: 0 }}
         onMomentumScrollEnd={(event) => {
-          console.log(
-            'event.nativeEvent.contentOffset.x:',
-            event.nativeEvent.contentOffset.x,
-            DeviceSize.width,
-          )
           const page = event.nativeEvent.contentOffset.x / DeviceSize.width
-          console.log('page:', page)
           setCurWeek(Math.floor(page))
         }}
         className='flex-grow-0'
@@ -336,13 +420,7 @@ export default function Calendar() {
           ref={subScrollViewRef}
           contentOffset={{ x: DeviceSize.width * 3, y: 0 }}
           onMomentumScrollEnd={(event) => {
-            console.log(
-              'event.nativeEvent.contentOffset.x:',
-              event.nativeEvent.contentOffset.x,
-              DeviceSize.width,
-            )
             const page = event.nativeEvent.contentOffset.x / DeviceSize.width
-            console.log('page:', page)
             // setCurDay(days[Math.floor(page)])
             setSelectedDate(trainingDays[Math.floor(page)].day)
           }}
@@ -369,9 +447,12 @@ export default function Calendar() {
                     {date.sessions.map((session) => (
                       <View
                         key={session.id}
-                        className='h-64 w-full gap-4 bg-red-300'
+                        className='h-64 w-full gap-4 bg-red-300 p-4'
                       >
-                        <View className='w-full flex-row gap-4'>
+                        <View className='w-full flex-row items-center justify-between gap-4'>
+                          <Text className='text-lg font-bold'>
+                            {session.name || 'Untitled Session'}
+                          </Text>
                           <TouchableOpacity onPress={() => onPress(session)}>
                             <View className='rounded-full bg-gray-400 p-4'>
                               <EllipsisIcon color='black' size={24} />
@@ -385,9 +466,19 @@ export default function Calendar() {
                             )
                           }}
                         >
-                          <View className='mx-4 rounded-md bg-blue-400 p-4'>
+                          <View className='rounded-md bg-blue-400 p-4'>
                             <Text className='mx-auto text-lg font-bold text-white'>
                               Start Session
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity>
+                          <View className='flex-row items-center gap-4'>
+                            <View className='rounded-full border-2 border-blue-400 p-1'>
+                              <PlusIcon size={20} color={'blue'} />
+                            </View>
+                            <Text className='text-xl font-black'>
+                              Add Exercise
                             </Text>
                           </View>
                         </TouchableOpacity>
@@ -498,6 +589,72 @@ export default function Calendar() {
           ))}
         </ScrollView>
       )}
+      <Modal
+        animationType='slide'
+        transparent={true}
+        visible={showMoveModal}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.')
+          setShowMoveModal(!showMoveModal)
+        }}
+      >
+        <Pressable
+          className='absolute inset-0 bg-gray-700 opacity-35'
+          onPress={() => {
+            setShowMoveModal(false)
+          }}
+        />
+        <View className='flex-grow' />
+        <View className='items-center justify-center bg-slate-700'>
+          <View className='w-full flex-row justify-between border-b-2 border-gray-200 p-4'>
+            <TouchableOpacity onPress={() => setShowMoveModal(!showMoveModal)}>
+              <Text className='text-lg text-blue-400'>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                console.log({ selectedMoveDate })
+                updateSessionMutation.mutateAsync({
+                  id: currentSession!.id,
+                  date: selectedMoveDate,
+                })
+                setShowMoveModal(false)
+              }}
+            >
+              <Text className='text-lg font-bold text-blue-400'>Select</Text>
+            </TouchableOpacity>
+          </View>
+          <SelectPicker
+            itemStyle={pickerSelectStyles.pickerItem}
+            style={pickerSelectStyles.picker}
+            selectedValue={selectedMoveDate}
+            onValueChange={(itemValue, itemIndex) =>
+              setSelectedMoveDate(itemValue)
+            }
+          >
+            {weeks.flat().map((week, i) => (
+              <SelectPicker.Item key={i} label={week} value={week} />
+            ))}
+          </SelectPicker>
+        </View>
+      </Modal>
     </SafeAreaView>
   )
 }
+
+const pickerSelectStyles = StyleSheet.create({
+  picker: {
+    width: '100%',
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 4,
+    color: 'white',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+  pickerItem: {
+    color: 'white',
+    // backgroundColor: 'black',
+  },
+})
