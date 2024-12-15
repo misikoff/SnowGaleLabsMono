@@ -25,11 +25,17 @@ import {
   EllipsisIcon,
   PlusIcon,
   PlusSquareIcon,
+  TrashIcon,
   XIcon,
 } from 'lucide-react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import { Session } from '@repo/db/schema'
+import {
+  Session,
+  SessionWithSetGroupWithExerciseAndSets,
+} from '@repo/db/schema'
+import DeleteExerciseAlert from '@/components/calendarHelpers/deleteExerciseAlert'
+import AddExerciseSheet from '@/components/session/addExerciseSheet'
 import AddSessionButton from '@/components/session/addSessionButton'
 import { deleteSession, getSessions, updateSession } from '@/lib/dbFunctions'
 
@@ -117,7 +123,8 @@ export default function Calendar() {
   const [selectedWeek, setSelectedWeek] = useState(weeks[4])
   const [showMoveModal, setShowMoveModal] = useState(false)
   const [selectedMoveDate, setSelectedMoveDate] = useState('')
-  const [currentSession, setCurrentSession] = useState<Session | null>(null)
+  const [currentSession, setCurrentSession] =
+    useState<SessionWithSetGroupWithExerciseAndSets | null>(null)
 
   const queryClient = useQueryClient()
   const deleteSessionMutation = useMutation({
@@ -295,6 +302,7 @@ export default function Calendar() {
     queryKey: ['sessions'],
     queryFn: async () => getSessions({ userId }),
   })
+  console.log({ sessions })
 
   const scrollViewRef = useRef(null)
   const subScrollViewRef = useRef(null)
@@ -310,7 +318,7 @@ export default function Calendar() {
       quote: string
       author: string
       adding: boolean
-      sessions: Session[]
+      sessions: SessionWithSetGroupWithExerciseAndSets[]
     }[]
   >([])
 
@@ -338,8 +346,8 @@ export default function Calendar() {
 
   return (
     <SafeAreaView className='flex-1 items-center'>
-      <View className='w-full flex-row justify-between p-4'>
-        <Text className='text-2xl font-bold'>
+      <View className='w-full flex-row items-center justify-between bg-slate-950 px-4'>
+        <Text className='text-2xl font-bold text-white'>
           {new Date(weeks[curWeek][3]).toLocaleString('en-US', {
             month: 'short',
           }) +
@@ -367,7 +375,7 @@ export default function Calendar() {
           const page = event.nativeEvent.contentOffset.x / DeviceSize.width
           setCurWeek(Math.floor(page))
         }}
-        className='flex-grow-0'
+        className='flex-grow-0 bg-slate-950'
       >
         {weeks.map((week, i) => (
           <View key={i} className='w-screen flex-row justify-between pt-4'>
@@ -376,7 +384,7 @@ export default function Calendar() {
                 key={date}
                 className={clsx(
                   'flex-grow border-b-2 pb-4',
-                  date === selectedDate ? 'border-blue-500' : 'border-gray-400',
+                  date === selectedDate ? 'border-white' : 'border-gray-400',
                 )}
                 onPress={() => {
                   setSelectedDate(date)
@@ -392,14 +400,14 @@ export default function Calendar() {
                 <View className='text-center'>
                   <Text
                     className={clsx(
-                      'mx-auto text-lg font-bold',
-                      date === selectedDate && 'text-blue-500',
+                      'mx-auto font-bold',
+                      date === selectedDate ? 'text-white' : 'text-gray-400',
                     )}
                   >
                     {date.split('-')[2]}
                   </Text>
                   {/* show dots for number of sessions */}
-                  <Text className='text-center'>
+                  <Text className='-mb-2 text-center text-white'>
                     {trainingDays
                       .find((d) => d.day === date)
                       ?.sessions.slice(0, 3)
@@ -415,7 +423,7 @@ export default function Calendar() {
       {trainingDays.length > 0 && (
         <ScrollView
           horizontal={true}
-          className='-mb-8 bg-gray-500'
+          className='-mb-8 bg-zinc-900'
           pagingEnabled={true}
           ref={subScrollViewRef}
           contentOffset={{ x: DeviceSize.width * 3, y: 0 }}
@@ -432,56 +440,140 @@ export default function Calendar() {
             >
               {date.sessions.length === 0 ? (
                 <View className='w-64 justify-center gap-2'>
-                  <Text className='text-center'>{date.day}</Text>
-                  <Text className='text-center'>{date.quote}</Text>
-                  <Text className='text-center font-bold'>{date.author}</Text>
-                  <Button
-                    title='Refresh Calendar'
-                    onPress={() => console.log('Refresh Calendar')}
-                    color='yellow'
-                  />
+                  {/* <Text className='text-center'>{date.day}</Text> */}
+                  <Text className='text-center text-lg text-white'>
+                    {date.quote}
+                  </Text>
+                  <Text className='text-center text-lg font-bold text-white'>
+                    {date.author}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      console.log('Refresh Calendar')
+                      // invalidate the query maybe for just this session
+                      queryClient.invalidateQueries({ queryKey: ['sessions'] })
+                    }}
+                  >
+                    <Text className='mx-auto mt-12 font-bold text-blue-400'>
+                      Refresh Calendar
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               ) : (
                 <ScrollView className='w-full'>
                   <View className='w-full gap-2'>
-                    {date.sessions.map((session) => (
-                      <View
-                        key={session.id}
-                        className='h-64 w-full gap-4 bg-red-300 p-4'
-                      >
-                        <View className='w-full flex-row items-center justify-between gap-4'>
-                          <Text className='text-lg font-bold'>
-                            {session.name || 'Untitled Session'}
-                          </Text>
-                          <TouchableOpacity onPress={() => onPress(session)}>
-                            <View className='rounded-full bg-gray-400 p-4'>
-                              <EllipsisIcon color='black' size={24} />
+                    {date.sessions.map((session, i) => (
+                      <View key={session.id}>
+                        {i > 0 && (
+                          <View className='border-b-4 border-zinc-600' />
+                        )}
+                        <View className='min-h-64 w-full gap-4 p-4'>
+                          <View className='w-full flex-row items-center justify-between gap-4'>
+                            <Text className='text-lg font-bold text-white'>
+                              {session.name || 'Untitled Session'}
+                            </Text>
+                            <TouchableOpacity onPress={() => onPress(session)}>
+                              <View className='rounded-full bg-gray-800 p-3'>
+                                <EllipsisIcon color='lightblue' size={24} />
+                              </View>
+                            </TouchableOpacity>
+                          </View>
+                          <TouchableOpacity
+                            onPress={() => {
+                              Haptics.notificationAsync(
+                                Haptics.NotificationFeedbackType.Success,
+                              )
+                            }}
+                          >
+                            <View className='rounded-md bg-blue-400 px-4 py-3'>
+                              <Text className='mx-auto text-lg font-bold text-white'>
+                                Start Session
+                              </Text>
                             </View>
                           </TouchableOpacity>
-                        </View>
-                        <TouchableOpacity
-                          onPress={() => {
-                            Haptics.notificationAsync(
-                              Haptics.NotificationFeedbackType.Success,
-                            )
-                          }}
-                        >
-                          <View className='rounded-md bg-blue-400 p-4'>
-                            <Text className='mx-auto text-lg font-bold text-white'>
-                              Start Session
+                          <TouchableOpacity className='flex-row items-center gap-4'>
+                            <Text className='text-xl font-bold text-blue-400'>
+                              Comment on Session
                             </Text>
-                          </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity>
+                          </TouchableOpacity>
                           <View className='flex-row items-center gap-4'>
-                            <View className='rounded-full border-2 border-blue-400 p-1'>
-                              <PlusIcon size={20} color={'blue'} />
+                            {/* <Text className='text-lg font-bold text-white'>
+                              Exercises: {session.setGroups.length}
+                            </Text> */}
+                            <View className=''>
+                              {session.setGroups
+                                .slice()
+                                .sort((s1, s2) => {
+                                  if (s1.order && s2.order) {
+                                    return s1.order - s2.order
+                                  } else if (s1.order) {
+                                    return -1
+                                  }
+                                  return 1
+                                })
+                                .map((setGroup, i) => (
+                                  <View
+                                    key={setGroup.id}
+                                    className='w-full flex-row items-center justify-between gap-4 border-b-2 border-gray-400 py-4'
+                                  >
+                                    <TouchableOpacity className='flex-row items-center justify-center gap-4'>
+                                      <View className='h-10 w-10 items-center justify-center rounded-full border-2 border-gray-400'>
+                                        <Text className='text-center text-lg text-white'>
+                                          {/* get alphabet letter for order */}
+                                          {String.fromCharCode(65 + i)}
+                                        </Text>
+                                      </View>
+                                      <View className=''>
+                                        <Text
+                                          key={setGroup.id}
+                                          className='text-xl font-bold text-white'
+                                        >
+                                          {setGroup.order}{' '}
+                                          {setGroup.exercise.name}
+                                        </Text>
+                                        <Text className='text-lg text-blue-300'>
+                                          {setGroup.sets.length} set
+                                          {setGroup.sets.length !== 1
+                                            ? 's'
+                                            : ''}
+                                        </Text>
+                                      </View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                      onPress={() => {
+                                        DeleteExerciseAlert(setGroup.exercise)
+                                      }}
+                                    >
+                                      <TrashIcon color='lightblue' size={24} />
+                                    </TouchableOpacity>
+                                  </View>
+                                ))}
                             </View>
-                            <Text className='text-xl font-black'>
-                              Add Exercise
-                            </Text>
                           </View>
-                        </TouchableOpacity>
+
+                          <View className='flex-row items-center gap-4'>
+                            <AddExerciseSheet session={session}>
+                              <View className='flex-row items-center gap-4'>
+                                <View className='rounded-full border-2 border-blue-400 p-1'>
+                                  <PlusIcon size={20} color='lightblue' />
+                                </View>
+                                <Text className='text-xl font-black text-white'>
+                                  Add Exercise
+                                </Text>
+                              </View>
+                            </AddExerciseSheet>
+                            <TouchableOpacity>
+                              <View className='flex-row items-center gap-4'>
+                                <View className='rounded-full border-2 border-blue-400 p-1'>
+                                  <PlusIcon size={20} color='lightblue' />
+                                </View>
+                                <Text className='text-xl font-black text-white'>
+                                  Add Circuit
+                                </Text>
+                              </View>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
                       </View>
                     ))}
                   </View>

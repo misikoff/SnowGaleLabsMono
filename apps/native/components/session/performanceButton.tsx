@@ -7,8 +7,9 @@ import {
   Text,
   Pressable,
   View,
-  TextInput,
+  TouchableOpacity,
 } from 'react-native'
+import { Picker as SelectPicker } from '@react-native-picker/picker'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { produce } from 'immer'
 
@@ -29,7 +30,7 @@ export default function PerformanceButton({
   children: React.ReactNode
 }) {
   const queryClient = useQueryClient()
-  const [modalVisible, setModalVisible] = useState(false)
+  const [showMoveModal, setShowMoveModal] = useState(false)
 
   const [curWeight, setCurWeight] = useState(set.weight)
   const [curReps, setCurReps] = useState(set.reps)
@@ -107,104 +108,124 @@ export default function PerformanceButton({
   })
 
   return (
-    <View>
+    <>
       <Modal
-        className='items-center justify-center'
         animationType='slide'
         transparent={true}
-        visible={modalVisible}
+        visible={showMoveModal}
         onRequestClose={() => {
           Alert.alert('Modal has been closed.')
-          setModalVisible(!modalVisible)
+          setShowMoveModal(!showMoveModal)
         }}
       >
-        <View className='my-8 items-center justify-center'>
-          <View
-            className='m-5 items-center rounded-3xl bg-slate-50 p-1'
-            style={styles.modalView}
-          >
-            <Text className='my-4 text-center font-bold'>Performance</Text>
+        <Pressable
+          className='absolute inset-0 bg-gray-700 opacity-35'
+          onPress={() => {
+            setShowMoveModal(false)
+          }}
+        />
+        <View className='flex-grow' />
+        <View className='items-center justify-center bg-slate-700'>
+          <View className='w-full flex-row justify-between border-b-2 border-gray-200 p-4'>
+            <TouchableOpacity onPress={() => setShowMoveModal(!showMoveModal)}>
+              <Text className='text-lg text-blue-400'>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={async () => {
+                // console.log({ selectedMoveDate })
+                // updateSessionMutation.mutateAsync({
+                //   id: currentSession!.id,
+                //   date: selectedMoveDate,
+                // })
+                await updateSetMutation.mutateAsync({
+                  id: set.id,
+                  weight: Number(curWeight),
+                  reps: Number(curReps),
+                  rpe: Number(curRpe),
+                })
+                setShowMoveModal(false)
+              }}
+            >
+              <Text className='text-lg font-bold text-blue-400'>Select</Text>
+            </TouchableOpacity>
+          </View>
 
-            <View className='flex-row justify-between gap-6'>
-              {/* TODO */}
-              <View className='flex-col'>
-                <View className='flex flex-col items-center'>
-                  <Text>Weight</Text>
-                  <TextInput
-                    className='h-10 w-20'
-                    style={styles.input}
-                    onChangeText={setCurWeight}
-                    value={curWeight}
-                    keyboardType='numeric'
-                    type='number'
-                  />
-                </View>
+          <View className='flex-row justify-between p-4'>
+            <View className='w-1/3'>
+              <Text className='text-center text-lg text-white'>Weight</Text>
 
-                <View className='flex flex-col items-center'>
-                  <Text>Reps</Text>
-                  <TextInput
-                    className='h-10 w-20'
-                    style={styles.input}
-                    onChangeText={setCurReps}
-                    value={curReps}
-                    keyboardType='numeric'
-                    type='number'
+              <SelectPicker
+                itemStyle={pickerSelectStyles.pickerItem}
+                style={pickerSelectStyles.picker}
+                selectedValue={curWeight}
+                onValueChange={(itemValue, itemIndex) =>
+                  setCurWeight(itemValue)
+                }
+              >
+                {[
+                  5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80,
+                  85, 90, 95, 100,
+                ].map((week, i) => (
+                  <SelectPicker.Item
+                    key={i}
+                    label={week.toString()}
+                    value={week}
                   />
-                </View>
-
-                <View className='flex flex-col items-center'>
-                  <Text>RPE</Text>
-                  <TextInput
-                    className='h-10 w-20'
-                    style={styles.input}
-                    onChangeText={setCurRpe}
-                    value={curRpe}
-                    keyboardType='numeric'
-                    type='number'
-                  />
-                </View>
-              </View>
+                ))}
+              </SelectPicker>
             </View>
+            <View className='w-1/3'>
+              <Text className='text-center text-lg text-white'>Reps</Text>
 
-            <View className='flex w-full flex-row justify-between gap-6'>
-              <Pressable
-                className='w-1/2 rounded-md rounded-bl-3xl bg-gray-300 p-3'
-                onPress={() => {
-                  setModalVisible(!modalVisible)
-                }}
+              <SelectPicker
+                itemStyle={pickerSelectStyles.pickerItem}
+                style={pickerSelectStyles.picker}
+                selectedValue={curReps}
+                onValueChange={(itemValue, itemIndex) => setCurReps(itemValue)}
               >
-                <Text className='text-center'>Cancel</Text>
-              </Pressable>
-              <Pressable
-                className='group w-1/2 rounded-md rounded-br-3xl bg-green-400 p-3 transition-colors disabled:bg-gray-600'
-                onPress={async () => {
-                  console.log({ curWeight, curReps, curRpe })
-                  await updateSetMutation.mutateAsync({
-                    id: set.id,
-                    weight: Number(curWeight),
-                    reps: Number(curReps),
-                    rpe: Number(curRpe),
-                  })
-
-                  setModalVisible(!modalVisible)
-                }}
+                {[
+                  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                  19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33,
+                  34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
+                  49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+                ].map((week, i) => (
+                  <SelectPicker.Item
+                    key={i}
+                    label={week.toString()}
+                    value={week}
+                  />
+                ))}
+              </SelectPicker>
+            </View>
+            <View className='w-1/3'>
+              <Text className='text-center text-lg text-white'>RIR</Text>
+              <SelectPicker
+                itemStyle={pickerSelectStyles.pickerItem}
+                style={pickerSelectStyles.picker}
+                selectedValue={curRpe}
+                onValueChange={(itemValue, itemIndex) => setCurRpe(itemValue)}
               >
-                <Text className='text-center transition-colors group-disabled:text-white'>
-                  Update
-                </Text>
-              </Pressable>
+                {[0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5].map((week, i) => (
+                  <SelectPicker.Item
+                    key={i}
+                    label={week.toString()}
+                    value={week}
+                  />
+                ))}
+              </SelectPicker>
             </View>
           </View>
         </View>
       </Modal>
-      <Pressable
+
+      <TouchableOpacity
         style={styles.button}
-        onPress={() => setModalVisible(true)}
+        onPress={() => setShowMoveModal(true)}
         disabled={disabled}
       >
         {children}
-      </Pressable>
-    </View>
+      </TouchableOpacity>
+    </>
   )
 }
 
@@ -227,5 +248,23 @@ const styles = StyleSheet.create({
     margin: 12,
     borderWidth: 1,
     padding: 10,
+  },
+})
+
+const pickerSelectStyles = StyleSheet.create({
+  picker: {
+    width: '100%',
+    fontSize: 8,
+    paddingVertical: 0,
+    paddingHorizontal: 0,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 4,
+    color: 'white',
+    paddingRight: 0, // to ensure the text is never behind the icon
+  },
+  pickerItem: {
+    color: 'white',
+    // backgroundColor: 'black',
   },
 })

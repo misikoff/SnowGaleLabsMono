@@ -44,7 +44,7 @@ export default function AddSessionButton({
       const previousSessions = queryClient.getQueryData(['sessions'])
 
       const nextSessions = produce(previousSessions, (draft: Session[]) => {
-        draft.push({ id, date, createdAt, updatedAt } as Session)
+        draft.push({ id, date, createdAt, updatedAt, setGroups: [] } as Session)
       })
       // console.log({ nextSessions })
       // Optimistically update to the new value

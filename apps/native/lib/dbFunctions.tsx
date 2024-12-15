@@ -100,6 +100,7 @@ export async function getSession(payload: {
       `
     id,
     name,
+    date,
     setGroups (
       id,
       order,
@@ -150,7 +151,33 @@ export async function getSessions(payload: { userId: User['id'] }) {
   payload = await toSupabaseUserPayload(payload)
   const { data, error } = await supabase
     .from('sessions')
-    .select('*')
+    .select(
+      `
+    id,
+    name,
+    date,
+    setGroups (
+      id,
+      order,
+      sessionId:session_id,
+      exercise:exercises (
+        id,
+        name
+      ),
+      sets (
+        id,
+        exerciseId:exercise_id,
+        setGroupId:set_group_id,
+        order,
+        reps,
+        rpe,
+        rir,
+        weight,
+        sessionId:session_id
+      )
+    )
+  `,
+    )
     .eq('user_id', payload.userId)
   // .limit(10)
   if (error) {
