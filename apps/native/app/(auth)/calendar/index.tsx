@@ -17,9 +17,8 @@ import * as Haptics from 'expo-haptics'
 import { useFocusEffect } from 'expo-router'
 import { useUser } from '@clerk/clerk-expo'
 import { Picker as SelectPicker } from '@react-native-picker/picker'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
-import { produce } from 'immer'
 import {
   BookMarkedIcon,
   EllipsisIcon,
@@ -37,85 +36,16 @@ import {
 import DeleteExerciseAlert from '@/components/calendarHelpers/deleteExerciseAlert'
 import AddExerciseBottomSheet from '@/components/session/addExerciseBottomSheet'
 import AddSessionButton from '@/components/session/addSessionButton'
+import { getSortedChunks } from '@/lib/calendarFunctions'
 import { getSessions } from '@/lib/dbFunctions'
 import {
   useDeleteSessionMutation,
   useUpdateSessionDateMutation,
 } from '@/lib/mutations/sessionMutations'
-
-// get 9 weeks centered around today
-const getSortedChunks = () => {
-  const today = new Date()
-  const days: string[] = []
-
-  // Collect 31 days before today, today, and 31 days after today
-  for (let i = -31; i <= 31; i++) {
-    const date = new Date(today)
-    date.setDate(today.getDate() + i)
-
-    // Adjust the date to match the local time zone
-    date.setHours(0, 0, 0, 0) // Set the time to midnight to avoid time zone issues
-    days.push(date.toISOString().split('T')[0]) // Format as YYYY-MM-DD
-  }
-
-  // Sort the dates and chunk into weeks of 7 days
-  return Array.from(
-    { length: 9 },
-    (_, i) => days.slice(i * 7, i * 7 + 7), // Slice into 7-day chunks
-  )
-}
-
-// function getSurroundingDays() {
-//   const today = new Date() // Get the current date
-//   const currentDay = today.getDate() // Get the day of the month
-
-//   // Create an array of the 3 days before, the current day, and 3 days after
-//   const surroundingDays = []
-//   for (let offset = -3; offset <= 3; offset++) {
-//     const date = new Date(today) // Clone the current date
-//     date.setDate(currentDay + offset) // Adjust the day
-//     surroundingDays.push(date.getDate())
-//   }
-
-//   return surroundingDays
-// }
+import { quotes } from '@/lib/quoteLib'
 
 const weeks = getSortedChunks()
 // const days = getSurroundingDays()
-
-const quotes: { quote: string; author: string }[] = [
-  {
-    quote: 'Not all who wander are lost',
-    author: 'J.R.R. Tolkien',
-  },
-  {
-    quote:
-      '[Abstract art is] a product of the untalented, sold by the unprincipled to the utterly bewildered.',
-    author: 'Al Capp',
-  },
-  {
-    quote:
-      'Talking with you is sort of the conversational equivalent of an out of body experience',
-    author: 'Calvin & Hobbes',
-  },
-  {
-    quote:
-      'Hanging is too good for a man who makes puns; he should be drawn and quoted.',
-    author: 'Fred Allen',
-  },
-  {
-    quote: 'The more things change, the more they remain... insane.',
-    author: 'Michael Fry and T. Lewis',
-  },
-  {
-    quote: 'By the work one knows the workmen.',
-    author: 'Jean de La Fontaine',
-  },
-  {
-    quote: 'A lie told often enough becomes the truth.',
-    author: 'Vladimir Lenin',
-  },
-]
 
 export default function Calendar() {
   const user = useUser()
