@@ -1,11 +1,8 @@
 import { TouchableOpacity } from 'react-native'
 import * as Crypto from 'expo-crypto'
 import * as Haptics from 'expo-haptics'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { produce } from 'immer'
 
-import { Session } from '@repo/db/schema'
-import { createSession } from '@/lib/dbFunctions'
+import { useCreateSessionMutation } from '@/lib/mutations/sessionMutations'
 
 export default function AddSessionButton({
   userId,
@@ -18,50 +15,7 @@ export default function AddSessionButton({
   children: React.ReactNode
   onCreate?: (sessionId: string) => void
 }) {
-  const queryClient = useQueryClient()
-  const createSessionMutation = useMutation({
-    mutationFn: ({
-      id,
-      createdAt,
-      updatedAt,
-      userId,
-    }: Parameters<typeof createSession>[0]) =>
-      createSession({
-        id,
-        date,
-        createdAt,
-        updatedAt,
-        userId,
-      }),
-    onMutate: async ({ id, date, createdAt, updatedAt }) => {
-      // Cancel any outgoing refetches
-      // (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({
-        queryKey: ['sessions'],
-      })
-
-      // Snapshot the previous value
-      const previousSessions = queryClient.getQueryData(['sessions'])
-
-      const nextSessions = produce(previousSessions, (draft: Session[]) => {
-        draft.push({ id, date, createdAt, updatedAt, setGroups: [] } as Session)
-      })
-      // console.log({ nextSessions })
-      // Optimistically update to the new value
-      queryClient.setQueryData(['sessions'], nextSessions)
-
-      // Return a context object with the snapshotted value
-      return { previousSessions }
-    },
-    onSuccess: () => {
-      console.log('session created')
-      queryClient.invalidateQueries({ queryKey: ['sessions'] })
-    },
-    onError: (error, variables, context) => {
-      console.error('error creating session', error)
-      queryClient.setQueryData(['sessions'], context.previousSessions)
-    },
-  })
+  const createSessionMutation = useCreateSessionMutation(date)
 
   return (
     <TouchableOpacity

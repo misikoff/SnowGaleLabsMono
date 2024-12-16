@@ -10,15 +10,9 @@ import {
   TouchableOpacity,
 } from 'react-native'
 import { Picker as SelectPicker } from '@react-native-picker/picker'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { produce } from 'immer'
 
-import {
-  SessionWithSetGroupWithExerciseAndSets,
-  Set,
-  SetGroupWithExerciseAndSets,
-} from '@repo/db/schema'
-import { updateSet } from '@/lib/dbFunctions'
+import { Set } from '@repo/db/schema'
+import { useUpdateSetMutation } from '@/lib/mutations/setMutation'
 
 export default function PerformanceButton({
   set,
@@ -29,83 +23,13 @@ export default function PerformanceButton({
   disabled?: boolean
   children: React.ReactNode
 }) {
-  const queryClient = useQueryClient()
   const [showMoveModal, setShowMoveModal] = useState(false)
 
   const [curWeight, setCurWeight] = useState(set.weight)
   const [curReps, setCurReps] = useState(set.reps)
   const [curRpe, setCurRpe] = useState(set.rpe)
 
-  const updateSetMutation = useMutation({
-    mutationFn: ({ id, reps, weight, rpe }: Parameters<typeof updateSet>[0]) =>
-      updateSet({
-        id,
-        reps,
-        weight,
-        rpe,
-      }),
-
-    // When mutate is called:
-    // TODO: better typing with a simple set or dummy set, but still may require casting
-    onMutate: async (updatedSet: any) => {
-      // Cancel any outgoing refetches
-      // (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({
-        queryKey: ['session', set.sessionId],
-      })
-
-      // Snapshot the previous value
-      const previousSession = queryClient.getQueryData([
-        'session',
-        set.sessionId,
-      ])
-      const nextSession = produce(
-        previousSession,
-        (draft: SessionWithSetGroupWithExerciseAndSets) => {
-          draft.setGroups.map((sg: SetGroupWithExerciseAndSets) => {
-            sg.sets = sg.sets.map((s: Set) => {
-              if (s.id === set.id) {
-                s.reps = updatedSet.reps
-                s.weight = updatedSet.weight
-                s.rpe = updatedSet.rpe
-              }
-              return s
-            })
-          })
-        },
-      )
-
-      // Optimistically update to the new value
-      queryClient.setQueryData(['session', set.sessionId], nextSession)
-
-      // setOpen(false)
-
-      // Return a context object with the snapshotted value
-      return { previousSession }
-    },
-    // If the mutation fails,
-    // use the context returned from onMutate to roll back
-    onError: (err, updatedSet, context) => {
-      console.log('error')
-      console.log({ err })
-      console.log({ updatedSet, context })
-      queryClient.setQueryData(
-        ['session', set.sessionId],
-        context?.previousSession,
-      )
-    },
-    onSuccess: () => {
-      console.log('success')
-      // need to do another mutation to add the first set to the set group
-    },
-    // Always refetch after error or success:
-    onSettled: () => {
-      console.log('settled')
-      queryClient.invalidateQueries({
-        queryKey: ['session', set.sessionId],
-      })
-    },
-  })
+  const updateSetMutation = useUpdateSetMutation(set.sessionId)
 
   return (
     <>

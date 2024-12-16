@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import {
   Text,
   View,
-  ActivityIndicator,
+  // ActivityIndicator,
   TouchableOpacity,
   Modal,
   Alert,
@@ -29,7 +29,6 @@ export default function AddExerciseSheet({
   session: SessionWithSetGroupWithExerciseAndSets
   children: React.ReactNode
 }) {
-  const queryClient = useQueryClient()
   const [modalVisible, setModalVisible] = useState(false)
   const user = useUser()
   const userId = user.user!.id

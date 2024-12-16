@@ -12,7 +12,7 @@ import {
 import * as Crypto from 'expo-crypto'
 import { useFocusEffect } from 'expo-router'
 import { useUser } from '@clerk/clerk-expo'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import {
   Exercise,
@@ -30,7 +30,6 @@ export default function AddExerciseButton({
   session: SessionWithSetGroupWithExerciseAndSets
   children: React.ReactNode
 }) {
-  const queryClient = useQueryClient()
   const [modalVisible, setModalVisible] = useState(false)
   const [disabled, setDisabled] = useState(false)
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>()
