@@ -1,0 +1,85 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+import { updateSession } from '../dbFunctions'
+
+export const useUpdateSessionMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, date }: Parameters<typeof updateSession>[0]) =>
+      updateSession({
+        id,
+        date,
+      }),
+    // When mutate is called:
+    // TODO: better typing with a simple set or dummy set, but still may require casting
+    onMutate: async ({ id, date }) => {
+      // // Cancel any outgoing refetches
+      // // (so they don't overwrite our optimistic update)
+      // await queryClient.cancelQueries({
+      //   queryKey: ['session', id],
+      // })
+      // // Snapshot the previous value
+      // const previousSession = queryClient.getQueryData(['session', id])
+      // const nextSession = produce(previousSession, (draft: any) => {
+      //   draft.completed = true
+      // })
+      // // Optimistically update to the new value
+      // queryClient.setQueryData(['session', id], nextSession)
+      // // setOpen(false)
+      // // Return a context object with the snapshotted value
+      // return { previousSession }
+
+      // Cancel any outgoing refetches
+      // (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({
+        queryKey: ['sessions'],
+      })
+
+      // Snapshot the previous value
+      const previousSessions = queryClient.getQueryData([
+        'sessions',
+      ]) as Session[]
+
+      const nextSessions = previousSessions.map((s) => {
+        if (s.id === id) {
+          return { ...s, date }
+        } else {
+          return s
+        }
+      })
+
+      console.log({ nextSessions })
+      // Optimistically update to the new value
+      queryClient.setQueryData(['sessions'], nextSessions)
+
+      // Return a context object with the snapshotted value
+      return { previousSessions }
+    },
+    // // If the mutation fails,
+    // // use the context returned from onMutate to roll back
+    // onError: (err, updatedSession, context) => {
+    //   console.log('error')
+    //   console.log({ err })
+    //   console.log({ updatedSession, context })
+    //   queryClient.setQueryData(
+    //     ['session', updatedSession.id],
+    //     context?.previousSession,
+    //   )
+    // },
+    // onSuccess: () => {
+    //   console.log('success')
+    //   // need to do another mutation to add the first set to the set group
+    // },
+    // // Always refetch after error or success:
+    // onSettled: () => {
+    //   console.log('settled')
+    //   // queryClient.invalidateQueries({
+    //   //   queryKey: ['session', session.id],
+    //   // })
+    // },
+    onSuccess: () => {
+      console.log('session updated')
+      queryClient.invalidateQueries({ queryKey: ['sessions'] })
+    },
+  })
+}

@@ -302,11 +302,12 @@ export default function AddExerciseBottomSheet({
         <View className='h-full w-full flex-1 items-center justify-center pb-4 pt-12'>
           {exercisesOptions && exercisesOptions.length > 0 && (
             <>
-              <View className='h-8 w-full flex-row items-center justify-between px-2'>
+              <View className='h-8 w-full flex-row items-baseline justify-between px-6'>
                 <TouchableOpacity
                   onPress={() => {
                     handleClosePress()
                   }}
+                  className='w-24'
                 >
                   <Text className='text-lg text-white'>Back</Text>
                 </TouchableOpacity>
@@ -349,10 +350,11 @@ export default function AddExerciseBottomSheet({
                     handleClosePress()
                   }}
                   disabled={selectedExercises.length === 0}
+                  className='w-24'
                 >
                   <Text
                     className={clsx(
-                      'w-24 text-lg font-bold',
+                      'text-right text-lg font-bold',
                       selectedExercises.length > 0
                         ? 'text-blue-500'
                         : 'text-gray-400',
@@ -367,11 +369,12 @@ export default function AddExerciseBottomSheet({
 
               <View className='relative mt-4 w-full px-2'>
                 <BottomSheetTextInput
+                  style={{ lineHeight: 30, fontSize: 24 }}
                   autoCapitalize='none'
-                  placeholder='search exercises and circuits'
+                  placeholder='Search exercises and circuits'
                   value={searchTerm}
                   onChangeText={setSearchTerm}
-                  className='h-10 w-full rounded-md border-2 bg-slate-950 px-2 text-lg text-white placeholder:text-gray-400'
+                  className='w-full rounded-full bg-slate-950 px-4 py-2 text-white placeholder:text-gray-400'
                 />
                 {searchTerm.length > 0 && (
                   <View className='absolute right-2 flex h-full justify-center'>

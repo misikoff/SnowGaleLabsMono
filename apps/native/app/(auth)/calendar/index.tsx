@@ -39,6 +39,7 @@ import AddExerciseBottomSheet from '@/components/session/addExerciseBottomSheet'
 import AddExerciseSheet from '@/components/session/addExerciseSheet'
 import AddSessionButton from '@/components/session/addSessionButton'
 import { deleteSession, getSessions, updateSession } from '@/lib/dbFunctions'
+import { useUpdateSessionMutation } from '@/lib/mutations/sessionMutations'
 
 // get 9 weeks centered around today
 const getSortedChunks = () => {
@@ -160,85 +161,6 @@ export default function Calendar() {
     },
   })
 
-  const updateSessionMutation = useMutation({
-    mutationFn: ({ id, date }: Parameters<typeof updateSession>[0]) =>
-      updateSession({
-        id,
-        date,
-      }),
-    // When mutate is called:
-    // TODO: better typing with a simple set or dummy set, but still may require casting
-    onMutate: async ({ id, date }) => {
-      // // Cancel any outgoing refetches
-      // // (so they don't overwrite our optimistic update)
-      // await queryClient.cancelQueries({
-      //   queryKey: ['session', id],
-      // })
-      // // Snapshot the previous value
-      // const previousSession = queryClient.getQueryData(['session', id])
-      // const nextSession = produce(previousSession, (draft: any) => {
-      //   draft.completed = true
-      // })
-      // // Optimistically update to the new value
-      // queryClient.setQueryData(['session', id], nextSession)
-      // // setOpen(false)
-      // // Return a context object with the snapshotted value
-      // return { previousSession }
-
-      // Cancel any outgoing refetches
-      // (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({
-        queryKey: ['sessions'],
-      })
-
-      // Snapshot the previous value
-      const previousSessions = queryClient.getQueryData([
-        'sessions',
-      ]) as Session[]
-
-      const nextSessions = previousSessions.map((s) => {
-        if (s.id === id) {
-          return { ...s, date }
-        } else {
-          return s
-        }
-      })
-
-      console.log({ nextSessions })
-      // Optimistically update to the new value
-      queryClient.setQueryData(['sessions'], nextSessions)
-
-      // Return a context object with the snapshotted value
-      return { previousSessions }
-    },
-    // // If the mutation fails,
-    // // use the context returned from onMutate to roll back
-    // onError: (err, updatedSession, context) => {
-    //   console.log('error')
-    //   console.log({ err })
-    //   console.log({ updatedSession, context })
-    //   queryClient.setQueryData(
-    //     ['session', updatedSession.id],
-    //     context?.previousSession,
-    //   )
-    // },
-    // onSuccess: () => {
-    //   console.log('success')
-    //   // need to do another mutation to add the first set to the set group
-    // },
-    // // Always refetch after error or success:
-    // onSettled: () => {
-    //   console.log('settled')
-    //   // queryClient.invalidateQueries({
-    //   //   queryKey: ['session', session.id],
-    //   // })
-    // },
-    onSuccess: () => {
-      console.log('session updated')
-      queryClient.invalidateQueries({ queryKey: ['sessions'] })
-    },
-  })
-
   const onPress = (session: Session) => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
     setCurrentSession(session)
@@ -344,6 +266,7 @@ export default function Calendar() {
       }
     }, [selectedWeek, sessions]),
   )
+  const sessionUpdateMutation = useUpdateSessionMutation()
 
   return (
     <SafeAreaView className='flex-1 items-center'>
@@ -707,7 +630,20 @@ export default function Calendar() {
             <TouchableOpacity
               onPress={() => {
                 console.log({ selectedMoveDate })
-                updateSessionMutation.mutateAsync({
+                const handleUpdate = () => {
+                  mutation.mutate(
+                    { userId: '123', data: { name: 'John Doe' } },
+                    {
+                      onSuccess: (data) => {
+                        console.log('User updated successfully:', data)
+                      },
+                      onError: (error) => {
+                        console.error('Error updating user:', error)
+                      },
+                    },
+                  )
+                }
+                sessionUpdateMutation.mutateAsync({
                   id: currentSession!.id,
                   date: selectedMoveDate,
                 })
