@@ -12,16 +12,16 @@ import {
 import * as Crypto from 'expo-crypto'
 import { useFocusEffect } from 'expo-router'
 import { useUser } from '@clerk/clerk-expo'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { produce } from 'immer'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 import {
   Exercise,
   SessionWithSetGroupWithExerciseAndSets,
-  SetGroup,
 } from '@repo/db/schema'
 import CustomSelect from '@/components/customSelect'
-import { createSet, createSetGroup, getExercises } from '@/lib/dbFunctions'
+import { getExercises } from '@/lib/dbFunctions'
+import { useCreateSetGroupMutation } from '@/lib/mutations/setGroupMutations'
+import { useCreateSetMutation } from '@/lib/mutations/setMutation'
 
 export default function AddExerciseButton({
   session,
@@ -66,161 +66,9 @@ export default function AddExerciseButton({
     value: exercise.id,
   }))
 
-  const createSetGroupMutation = useMutation({
-    mutationFn: ({
-      id,
-      exerciseId,
-      sessionId,
-      order,
-      userId,
-    }: Parameters<typeof createSetGroup>[0]) =>
-      createSetGroup({
-        id,
-        exerciseId,
-        sessionId,
-        order,
-        userId,
-      }),
-    // When mutate is called:
-    // TODO: better typing with a simple set or dummy set, but still may require casting
-    onMutate: async (newSetGroup: any) => {
-      // Cancel any outgoing refetches
-      // (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({
-        queryKey: ['session', session.id],
-      })
+  const createSetGroupMutation = useCreateSetGroupMutation()
 
-      // Snapshot the previous value
-      const previousSession = queryClient.getQueryData(['session', session.id])
-      const nextSession = produce(previousSession, (draft: any) => {
-        // fill in missing fields
-        // TODO: this is a bit of a hack, but it works for now
-        // figure out how to automatically fill in missing fields
-        newSetGroup.sets = []
-        newSetGroup.exercise = selectedExercise
-        draft.setGroups.push(newSetGroup as SetGroup)
-      })
-
-      console.log({ newSetGroup })
-      console.log({ id: newSetGroup.id })
-      console.log('creating new set', {
-        exerciseId: selectedExercise?.id || '',
-        sessionId: session.id,
-        setGroupId: newSetGroup.id,
-      })
-
-      // TODO: get this working instead of running the set creation after the promise
-      // createSetMutation.mutateAsync({
-      //   id: Crypto.randomUUID(),
-      //   exerciseId: selectedExercise?.id || '',
-      //   sessionId: session.id,
-      //   setGroupId: newSetGroup.id,
-      //   order: nextOrder,
-      // })
-
-      // Optimistically update to the new value
-      queryClient.setQueryData(['session', session.id], nextSession)
-
-      // setOpen(false)
-
-      // Return a context object with the snapshotted value
-      return { previousSession }
-    },
-    // If the mutation fails,
-    // use the context returned from onMutate to roll back
-    onError: (err, newSetGroup, context) => {
-      console.log('error')
-      console.log({ err })
-      console.log({ newSetGroup, context })
-      queryClient.setQueryData(
-        ['session', session.id],
-        context?.previousSession,
-      )
-    },
-    onSuccess: () => {
-      console.log('success')
-      // need to do another mutation to add the first set to the set group
-    },
-    // Always refetch after error or success:
-    onSettled: () => {
-      console.log('settled')
-      queryClient.invalidateQueries({
-        queryKey: ['session', session.id],
-      })
-    },
-  })
-
-  const createSetMutation = useMutation({
-    mutationFn: ({
-      id,
-      exerciseId,
-      sessionId,
-      setGroupId,
-      userId,
-    }: Parameters<typeof createSet>[0]) =>
-      createSet({
-        id,
-        exerciseId,
-        sessionId,
-        setGroupId,
-        userId,
-        order: nextOrder,
-      }),
-    // When mutate is called:
-    // TODO: better typing with a simple set or dummy set, but still may require casting
-    onMutate: async (newSet: any) => {
-      // Cancel any outgoing refetches
-      // (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({
-        queryKey: ['session', session.id],
-      })
-
-      // Snapshot the previous value
-      const previousSession = queryClient.getQueryData(['session', session.id])
-      const nextSession = produce(
-        previousSession,
-        (draft: SessionWithSetGroupWithExerciseAndSets) => {
-          draft.setGroups = draft.setGroups.map(
-            (curSetGroup: SetGroupWithExerciseAndSets) => {
-              if (curSetGroup.id === newSet.setGroupId) {
-                curSetGroup.sets.push(newSet as Set)
-              }
-              return curSetGroup
-            },
-          )
-        },
-      )
-      // Optimistically update to the new value
-      queryClient.setQueryData(['session', session.id], nextSession)
-
-      // setOpen(false)
-
-      // Return a context object with the snapshotted value
-      return { previousSession }
-    },
-    // If the mutation fails,
-    // use the context returned from onMutate to roll back
-    onError: (err, newSet, context) => {
-      console.log('error')
-      console.log({ err })
-      console.log({ newSet, context })
-      queryClient.setQueryData(
-        ['session', session.id],
-        context?.previousSession,
-      )
-    },
-    onSuccess: () => {
-      console.log('success')
-      // need to do another mutation to add the first set to the set group
-    },
-    // Always refetch after error or success:
-    onSettled: () => {
-      console.log('settled')
-      queryClient.invalidateQueries({
-        queryKey: ['session', session.id],
-      })
-    },
-  })
+  const createSetMutation = useCreateSetMutation(nextOrder, session.id)
 
   return (
     <View className='mt-12 items-center justify-center'>

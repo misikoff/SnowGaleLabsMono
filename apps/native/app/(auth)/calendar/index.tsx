@@ -36,10 +36,12 @@ import {
 } from '@repo/db/schema'
 import DeleteExerciseAlert from '@/components/calendarHelpers/deleteExerciseAlert'
 import AddExerciseBottomSheet from '@/components/session/addExerciseBottomSheet'
-import AddExerciseSheet from '@/components/session/addExerciseSheet'
 import AddSessionButton from '@/components/session/addSessionButton'
-import { deleteSession, getSessions, updateSession } from '@/lib/dbFunctions'
-import { useUpdateSessionMutation } from '@/lib/mutations/sessionMutations'
+import { getSessions } from '@/lib/dbFunctions'
+import {
+  useDeleteSessionMutation,
+  useUpdateSessionDateMutation,
+} from '@/lib/mutations/sessionMutations'
 
 // get 9 weeks centered around today
 const getSortedChunks = () => {
@@ -129,37 +131,8 @@ export default function Calendar() {
     useState<SessionWithSetGroupWithExerciseAndSets | null>(null)
 
   const queryClient = useQueryClient()
-  const deleteSessionMutation = useMutation({
-    mutationFn: (id: Session['id']) => deleteSession(id),
-    onMutate: async (id) => {
-      // Cancel any outgoing refetches
-      // (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({
-        queryKey: ['sessions'],
-      })
-
-      // Snapshot the previous value
-      const previousSessions = queryClient.getQueryData([
-        'sessions',
-      ]) as Session[]
-
-      const nextSessions = previousSessions.filter((s) => {
-        console.log({ a: id, b: s.id, res: s.id !== id })
-        return s.id !== id
-      })
-
-      console.log({ nextSessions })
-      // Optimistically update to the new value
-      queryClient.setQueryData(['sessions'], nextSessions)
-
-      // Return a context object with the snapshotted value
-      return { previousSessions }
-    },
-    onSuccess: () => {
-      console.log('session deleted')
-      queryClient.invalidateQueries({ queryKey: ['sessions'] })
-    },
-  })
+  const sessionUpdateMutation = useUpdateSessionDateMutation()
+  const sessionDeleteMutation = useDeleteSessionMutation()
 
   const onPress = (session: Session) => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
@@ -207,7 +180,7 @@ export default function Calendar() {
                   Haptics.notificationAsync(
                     Haptics.NotificationFeedbackType.Success,
                   )
-                  deleteSessionMutation.mutateAsync(session.id)
+                  sessionDeleteMutation.mutateAsync(session.id)
                 },
               },
             ],
@@ -266,7 +239,6 @@ export default function Calendar() {
       }
     }, [selectedWeek, sessions]),
   )
-  const sessionUpdateMutation = useUpdateSessionMutation()
 
   return (
     <SafeAreaView className='flex-1 items-center'>
