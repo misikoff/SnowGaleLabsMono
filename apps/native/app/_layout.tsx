@@ -8,6 +8,7 @@ import {
   // ClerkLoaded,
   useAuth,
 } from '@clerk/clerk-expo'
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
@@ -80,11 +81,12 @@ export default function HomeLayout() {
       tokenCache={tokenCache}
     >
       <GestureHandlerRootView>
-        <InitialLayout />
-        {/* <ClerkLoaded> */}
-        {/* <QueryClientProvider client={queryClient}> */}
-        {/* <SafeAreaView className='flex-1'> */}
-        {/* <View
+        <BottomSheetModalProvider>
+          <InitialLayout />
+          {/* <ClerkLoaded> */}
+          {/* <QueryClientProvider client={queryClient}> */}
+          {/* <SafeAreaView className='flex-1'> */}
+          {/* <View
           style={{ height: STATUS_BAR_HEIGHT, backgroundColor: '#0D87E1' }}
           >
           <StatusBar
@@ -93,13 +95,14 @@ export default function HomeLayout() {
           barStyle='light-content'
           />
           </View> */}
-        {/* <Slot /> */}
-        {/* <Stack>
+          {/* <Slot /> */}
+          {/* <Stack>
             <Stack.Screen name='(home)' options={{ headerShown: false }} />
             </Stack> */}
-        {/* </SafeAreaView> */}
-        {/* </QueryClientProvider> */}
-        {/* </ClerkLoaded> */}
+          {/* </SafeAreaView> */}
+          {/* </QueryClientProvider> */}
+          {/* </ClerkLoaded> */}
+        </BottomSheetModalProvider>
       </GestureHandlerRootView>
     </ClerkProvider>
   )

@@ -35,6 +35,7 @@ import {
   SessionWithSetGroupWithExerciseAndSets,
 } from '@repo/db/schema'
 import DeleteExerciseAlert from '@/components/calendarHelpers/deleteExerciseAlert'
+import AddExerciseBottomSheet from '@/components/session/addExerciseBottomSheet'
 import AddExerciseSheet from '@/components/session/addExerciseSheet'
 import AddSessionButton from '@/components/session/addSessionButton'
 import { deleteSession, getSessions, updateSession } from '@/lib/dbFunctions'
@@ -552,7 +553,7 @@ export default function Calendar() {
                           </View>
 
                           <View className='flex-row items-center gap-4'>
-                            <AddExerciseSheet session={session}>
+                            <AddExerciseBottomSheet session={session}>
                               <View className='flex-row items-center gap-4'>
                                 <View className='rounded-full border-2 border-blue-400 p-1'>
                                   <PlusIcon size={20} color='lightblue' />
@@ -561,7 +562,8 @@ export default function Calendar() {
                                   Add Exercise
                                 </Text>
                               </View>
-                            </AddExerciseSheet>
+                            </AddExerciseBottomSheet>
+
                             <TouchableOpacity>
                               <View className='flex-row items-center gap-4'>
                                 <View className='rounded-full border-2 border-blue-400 p-1'>
