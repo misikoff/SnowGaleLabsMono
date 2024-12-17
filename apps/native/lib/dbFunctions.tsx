@@ -7,7 +7,7 @@ import {
   Session,
   User,
 } from '@repo/db/schema'
-import { queryClient } from '@/app/_layout'
+import queryClient from '@/lib/queryClient'
 import { supabase } from '@/utils/supabase'
 
 // Note: security depends on RLS preventing access to records with user ids that do not match the asset
@@ -47,12 +47,12 @@ async function toSupabaseUserPayload<T extends { userId?: User['clerkId'] }>(
   obj: T,
 ): Promise<T> {
   if (obj.userId) {
-    obj.userId = await currentUserId(obj.userId)
+    obj.userId = await getCurrentUserId(obj.userId)
   }
   return obj
 }
 
-export const currentUserId = async (clerkId: string) => {
+const getCurrentUserId = async (clerkId: string) => {
   const result = await queryClient.fetchQuery({
     queryKey: ['currentUser', clerkId],
     queryFn: async () => {
@@ -184,7 +184,7 @@ export async function getSessions(payload: { userId: User['id'] }) {
     console.error('Error fetching sessions:', error)
     return []
   }
-  return data as Session[]
+  return data as any as Session[]
 }
 
 export async function createSession(payload: {

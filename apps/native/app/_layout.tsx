@@ -9,8 +9,10 @@ import {
   useAuth,
 } from '@clerk/clerk-expo'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
-import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+
+import queryClient from '@/lib/queryClient'
 
 const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY
 
@@ -33,9 +35,6 @@ const tokenCache = {
     }
   },
 }
-
-// TODO: consider moving this to within (auth)
-export const queryClient = new QueryClient()
 
 const InitialLayout = () => {
   const { isLoaded, isSignedIn } = useAuth()

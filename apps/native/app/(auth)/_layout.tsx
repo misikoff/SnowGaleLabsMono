@@ -17,6 +17,7 @@ export const LogoutButton = () => {
     </Pressable>
   )
 }
+
 export default function TabLayout() {
   const { isSignedIn } = useAuth()
 
