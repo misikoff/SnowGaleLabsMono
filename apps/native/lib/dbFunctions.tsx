@@ -231,7 +231,7 @@ export async function updateSession(payload: {
   return getFirstOrNull({ data })
 }
 
-export async function deleteSession(id: Session['id']) {
+export async function deleteSession({ id }: { id: Session['id'] }) {
   // deletes all set groups and sets associated with the session
   const { data, error } = await supabase.from('sessions').delete().eq('id', id)
   console.log({ data, error })
@@ -280,7 +280,7 @@ export async function updateSetGroup(payload: {
   return getFirstOrNull({ data })
 }
 
-export async function deleteSetGroup(id: SetGroup['id']) {
+export async function deleteSetGroup({ id }: { id: SetGroup['id'] }) {
   // deletes all set groups and sets associated with the session
   const { data, error } = await supabase.from('setGroups').delete().eq('id', id)
   console.log({ data, error })

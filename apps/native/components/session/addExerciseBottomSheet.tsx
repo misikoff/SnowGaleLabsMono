@@ -77,8 +77,7 @@ export default function AddExerciseBottomSheet({
   }))
 
   const createSetGroupMutation = useCreateSetGroupMutation()
-
-  const createSetMutation = useCreateSetMutation(nextOrder, session.id)
+  const createSetMutation = useCreateSetMutation()
 
   // console.log({ exercises })
   const sheetRef = useRef<BottomSheetModal>(null)
@@ -188,6 +187,7 @@ export default function AddExerciseBottomSheet({
                               sessionId: session.id,
                               setGroupId: newId,
                               order: 0,
+                              userId,
                             })
                             // maybe not needed
                             // setDisabled(false)

@@ -16,6 +16,7 @@ import { produce } from 'immer'
 import { Exercise, SetGroupWithExerciseAndSets } from '@repo/db/schema'
 import CustomSelect from '@/components/customSelect'
 import { getExercises, updateSet, updateSetGroup } from '@/lib/dbFunctions'
+import { invalidateSessionQueries } from '@/lib/mutations/refetcher'
 
 export default function SwapExerciseButton({
   setGroup,
@@ -128,11 +129,9 @@ export default function SwapExerciseButton({
       // need to do another mutation to add the first set to the set group
     },
     // Always refetch after error or success:
-    onSettled: () => {
+    onSettled: (x1, x2, vars) => {
       console.log('settled')
-      queryClient.invalidateQueries({
-        queryKey: ['session', setGroup.sessionId],
-      })
+      invalidateSessionQueries(queryClient, vars.sessionId)
     },
   })
 
@@ -144,7 +143,7 @@ export default function SwapExerciseButton({
   //     }),
   //   // When mutate is called:
   //   // TODO: better typing with a simple set or dummy set, but still may require casting
-  //   onMutate: async (newSet: any) => {
+  //   onMutate: async (vars) => {
   //     // Cancel any outgoing refetches
   //     // (so they don't overwrite our optimistic update)
   //     await queryClient.cancelQueries({
@@ -179,12 +178,12 @@ export default function SwapExerciseButton({
   //   },
   //   // If the mutation fails,
   //   // use the context returned from onMutate to roll back
-  //   onError: (err, newSet, context) => {
+  //   onError: (err, vars, context) => {
   //     console.log('error')
   //     console.log({ err })
-  //     console.log({ newSet, context })
+  //     console.log({ vars, context })
   //     queryClient.setQueryData(
-  //       ['session', setGroup.sessionId],
+  //       ['session', vars.sessionId],
   //       context?.previousSession,
   //     )
   //   },
@@ -193,11 +192,9 @@ export default function SwapExerciseButton({
   //     // need to do another mutation to add the first set to the set group
   //   },
   //   // Always refetch after error or success:
-  //   onSettled: () => {
+  //   onSettled: (x1, x2, vars) => {
   //     console.log('settled')
-  //     queryClient.invalidateQueries({
-  //       queryKey: ['session', setGroup.sessionId],
-  //     })
+  //     invalidateSessionQueries(queryClient, vars.sessionId)
   //   },
   // })
 
@@ -235,7 +232,7 @@ export default function SwapExerciseButton({
                     return e.id === option.value
                   })
                   console.log({ selected })
-                  console.log({ id: selected.id })
+                  console.log({ id: selected?.id })
                   setSelectedExercise(selected)
                   setDisabled(option.value === setGroup.exerciseId)
                 }}

@@ -10,7 +10,9 @@ module.exports = {
   ],
   plugins: ['@typescript-eslint', 'prettier'],
   settings: {
-    'import/parsers': {
+    "import/no-named-as-default": 0,
+    'import/parsers'
+    : {
       '@typescript-eslint/parser': ['.ts', '.tsx'],
     },
     'import/resolver': {

@@ -38,6 +38,7 @@ import AddSessionButton from '@/components/session/addSessionButton'
 import DeleteSetGroupButton from '@/components/session/deleteSetGroupButton'
 import { getSortedChunks } from '@/lib/calendarFunctions'
 import { getSessions } from '@/lib/dbFunctions'
+import { invalidateSessionQueries } from '@/lib/mutations/refetcher'
 import {
   useDeleteSessionMutation,
   useUpdateSessionDateMutation,
@@ -45,14 +46,12 @@ import {
 import { quotes } from '@/lib/quoteLib'
 
 const weeks = getSortedChunks()
-// const days = getSurroundingDays()
 
 export default function Calendar() {
   const user = useUser()
   const userId = user.user!.id
 
   const [curWeek, setCurWeek] = useState(4)
-  // const [curDay, setCurDay] = useState(3)
   const [selectedDate, setSelectedDate] = useState(weeks[4][3])
   const [selectedWeek, setSelectedWeek] = useState(weeks[4])
   const [showMoveModal, setShowMoveModal] = useState(false)
@@ -110,7 +109,7 @@ export default function Calendar() {
                   Haptics.notificationAsync(
                     Haptics.NotificationFeedbackType.Success,
                   )
-                  sessionDeleteMutation.mutateAsync(session.id)
+                  sessionDeleteMutation.mutateAsync({ id: session.id })
                 },
               },
             ],
@@ -163,10 +162,6 @@ export default function Calendar() {
         }
       })
       setTrainingDays(dates)
-      return () => {
-        // Do something when the screen is unfocused
-        // Useful for cleanup functions
-      }
     }, [selectedWeek, sessions]),
   )
 
@@ -219,7 +214,6 @@ export default function Calendar() {
                     x: DeviceSize.width * d,
                     animated: true,
                   })
-                  // setCurDay(d)
                   setCurWeek(i)
                 }}
               >
@@ -255,7 +249,6 @@ export default function Calendar() {
           contentOffset={{ x: DeviceSize.width * 3, y: 0 }}
           onMomentumScrollEnd={(event) => {
             const page = event.nativeEvent.contentOffset.x / DeviceSize.width
-            // setCurDay(days[Math.floor(page)])
             setSelectedDate(trainingDays[Math.floor(page)].day)
           }}
         >
@@ -276,8 +269,7 @@ export default function Calendar() {
                   <TouchableOpacity
                     onPress={() => {
                       console.log('Refresh Calendar')
-                      // invalidate the query maybe for just this session
-                      queryClient.invalidateQueries({ queryKey: ['sessions'] })
+                      invalidateSessionQueries(queryClient)
                     }}
                   >
                     <Text className='mx-auto mt-12 font-bold text-blue-400'>
@@ -323,10 +315,7 @@ export default function Calendar() {
                             </Text>
                           </TouchableOpacity>
                           <View className='flex-row items-center gap-4'>
-                            {/* <Text className='text-lg font-bold text-white'>
-                              Exercises: {session.setGroups.length}
-                            </Text> */}
-                            <View className=''>
+                            <View>
                               {session.setGroups
                                 .slice()
                                 .sort((s1, s2) => {
@@ -528,19 +517,6 @@ export default function Calendar() {
             <TouchableOpacity
               onPress={() => {
                 console.log({ selectedMoveDate })
-                const handleUpdate = () => {
-                  mutation.mutate(
-                    { userId: '123', data: { name: 'John Doe' } },
-                    {
-                      onSuccess: (data) => {
-                        console.log('User updated successfully:', data)
-                      },
-                      onError: (error) => {
-                        console.error('Error updating user:', error)
-                      },
-                    },
-                  )
-                }
                 sessionUpdateMutation.mutateAsync({
                   id: currentSession!.id,
                   date: selectedMoveDate,
@@ -555,9 +531,7 @@ export default function Calendar() {
             itemStyle={pickerSelectStyles.pickerItem}
             style={pickerSelectStyles.picker}
             selectedValue={selectedMoveDate}
-            onValueChange={(itemValue, itemIndex) =>
-              setSelectedMoveDate(itemValue)
-            }
+            onValueChange={(itemValue) => setSelectedMoveDate(itemValue)}
           >
             {weeks.flat().map((week, i) => (
               <SelectPicker.Item key={i} label={week} value={week} />

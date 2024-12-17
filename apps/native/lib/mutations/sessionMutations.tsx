@@ -5,6 +5,7 @@ import { Session } from '@repo/db/schema'
 
 import { createSession, deleteSession, updateSession } from '../dbFunctions'
 import { mutationSettings } from './mutationSettings'
+import { invalidateSessionQueries, sessionRefetcher } from './refetcher'
 // TODO: add debug variable to turn on/off console logs
 // TODO: add debug variable to turn on/off optimistic updates
 // There should be a global variable and one per data type
@@ -56,11 +57,14 @@ export const useCreateSessionMutation = () => {
     },
     onSuccess: () => {
       console.log('session created')
-      queryClient.invalidateQueries({ queryKey: ['sessions'] })
     },
     onError: (error, variables, context) => {
       console.error('error creating session', error)
-      queryClient.setQueryData(['sessions'], context.previousSessions)
+      queryClient.setQueryData(['sessions'], context?.previousSessions)
+    },
+    onSettled: (x1, x2, vars) => {
+      console.log('session settled')
+      invalidateSessionQueries(queryClient, vars.id)
     },
   })
 }
@@ -75,7 +79,7 @@ export const useUpdateSessionDateMutation = () => {
       }),
     // When mutate is called:
     // TODO: better typing with a simple set or dummy set, but still may require casting
-    onMutate: async ({ id, date }) => {
+    onMutate: async (vars) => {
       if (!mutationSettings.optimisticUpdate) {
         return
       }
@@ -106,20 +110,17 @@ export const useUpdateSessionDateMutation = () => {
         'sessions',
       ]) as Session[]
 
-      const nextSessions = previousSessions.map((s) => {
-        if (s.id === id) {
-          return { ...s, date }
+      const nextSession = previousSessions.map((s) => {
+        if (s.id === vars.id) {
+          return { ...s, date: vars.date }
         } else {
           return s
         }
-      })
+      }) as any as Session
 
-      console.log({ nextSessions })
+      console.log({ nextSession })
       // Optimistically update to the new value
-      queryClient.setQueryData(['sessions'], nextSessions)
-
-      // Return a context object with the snapshotted value
-      return { previousSessions }
+      sessionRefetcher(queryClient, nextSession, vars.id)
     },
     // // If the mutation fails,
     // // use the context returned from onMutate to roll back
@@ -137,15 +138,16 @@ export const useUpdateSessionDateMutation = () => {
     //   // need to do another mutation to add the first set to the set group
     // },
     // // Always refetch after error or success:
-    // onSettled: () => {
+    // onSettled: (x1, x2, vars) => {
     //   console.log('settled')
-    //   // queryClient.invalidateQueries({
-    //   //   queryKey: ['session', session.id],
-    //   // })
+    //   invalidateSessionQueries(queryClient, vars.id)
     // },
-    onSuccess: () => {
+    onSuccess: ({ x1, vars, x2 }) => {
       console.log('session updated')
-      queryClient.invalidateQueries({ queryKey: ['sessions'] })
+    },
+    onSettled: ({ x1, x2, vars }) => {
+      console.log('session updated')
+      invalidateSessionQueries(queryClient, vars.id)
     },
   })
 }
@@ -153,8 +155,9 @@ export const useUpdateSessionDateMutation = () => {
 export const useDeleteSessionMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (id: Session['id']) => deleteSession(id),
-    onMutate: async (id) => {
+    mutationFn: ({ id }: Parameters<typeof deleteSession>[0]) =>
+      deleteSession({ id }),
+    onMutate: async (vars) => {
       if (!mutationSettings.optimisticUpdate) {
         return
       }
@@ -170,20 +173,22 @@ export const useDeleteSessionMutation = () => {
       ]) as Session[]
 
       const nextSessions = previousSessions.filter((s) => {
-        console.log({ a: id, b: s.id, res: s.id !== id })
-        return s.id !== id
+        // console.log({ a: id, b: s.id, res: s.id !== vars.id })
+        return s.id !== vars.id
       })
 
       console.log({ nextSessions })
       // Optimistically update to the new value
-      queryClient.setQueryData(['sessions'], nextSessions)
+      sessionRefetcher(queryClient, null, vars.id)
 
       // Return a context object with the snapshotted value
       return { previousSessions }
     },
     onSuccess: () => {
       console.log('session deleted')
-      queryClient.invalidateQueries({ queryKey: ['sessions'] })
+    },
+    onSettled: (x1, x2, vars) => {
+      invalidateSessionQueries(queryClient, vars.id)
     },
   })
 }
@@ -209,34 +214,31 @@ export const useCompleteSessionMutation = () => {
       const previousSession = queryClient.getQueryData(['session', vars.id])
       const nextSession = produce(previousSession, (draft: any) => {
         draft.completed = true
-      })
+      }) as Session
 
       // Optimistically update to the new value
-      queryClient.setQueryData(['session', vars.id], nextSession)
-
-      // setOpen(false)
+      sessionRefetcher(queryClient, nextSession, vars.id)
 
       // Return a context object with the snapshotted value
       return { previousSession }
     },
     // If the mutation fails,
     // use the context returned from onMutate to roll back
-    onError: (err, updatedSession, context) => {
+    onError: (err, vars, context) => {
       console.log('error')
       console.log({ err })
-      console.log({ updatedSession, context })
+      console.log({ vars, context })
       queryClient.setQueryData(['session', vars.id], context?.previousSession)
     },
-    onSuccess: (vars) => {
+    onSuccess: (x1, vars, x2) => {
       console.log('success')
+      console.log({ x1, x2, vars })
       // need to do another mutation to add the first set to the set group
     },
     // Always refetch after error or success:
     onSettled: (x1, x2, vars) => {
       console.log('settled')
-      queryClient.invalidateQueries({
-        queryKey: ['session', vars.id],
-      })
+      invalidateSessionQueries(queryClient, vars.id)
     },
   })
 }

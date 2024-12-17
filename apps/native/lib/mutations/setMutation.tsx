@@ -9,6 +9,7 @@ import {
 
 import { createSet, deleteSet, updateSet } from '../dbFunctions'
 import { mutationSettings } from './mutationSettings'
+import { invalidateSessionQueries } from './refetcher'
 
 export const useCreateSetMutation = () => {
   const queryClient = useQueryClient()
@@ -86,9 +87,7 @@ export const useCreateSetMutation = () => {
     // Always refetch after error or success:
     onSettled: (x1, x2, vars) => {
       console.log('settled')
-      queryClient.invalidateQueries({
-        queryKey: ['session', vars.sessionId],
-      })
+      invalidateSessionQueries(queryClient, vars.sessionId)
     },
   })
 }
@@ -172,9 +171,7 @@ export const useUpdateSetMutation = () => {
     // Always refetch after error or success:
     onSettled: (vars) => {
       console.log('settled')
-      queryClient.invalidateQueries({
-        queryKey: ['session', vars.sessionId],
-      })
+      invalidateSessionQueries(queryClient, vars.sessionId)
     },
   })
 }
@@ -243,9 +240,7 @@ export const useDeleteSetMutation = () => {
     // Always refetch after error or success:
     onSettled: (x1, x2, vars) => {
       console.log('settled')
-      queryClient.invalidateQueries({
-        queryKey: ['session', vars.sessionId],
-      })
+      invalidateSessionQueries(queryClient, vars.sessionId)
     },
   })
 }

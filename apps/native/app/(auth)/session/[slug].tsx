@@ -5,11 +5,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { produce } from 'immer'
 import { ArrowDownWideNarrow, ArrowUpWideNarrow } from 'lucide-react-native'
 
-import { SetGroupWithExerciseAndSets } from '@repo/db/schema'
+import { SetGroup, SetGroupWithExerciseAndSets } from '@repo/db/schema'
 import AddExerciseButton from '@/components/session/addExerciseButton'
 import CompleteSessionButton from '@/components/session/completeSessionButton'
 import SetGroupBlock from '@/components/session/setGroupBlock'
 import { getSession, updateSetGroup } from '@/lib/dbFunctions'
+import { invalidateSessionQueries } from '@/lib/mutations/refetcher'
 
 export default function Page() {
   const { slug: sessionId } = useLocalSearchParams()
@@ -31,9 +32,11 @@ export default function Page() {
     mutationFn: async ({
       index1,
       index2,
+      sessionId,
     }: {
       index1: number
       index2: number
+      sessionId: SetGroup['sessionId']
     }) => {
       const curSession = session!
       const setGroup1 = curSession.setGroups[index1]
@@ -45,7 +48,7 @@ export default function Page() {
     },
     // When mutate is called:
     // TODO: better typing with a simple set or dummy set, but still may require casting
-    onMutate: async (indices) => {
+    onMutate: async (vars) => {
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
@@ -55,10 +58,10 @@ export default function Page() {
       // Snapshot the previous value
       const previousSession = queryClient.getQueryData(['session', sessionId])
       const nextSession = produce(previousSession, (draft: any) => {
-        const order1 = draft.setGroups[indices.index1].order
-        const order2 = draft.setGroups[indices.index2].order
-        draft.setGroups[indices.index1].order = order2
-        draft.setGroups[indices.index2].order = order1
+        const order1 = draft.setGroups[vars.index1].order
+        const order2 = draft.setGroups[vars.index2].order
+        draft.setGroups[vars.index1].order = order2
+        draft.setGroups[vars.index2].order = order1
         draft.setGroups = draft.setGroups.sort(
           (a: SetGroupWithExerciseAndSets, b: SetGroupWithExerciseAndSets) => {
             // handle a.order being undefined
@@ -87,11 +90,9 @@ export default function Page() {
       console.log('success')
     },
     // Always refetch after error or success:
-    onSettled: () => {
+    onSettled: (x1, x2, vars) => {
       console.log('settled')
-      queryClient.invalidateQueries({
-        queryKey: ['session', sessionId],
-      })
+      invalidateSessionQueries(queryClient, vars.sessionId)
     },
   })
 
@@ -129,6 +130,7 @@ export default function Page() {
                       await updateSetGroupOrderMutation.mutateAsync({
                         index1: index,
                         index2: index - 1,
+                        sessionId: setGroup.sessionId,
                       })
                     }}
                   >
@@ -140,6 +142,7 @@ export default function Page() {
                       await updateSetGroupOrderMutation.mutateAsync({
                         index1: index,
                         index2: index + 1,
+                        sessionId: setGroup.sessionId,
                       })
                     }}
                   >
