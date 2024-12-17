@@ -15,7 +15,7 @@ export default function AddSessionButton({
   children: React.ReactNode
   onCreate?: (sessionId: string) => void
 }) {
-  const createSessionMutation = useCreateSessionMutation(date)
+  const createSessionMutation = useCreateSessionMutation()
 
   return (
     <TouchableOpacity
@@ -30,6 +30,7 @@ export default function AddSessionButton({
           createdAt: new Date(),
           updatedAt: new Date(),
           userId,
+          date,
         })
         if (onCreate) {
           onCreate(newSessionId)

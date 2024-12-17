@@ -33,9 +33,9 @@ import {
   Session,
   SessionWithSetGroupWithExerciseAndSets,
 } from '@repo/db/schema'
-import DeleteExerciseAlert from '@/components/calendarHelpers/deleteExerciseAlert'
 import AddExerciseBottomSheet from '@/components/session/addExerciseBottomSheet'
 import AddSessionButton from '@/components/session/addSessionButton'
+import DeleteSetGroupButton from '@/components/session/deleteSetGroupButton'
 import { getSortedChunks } from '@/lib/calendarFunctions'
 import { getSessions } from '@/lib/dbFunctions'
 import {
@@ -130,8 +130,8 @@ export default function Calendar() {
   })
   console.log({ sessions })
 
-  const scrollViewRef = useRef(null)
-  const subScrollViewRef = useRef(null)
+  const scrollViewRef = useRef<any | null>(null)
+  const subScrollViewRef = useRef<any | null>(null)
   const DeviceSize = {
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
@@ -365,13 +365,9 @@ export default function Calendar() {
                                         </Text>
                                       </View>
                                     </TouchableOpacity>
-                                    <TouchableOpacity
-                                      onPress={() => {
-                                        DeleteExerciseAlert(setGroup.exercise)
-                                      }}
-                                    >
+                                    <DeleteSetGroupButton setGroup={setGroup}>
                                       <TrashIcon color='lightblue' size={24} />
-                                    </TouchableOpacity>
+                                    </DeleteSetGroupButton>
                                   </View>
                                 ))}
                             </View>

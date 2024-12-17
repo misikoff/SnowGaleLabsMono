@@ -55,11 +55,13 @@ const InitialLayout = () => {
 
     if (isSignedIn && !inTabsGroup) {
       // console.log('replacing to /session')
-      router.replace('/session')
+      router.replace('/calendar')
     } else if (!isSignedIn && inTabsGroup) {
       // console.log('replacing to /login')
       router.replace('/login')
-    } else if (!isSignedIn && segments.length === 0) {
+    }
+    // TODO: fix this. not sure if the condition is wrong or should be removed
+    else if (!isSignedIn && segments.length === 0) {
       // console.log('replacing to /login')
       router.replace('/login')
     }

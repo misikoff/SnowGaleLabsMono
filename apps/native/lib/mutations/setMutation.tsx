@@ -3,12 +3,14 @@ import { produce } from 'immer'
 
 import {
   SessionWithSetGroupWithExerciseAndSets,
+  Set,
   SetGroupWithExerciseAndSets,
 } from '@repo/db/schema'
 
 import { createSet, deleteSet, updateSet } from '../dbFunctions'
+import { mutationSettings } from './mutationSettings'
 
-export const useCreateSetMutation = (nextOrder: number, sessionId = '') => {
+export const useCreateSetMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({
@@ -17,6 +19,7 @@ export const useCreateSetMutation = (nextOrder: number, sessionId = '') => {
       sessionId,
       setGroupId,
       userId,
+      order,
     }: Parameters<typeof createSet>[0]) =>
       createSet({
         id,
@@ -24,26 +27,33 @@ export const useCreateSetMutation = (nextOrder: number, sessionId = '') => {
         sessionId,
         setGroupId,
         userId,
-        order: nextOrder,
+        order,
       }),
     // When mutate is called:
     // TODO: better typing with a simple set or dummy set, but still may require casting
-    onMutate: async (newSet) => {
+    onMutate: async (vars) => {
+      if (!mutationSettings.optimisticUpdate) {
+        return
+      }
+
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
-        queryKey: ['session', sessionId],
+        queryKey: ['session', vars.sessionId],
       })
 
       // Snapshot the previous value
-      const previousSession = queryClient.getQueryData(['session', sessionId])
+      const previousSession = queryClient.getQueryData([
+        'session',
+        vars.sessionId,
+      ])
       const nextSession = produce(
         previousSession,
         (draft: SessionWithSetGroupWithExerciseAndSets) => {
           draft.setGroups = draft.setGroups.map(
             (curSetGroup: SetGroupWithExerciseAndSets) => {
-              if (curSetGroup.id === newSet.setGroupId) {
-                curSetGroup.sets.push(newSet as Set)
+              if (curSetGroup.id === vars.setGroupId) {
+                curSetGroup.sets.push(vars as Set)
               }
               return curSetGroup
             },
@@ -51,7 +61,7 @@ export const useCreateSetMutation = (nextOrder: number, sessionId = '') => {
         },
       )
       // Optimistically update to the new value
-      queryClient.setQueryData(['session', sessionId], nextSession)
+      queryClient.setQueryData(['session', vars.sessionId], nextSession)
 
       // setOpen(false)
 
@@ -60,30 +70,39 @@ export const useCreateSetMutation = (nextOrder: number, sessionId = '') => {
     },
     // If the mutation fails,
     // use the context returned from onMutate to roll back
-    onError: (err, newSet, context) => {
+    onError: (err, vars, context) => {
       console.log('error')
       console.log({ err })
-      console.log({ newSet, context })
-      queryClient.setQueryData(['session', sessionId], context?.previousSession)
+      console.log({ vars, context })
+      queryClient.setQueryData(
+        ['session', vars.sessionId],
+        context?.previousSession,
+      )
     },
     onSuccess: () => {
       console.log('success')
       // need to do another mutation to add the first set to the set group
     },
     // Always refetch after error or success:
-    onSettled: () => {
+    onSettled: (x1, x2, vars) => {
       console.log('settled')
       queryClient.invalidateQueries({
-        queryKey: ['session', sessionId],
+        queryKey: ['session', vars.sessionId],
       })
     },
   })
 }
 
-export const useUpdateSetMutation = (sessionId: string) => {
+export const useUpdateSetMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, reps, weight, rpe }: Parameters<typeof updateSet>[0]) =>
+    mutationFn: ({
+      id,
+      reps,
+      weight,
+      rpe,
+      sessionId,
+    }: Parameters<typeof updateSet>[0] & { sessionId: string }) =>
       updateSet({
         id,
         reps,
@@ -93,27 +112,33 @@ export const useUpdateSetMutation = (sessionId: string) => {
 
     // When mutate is called:
     // TODO: better typing with a simple set or dummy set, but still may require casting
-    onMutate: async (updatedSet) => {
+    onMutate: async (vars) => {
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
-        queryKey: ['session', sessionId],
+        queryKey: ['session', vars.sessionId],
       })
 
       // Snapshot the previous value
       const previousSession = queryClient.getQueryData([
         'session',
-        set.sessionId,
+        vars.sessionId,
       ])
       const nextSession = produce(
         previousSession,
         (draft: SessionWithSetGroupWithExerciseAndSets) => {
           draft.setGroups.map((sg: SetGroupWithExerciseAndSets) => {
             sg.sets = sg.sets.map((s: Set) => {
-              if (s.id === set.id) {
-                s.reps = updatedSet.reps
-                s.weight = updatedSet.weight
-                s.rpe = updatedSet.rpe
+              if (s.id === vars.id) {
+                if (vars.reps) {
+                  s.reps = vars.reps
+                }
+                if (vars.weight) {
+                  s.weight = vars.weight
+                }
+                if (vars.rpe) {
+                  s.rpe = vars.rpe
+                }
               }
               return s
             })
@@ -122,7 +147,7 @@ export const useUpdateSetMutation = (sessionId: string) => {
       )
 
       // Optimistically update to the new value
-      queryClient.setQueryData(['session', sessionId], nextSession)
+      queryClient.setQueryData(['session', vars.sessionId], nextSession)
 
       // setOpen(false)
 
@@ -131,49 +156,62 @@ export const useUpdateSetMutation = (sessionId: string) => {
     },
     // If the mutation fails,
     // use the context returned from onMutate to roll back
-    onError: (err, updatedSet, context) => {
+    onError: (err, vars, context) => {
       console.log('error')
       console.log({ err })
-      console.log({ updatedSet, context })
-      queryClient.setQueryData(['session', sessionId], context?.previousSession)
+      console.log({ vars, context })
+      queryClient.setQueryData(
+        ['session', vars.sessionId],
+        context?.previousSession,
+      )
     },
     onSuccess: () => {
       console.log('success')
       // need to do another mutation to add the first set to the set group
     },
     // Always refetch after error or success:
-    onSettled: () => {
+    onSettled: (vars) => {
       console.log('settled')
       queryClient.invalidateQueries({
-        queryKey: ['session', sessionId],
+        queryKey: ['session', vars.sessionId],
       })
     },
   })
 }
 
-export const useDeleteSetMutation = (sessionId: string) => {
+export const useDeleteSetMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (id: Parameters<typeof deleteSet>[0]) => deleteSet(id),
+    mutationFn: ({
+      id,
+      setGroupId,
+      sessionId,
+    }: Parameters<typeof deleteSet>[0] & {
+      setGroupId: Set['setGroupId']
+      sessionId: Set['sessionId']
+    }) => deleteSet({ id }),
     // When mutate is called:
-    onMutate: async (id) => {
+    onMutate: async (vars) => {
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
-        queryKey: ['session', sessionId],
+        queryKey: ['session', vars.sessionId],
       })
 
       // Snapshot the previous value
-      const previousSession = queryClient.getQueryData(['session', sessionId])
+      const previousSession = queryClient.getQueryData([
+        'session',
+        vars.sessionId,
+      ])
 
       const nextSession = produce(
         previousSession,
         (draft: SessionWithSetGroupWithExerciseAndSets) => {
           draft.setGroups = draft.setGroups.map(
             (curSetGroup: SetGroupWithExerciseAndSets) => {
-              if (curSetGroup.id === set.setGroupId) {
+              if (curSetGroup.id === vars.setGroupId) {
                 curSetGroup.sets = curSetGroup.sets.filter(
-                  (curSet) => curSet.id !== id,
+                  (curSet) => curSet.id !== vars.id,
                 )
               }
               return curSetGroup
@@ -183,27 +221,30 @@ export const useDeleteSetMutation = (sessionId: string) => {
       )
       console.log({ nextSession })
       // Optimistically update to the new value
-      queryClient.setQueryData(['session', sessionId], nextSession)
+      queryClient.setQueryData(['session', vars.sessionId], nextSession)
 
       // Return a context object with the snapshotted value
       return { previousSession }
     },
     // If the mutation fails,
     // use the context returned from onMutate to roll back
-    onError: (err, deletedSet, context) => {
+    onError: (err, vars, context) => {
       console.log('error')
       console.log({ err })
       console.log({ context })
-      queryClient.setQueryData(['session', sessionId], context?.previousSession)
+      queryClient.setQueryData(
+        ['session', vars.sessionId],
+        context?.previousSession,
+      )
     },
     onSuccess: () => {
       console.log('success')
     },
     // Always refetch after error or success:
-    onSettled: () => {
+    onSettled: (x1, x2, vars) => {
       console.log('settled')
       queryClient.invalidateQueries({
-        queryKey: ['session', sessionId],
+        queryKey: ['session', vars.sessionId],
       })
     },
   })

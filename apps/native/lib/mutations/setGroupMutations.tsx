@@ -2,11 +2,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { produce } from 'immer'
 
 import {
+  Session,
   SessionWithSetGroupWithExerciseAndSets,
   SetGroupWithExerciseAndSets,
 } from '@repo/db/schema'
 
 import { createSetGroup, deleteSetGroup, updateSetGroup } from '../dbFunctions'
+import { mutationSettings } from './mutationSettings'
 
 export const useCreateSetGroupMutation = () => {
   const queryClient = useQueryClient()
@@ -28,6 +30,9 @@ export const useCreateSetGroupMutation = () => {
     // When mutate is called:
     // TODO: better typing with a simple set or dummy set, but still may require casting
     onMutate: async (newSetGroup) => {
+      if (!mutationSettings.optimisticUpdate) {
+        return
+      }
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       // await queryClient.cancelQueries({
@@ -95,26 +100,33 @@ export const useCreateSetGroupMutation = () => {
   })
 }
 
-export const useUpdateSetGroupMutation = (sessionId: string) => {
+export const useUpdateSetGroupMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async ({
       id,
       exerciseId,
-    }: Parameters<typeof updateSetGroup>[0]) => {
+      sessionId,
+    }: Parameters<typeof updateSetGroup>[0] & { sessionId: string }) => {
       // update all set groups with new order
     },
     // When mutate is called:
     // TODO: better typing with a simple set or dummy set, but still may require casting
-    onMutate: async (newSetGroup) => {
+    onMutate: async (vars) => {
+      if (!mutationSettings.optimisticUpdate) {
+        return
+      }
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
-        queryKey: ['session', sessionId],
+        queryKey: ['session', vars.sessionId],
       })
 
       // Snapshot the previous value
-      const previousSession = queryClient.getQueryData(['session', sessionId])
+      const previousSession = queryClient.getQueryData([
+        'session',
+        vars.sessionId,
+      ])
       const nextSession = produce(previousSession, (draft) => {
         // draft.setGroups = draft.setGroups.map(
         //   (curSetGroup: SetGroupWithExerciseAndSets) => {
@@ -132,83 +144,108 @@ export const useUpdateSetGroupMutation = (sessionId: string) => {
       })
 
       // Optimistically update to the new value
-      queryClient.setQueryData(['session', sessionId], nextSession)
+      queryClient.setQueryData(['session', vars.sessionId], nextSession)
 
       // Return a context object with the snapshotted value
       return { previousSession }
     },
     // If the mutation fails,
     // use the context returned from onMutate to roll back
-    onError: (err, newSetGroup, context) => {
+    onError: (err, vars, context) => {
       console.log('error')
       console.log({ err })
-      console.log({ newSetGroup, context })
-      queryClient.setQueryData(['session', sessionId], context?.previousSession)
+      console.log({ vars, context })
+      queryClient.setQueryData(
+        ['session', vars.sessionId],
+        context?.previousSession,
+      )
     },
-    onSuccess: () => {
+    onSuccess: (vars) => {
       console.log('success')
       // need to do another mutation to add the first set to the set group
     },
     // Always refetch after error or success:
-    onSettled: () => {
+    onSettled: (x1, x2, vars) => {
       console.log('settled')
       queryClient.invalidateQueries({
-        queryKey: ['session', sessionId],
+        queryKey: ['session', vars.sessionId],
       })
     },
   })
 }
 
-export const useDeleteSetGroupMutation = (sessionId: string) => {
+export const useDeleteSetGroupMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (id: Parameters<typeof deleteSetGroup>[0]) =>
-      deleteSetGroup(id),
+    mutationFn: ({
+      id,
+      sessionId,
+    }: {
+      id: Parameters<typeof deleteSetGroup>[0]
+      sessionId?: Session['id']
+    }) => deleteSetGroup(id),
     // When mutate is called:
-    onMutate: async () => {
+    onMutate: async (vars) => {
+      if (!mutationSettings.optimisticUpdate) {
+        return
+      }
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({
-        queryKey: ['session', sessionId],
-      })
+      if (vars.sessionId) {
+        await queryClient.cancelQueries({
+          queryKey: ['session', vars.sessionId],
+        })
+      }
 
       // Snapshot the previous value
-      const previousSession = queryClient.getQueryData(['session', sessionId])
+      const previousSession = queryClient.getQueryData([
+        'session',
+        vars.sessionId,
+      ])
 
       const nextSession = produce(
         previousSession,
         (draft: SessionWithSetGroupWithExerciseAndSets) => {
           draft.setGroups = draft.setGroups.filter(
             (curSetGroup: SetGroupWithExerciseAndSets) => {
-              return curSetGroup.id !== setGroup.id
+              return curSetGroup.id !== vars.id
             },
           )
         },
       )
       console.log({ nextSession })
       // Optimistically update to the new value
-      queryClient.setQueryData(['session', sessionId], nextSession)
+      if (vars.sessionId) {
+        queryClient.setQueryData(['session', vars.sessionId], nextSession)
+      }
 
       // Return a context object with the snapshotted value
       return { previousSession }
     },
     // If the mutation fails,
     // use the context returned from onMutate to roll back
-    onError: (err, deletedSetGroup, context) => {
+    onError: (err, args, context) => {
       console.log('error')
       console.log({ err })
       console.log({ context })
-      queryClient.setQueryData(['session', sessionId], context?.previousSession)
+      if (args.sessionId) {
+        queryClient.setQueryData(
+          ['session', args.sessionId],
+          context?.previousSession,
+        )
+      }
     },
     onSuccess: (x) => {
       console.log('success')
     },
     // Always refetch after error or success:
-    onSettled: () => {
+    onSettled: (x1, x2, args) => {
       console.log('settled')
-      queryClient.invalidateQueries({
-        queryKey: ['session', sessionId],
-      })
+      if (args.sessionId) {
+        queryClient.invalidateQueries({
+          queryKey: ['session', args.sessionId],
+        })
+      }
     },
   })
 }

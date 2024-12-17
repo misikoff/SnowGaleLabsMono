@@ -314,7 +314,7 @@ export async function createSet(payload: {
   return getFirstOrNull({ data })
 }
 
-export async function deleteSet(id: Set['id']) {
+export async function deleteSet({ id }: { id: Set['id'] }) {
   // deletes all set groups and sets associated with the session
   const { data, error } = await supabase.from('sets').delete().eq('id', id)
   console.log({ data, error })
@@ -328,7 +328,7 @@ export async function updateSet(payload: {
   rir?: Set['rir']
   weight?: Set['weight']
   exerciseId?: Set['exerciseId']
-  userId?: Session['userId']
+  userId?: Set['userId']
 }) {
   payload = await toSupabaseUserPayload(payload)
 

@@ -2,11 +2,9 @@ import { useState } from 'react'
 
 import { Alert, Modal, StyleSheet, Text, Pressable, View } from 'react-native'
 import { router } from 'expo-router'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { produce } from 'immer'
 
 import { SessionWithSetGroupWithExerciseAndSets } from '@repo/db/schema'
-import { updateSession } from '@/lib/dbFunctions'
+import { useCompleteSessionMutation } from '@/lib/mutations/sessionMutations'
 
 export default function CompleteSessionButton({
   session,
@@ -15,61 +13,9 @@ export default function CompleteSessionButton({
   session: SessionWithSetGroupWithExerciseAndSets
   children: React.ReactNode
 }) {
-  const queryClient = useQueryClient()
   const [modalVisible, setModalVisible] = useState(false)
 
-  const updateSessionMutation = useMutation({
-    mutationFn: ({ id, completed }: Parameters<typeof updateSession>[0]) =>
-      updateSession({
-        id,
-        completed,
-      }),
-    // When mutate is called:
-    // TODO: better typing with a simple set or dummy set, but still may require casting
-    onMutate: async (updatedSession: any) => {
-      // Cancel any outgoing refetches
-      // (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({
-        queryKey: ['session', session.id],
-      })
-
-      // Snapshot the previous value
-      const previousSession = queryClient.getQueryData(['session', session.id])
-      const nextSession = produce(previousSession, (draft: any) => {
-        draft.completed = true
-      })
-
-      // Optimistically update to the new value
-      queryClient.setQueryData(['session', session.id], nextSession)
-
-      // setOpen(false)
-
-      // Return a context object with the snapshotted value
-      return { previousSession }
-    },
-    // If the mutation fails,
-    // use the context returned from onMutate to roll back
-    onError: (err, updatedSession, context) => {
-      console.log('error')
-      console.log({ err })
-      console.log({ updatedSession, context })
-      queryClient.setQueryData(
-        ['session', session.id],
-        context?.previousSession,
-      )
-    },
-    onSuccess: () => {
-      console.log('success')
-      // need to do another mutation to add the first set to the set group
-    },
-    // Always refetch after error or success:
-    onSettled: () => {
-      console.log('settled')
-      queryClient.invalidateQueries({
-        queryKey: ['session', session.id],
-      })
-    },
-  })
+  const updateSessionMutation = useCompleteSessionMutation()
 
   return (
     <View className='mt-12 items-center justify-center'>

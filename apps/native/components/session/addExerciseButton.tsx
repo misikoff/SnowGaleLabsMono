@@ -67,7 +67,7 @@ export default function AddExerciseButton({
 
   const createSetGroupMutation = useCreateSetGroupMutation()
 
-  const createSetMutation = useCreateSetMutation(nextOrder, session.id)
+  const createSetMutation = useCreateSetMutation()
 
   return (
     <View className='mt-12 items-center justify-center'>

@@ -29,7 +29,7 @@ export default function PerformanceButton({
   const [curReps, setCurReps] = useState(set.reps)
   const [curRpe, setCurRpe] = useState(set.rpe)
 
-  const updateSetMutation = useUpdateSetMutation(set.sessionId)
+  const updateSetMutation = useUpdateSetMutation()
 
   return (
     <>
@@ -66,6 +66,7 @@ export default function PerformanceButton({
                   weight: Number(curWeight),
                   reps: Number(curReps),
                   rpe: Number(curRpe),
+                  sessionId: set.sessionId,
                 })
                 setShowMoveModal(false)
               }}
