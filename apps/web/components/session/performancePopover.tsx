@@ -53,7 +53,7 @@ export default function PerformanceButton({
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
-        queryKey: ['session', set.sessionId],
+        queryKey: ['sessions', set.sessionId],
       })
 
       // Snapshot the previous value
@@ -101,7 +101,7 @@ export default function PerformanceButton({
     onSettled: () => {
       console.log('settled')
       queryClient.invalidateQueries({
-        queryKey: ['session', set.sessionId],
+        queryKey: ['sessions', set.sessionId],
       })
     },
   })

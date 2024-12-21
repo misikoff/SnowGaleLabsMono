@@ -25,7 +25,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['session', params.slug],
+    queryKey: ['sessions', params.slug],
     queryFn: () => getSession(params.slug),
   })
 
@@ -51,7 +51,7 @@ export default function Home({ params }: { params: { slug: string } }) {
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
-        queryKey: ['session', params.slug],
+        queryKey: ['sessions', params.slug],
       })
 
       // Snapshot the previous value
@@ -95,7 +95,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     onSettled: () => {
       console.log('settled')
       queryClient.invalidateQueries({
-        queryKey: ['session', params.slug],
+        queryKey: ['sessions', params.slug],
       })
     },
   })

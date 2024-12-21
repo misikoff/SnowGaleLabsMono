@@ -86,7 +86,7 @@ export const useUpdateSessionDateMutation = () => {
       // // Cancel any outgoing refetches
       // // (so they don't overwrite our optimistic update)
       // await queryClient.cancelQueries({
-      //   queryKey: ['session', id],
+      //   queryKey: ['sessions', id],
       // })
       // // Snapshot the previous value
       // const previousSession = queryClient.getQueryData(['session', id])
@@ -207,7 +207,7 @@ export const useCompleteSessionMutation = () => {
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
-        queryKey: ['session', vars.id],
+        queryKey: ['sessions', vars.id],
       })
 
       // Snapshot the previous value

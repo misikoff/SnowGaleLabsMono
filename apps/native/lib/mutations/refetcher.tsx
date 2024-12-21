@@ -8,13 +8,14 @@ export function invalidateSessionQueries(
   sessionId?: string | undefined | null,
 ) {
   queryClient.invalidateQueries({
-    queryKey: ['session'],
+    queryKey: ['sessions'],
   })
-  if (sessionId) {
-    queryClient.invalidateQueries({
-      queryKey: ['session', sessionId],
-    })
-  }
+  // not needed, since the above also invalidates the below
+  // if (sessionId) {
+  //   queryClient.invalidateQueries({
+  //     queryKey: ['sessions', sessionId],
+  //   })
+  // }
 }
 
 export function sessionRefetcher(

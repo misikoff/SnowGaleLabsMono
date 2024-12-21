@@ -88,7 +88,7 @@ export default function AddExerciseButtonDrawer({
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
-        queryKey: ['session', session.id],
+        queryKey: ['sessions', session.id],
       })
 
       // Snapshot the previous value
@@ -139,7 +139,7 @@ export default function AddExerciseButtonDrawer({
     onSettled: () => {
       console.log('settled')
       queryClient.invalidateQueries({
-        queryKey: ['session', session.id],
+        queryKey: ['sessions', session.id],
       })
     },
   })
@@ -163,7 +163,7 @@ export default function AddExerciseButtonDrawer({
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
-        queryKey: ['session', session.id],
+        queryKey: ['sessions', session.id],
       })
 
       // Snapshot the previous value
@@ -205,7 +205,7 @@ export default function AddExerciseButtonDrawer({
     onSettled: () => {
       console.log('settled')
       queryClient.invalidateQueries({
-        queryKey: ['session', session.id],
+        queryKey: ['sessions', session.id],
       })
     },
   })

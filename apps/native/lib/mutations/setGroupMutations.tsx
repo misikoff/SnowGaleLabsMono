@@ -39,7 +39,7 @@ export const useCreateSetGroupMutation = () => {
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
-        queryKey: ['session', vars.sessionId],
+        queryKey: ['sessions', vars.sessionId],
       })
       // // Snapshot the previous value
       const previousSession =
@@ -127,7 +127,7 @@ export const useUpdateSetGroupMutation = () => {
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
-        queryKey: ['session', vars.sessionId],
+        queryKey: ['sessions', vars.sessionId],
       })
 
       // Snapshot the previous value
@@ -198,7 +198,7 @@ export const useDeleteSetGroupMutation = () => {
       // (so they don't overwrite our optimistic update)
       if (vars.sessionId) {
         await queryClient.cancelQueries({
-          queryKey: ['session', vars.sessionId],
+          queryKey: ['sessions', vars.sessionId],
         })
       }
 

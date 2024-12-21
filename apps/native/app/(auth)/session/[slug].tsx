@@ -23,7 +23,7 @@ export default function Page() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['session', sessionId],
+    queryKey: ['sessions', sessionId],
     queryFn: () => getSession({ userId, sessionId: sessionId as string }),
   })
   console.log({ session })
@@ -52,7 +52,7 @@ export default function Page() {
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
-        queryKey: ['session', sessionId],
+        queryKey: ['sessions', sessionId],
       })
 
       // Snapshot the previous value

@@ -40,7 +40,7 @@ export const useCreateSetMutation = () => {
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
-        queryKey: ['session', vars.sessionId],
+        queryKey: ['sessions', vars.sessionId],
       })
 
       // Snapshot the previous value
@@ -115,7 +115,7 @@ export const useUpdateSetMutation = () => {
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
-        queryKey: ['session', vars.sessionId],
+        queryKey: ['sessions', vars.sessionId],
       })
 
       // Snapshot the previous value
@@ -192,7 +192,7 @@ export const useDeleteSetMutation = () => {
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
-        queryKey: ['session', vars.sessionId],
+        queryKey: ['sessions', vars.sessionId],
       })
 
       // Snapshot the previous value

@@ -35,7 +35,7 @@ export default function AddSetButton({
       // Cancel any outgoing refetches
       // (so they don't overwrite our optimistic update)
       await queryClient.cancelQueries({
-        queryKey: ['session', setGroup.sessionId],
+        queryKey: ['sessions', setGroup.sessionId],
       })
 
       // Snapshot the previous value
@@ -77,7 +77,7 @@ export default function AddSetButton({
     onSettled: () => {
       console.log('settled')
       queryClient.invalidateQueries({
-        queryKey: ['session', setGroup.sessionId],
+        queryKey: ['sessions', setGroup.sessionId],
       })
     },
   })
