@@ -10,13 +10,12 @@ import {
   ActivityIndicator,
 } from 'react-native'
 import { useFocusEffect } from 'expo-router'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { produce } from 'immer'
+import { useQuery } from '@tanstack/react-query'
 
 import { Exercise, SetGroupWithExerciseAndSets } from '@repo/db/schema'
 import CustomSelect from '@/components/customSelect'
-import { getExercises, updateSet, updateSetGroup } from '@/lib/dbFunctions'
-import { invalidateSessionQueries } from '@/lib/mutations/refetcher'
+import { getExercises } from '@/lib/dbFunctions'
+import { useSwapSetGroupMutation } from '@/lib/mutations/setGroupMutations'
 
 export default function SwapExerciseButton({
   setGroup,
@@ -25,7 +24,6 @@ export default function SwapExerciseButton({
   setGroup: SetGroupWithExerciseAndSets
   children: React.ReactNode
 }) {
-  const queryClient = useQueryClient()
   const [modalVisible, setModalVisible] = useState(false)
   const [disabled, setDisabled] = useState(false)
   const [inProgress, setInProgress] = useState(false)
@@ -55,148 +53,7 @@ export default function SwapExerciseButton({
     value: exercise.id,
   }))
 
-  const updateSetGroupMutation = useMutation({
-    mutationFn: async ({
-      id,
-      exerciseId,
-    }: Parameters<typeof updateSetGroup>[0]) => {
-      await updateSetGroup({
-        id,
-        exerciseId,
-      })
-
-      // change the exercise ids of all the sets in the set group
-      await Promise.all(
-        setGroup.sets.map((set) => {
-          return updateSet({
-            id: set.id,
-            exerciseId,
-          })
-        }),
-      )
-    },
-    // When mutate is called:
-    // TODO: better typing with a simple set or dummy set, but still may require casting
-    onMutate: async (newSetGroup: any) => {
-      // Cancel any outgoing refetches
-      // (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({
-        queryKey: ['sessions', setGroup.sessionId],
-      })
-
-      // Snapshot the previous value
-      const previousSession = queryClient.getQueryData([
-        'session',
-        setGroup.sessionId,
-      ])
-      const nextSession = produce(previousSession, (draft: any) => {
-        draft.setGroups = draft.setGroups.map(
-          (curSetGroup: SetGroupWithExerciseAndSets) => {
-            if (curSetGroup.id === newSetGroup.id) {
-              curSetGroup.exerciseId = newSetGroup.exerciseId
-              curSetGroup.exercise = selectedExercise as Exercise
-              curSetGroup.sets = curSetGroup.sets.map((set) => {
-                set.exerciseId = newSetGroup.exerciseId
-                return set
-              })
-            }
-            return curSetGroup
-          },
-        )
-      })
-
-      // Optimistically update to the new value
-      queryClient.setQueryData(['session', setGroup.sessionId], nextSession)
-
-      // setOpen(false)
-
-      // Return a context object with the snapshotted value
-      return { previousSession }
-    },
-    // If the mutation fails,
-    // use the context returned from onMutate to roll back
-    onError: (err, newSetGroup, context) => {
-      console.log('error')
-      console.log({ err })
-      console.log({ newSetGroup, context })
-      queryClient.setQueryData(
-        ['session', setGroup.sessionId],
-        context?.previousSession,
-      )
-    },
-    onSuccess: () => {
-      console.log('success')
-      // need to do another mutation to add the first set to the set group
-    },
-    // Always refetch after error or success:
-    onSettled: (x1, x2, vars) => {
-      console.log('settled')
-      invalidateSessionQueries(queryClient, vars.sessionId)
-    },
-  })
-
-  // const updateSetMutation = useMutation({
-  //   mutationFn: ({ id, exerciseId }: Parameters<typeof updateSet>[0]) =>
-  //     updateSet({
-  //       id,
-  //       exerciseId,
-  //     }),
-  //   // When mutate is called:
-  //   // TODO: better typing with a simple set or dummy set, but still may require casting
-  //   onMutate: async (vars) => {
-  //     // Cancel any outgoing refetches
-  //     // (so they don't overwrite our optimistic update)
-  //     await queryClient.cancelQueries({
-  //       queryKey: ['sessions', setGroup.sessionId],
-  //     })
-
-  //     // Snapshot the previous value
-  //     const previousSession = queryClient.getQueryData([
-  //       'session',
-  //       setGroup.sessionId,
-  //     ])
-  //     const nextSession = produce(
-  //       previousSession,
-  //       (draft: SessionWithSetGroupWithExerciseAndSets) => {
-  //         draft.setGroups = draft.setGroups.map(
-  //           (curSetGroup: SetGroupWithExerciseAndSets) => {
-  //             if (curSetGroup.id === newSet.setGroupId) {
-  //               curSetGroup.sets.push(newSet as Set)
-  //             }
-  //             return curSetGroup
-  //           },
-  //         )
-  //       },
-  //     )
-  //     // Optimistically update to the new value
-  //     queryClient.setQueryData(['session', setGroup.sessionId], nextSession)
-
-  //     // setOpen(false)
-
-  //     // Return a context object with the snapshotted value
-  //     return { previousSession }
-  //   },
-  //   // If the mutation fails,
-  //   // use the context returned from onMutate to roll back
-  //   onError: (err, vars, context) => {
-  //     console.log('error')
-  //     console.log({ err })
-  //     console.log({ vars, context })
-  //     queryClient.setQueryData(
-  //       ['session', vars.sessionId],
-  //       context?.previousSession,
-  //     )
-  //   },
-  //   onSuccess: () => {
-  //     console.log('success')
-  //     // need to do another mutation to add the first set to the set group
-  //   },
-  //   // Always refetch after error or success:
-  //   onSettled: (x1, x2, vars) => {
-  //     console.log('settled')
-  //     invalidateSessionQueries(queryClient, vars.sessionId)
-  //   },
-  // })
+  const updateSetGroupMutation = useSwapSetGroupMutation()
 
   return (
     <View>
@@ -268,6 +125,8 @@ export default function SwapExerciseButton({
                       .mutateAsync({
                         id: setGroup.id,
                         exerciseId: selectedExercise?.id || '',
+                        sessionId: setGroup.sessionId || '',
+                        sets: setGroup.sets,
                       })
                       .then(() => {
                         // maybe not needed
