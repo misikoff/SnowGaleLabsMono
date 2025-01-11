@@ -14,7 +14,7 @@ import {
   StyleSheet,
 } from 'react-native'
 import * as Haptics from 'expo-haptics'
-import { useFocusEffect } from 'expo-router'
+import { Link, useFocusEffect } from 'expo-router'
 import { useUser } from '@clerk/clerk-expo'
 import { Picker as SelectPicker } from '@react-native-picker/picker'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -363,7 +363,7 @@ export default function Calendar() {
                           </View>
 
                           <View className='flex-row items-center gap-4'>
-                            <AddExerciseBottomSheet session={session}>
+                            {/* <AddExerciseBottomSheet session={session}>
                               <View className='flex-row items-center gap-4'>
                                 <View className='rounded-full border-2 border-blue-400 p-1'>
                                   <PlusIcon size={20} color='lightblue' />
@@ -372,7 +372,15 @@ export default function Calendar() {
                                   Add Exercise
                                 </Text>
                               </View>
-                            </AddExerciseBottomSheet>
+                            </AddExerciseBottomSheet> */}
+
+                            <Link
+                              href={`/(auth)/calendar/addExercise?sessionId=${session.id}`}
+                            >
+                              <Text className='text-xl font-bold text-blue-400'>
+                                {`/(auth)/calendar/addExercise?sessionId=${session.id}`}
+                              </Text>
+                            </Link>
 
                             <TouchableOpacity>
                               <View className='flex-row items-center gap-4'>
