@@ -33,7 +33,6 @@ import {
   Session,
   SessionWithSetGroupWithExerciseAndSets,
 } from '@repo/db/schema'
-import AddExerciseBottomSheet from '@/components/session/addExerciseBottomSheet'
 import AddSessionButton from '@/components/session/addSessionButton'
 import DeleteSetGroupButton from '@/components/session/deleteSetGroupButton'
 import { getSortedChunks } from '@/lib/calendarFunctions'
