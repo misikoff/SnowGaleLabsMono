@@ -245,7 +245,7 @@ importers:
         version: 4.1.0
       dotenv:
         specifier: ^16.4.5
-        version: 16.4.5
+        version: 16.4.7
       framer-motion:
         specifier: ^11.11.11
         version: 11.11.17(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -330,7 +330,7 @@ importers:
     dependencies:
       dotenv:
         specifier: ^16.4.5
-        version: 16.4.5
+        version: 16.4.7
       drizzle-orm:
         specifier: ^0.36.1
         version: 0.36.2(@types/react@18.3.18)(postgres@3.4.5)(react@18.3.1)
@@ -3777,8 +3777,8 @@ packages:
     resolution: {integrity: sha512-zIHwmZPRshsCdpMDyVsqGmgyP0yT8GAgXUnkdAoJisxvf33k7yO6OuoKmcTGuXPWSsm8Oh88nZicRLA9Y0rUeA==}
     engines: {node: '>=12'}
 
-  dotenv@16.4.5:
-    resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
+  dotenv@16.4.7:
+    resolution: {integrity: sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==}
     engines: {node: '>=12'}
 
   drizzle-kit@0.28.1:
@@ -9067,7 +9067,7 @@ snapshots:
     dependencies:
       chalk: 4.1.2
       debug: 4.4.0
-      dotenv: 16.4.5
+      dotenv: 16.4.7
       dotenv-expand: 11.0.7
       getenv: 1.0.0
     transitivePeerDependencies:
@@ -11555,9 +11555,9 @@ snapshots:
 
   dotenv-expand@11.0.7:
     dependencies:
-      dotenv: 16.4.5
+      dotenv: 16.4.7
 
-  dotenv@16.4.5: {}
+  dotenv@16.4.7: {}
 
   drizzle-kit@0.28.1:
     dependencies:
