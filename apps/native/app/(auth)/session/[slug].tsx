@@ -1,6 +1,5 @@
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import { Link, useLocalSearchParams } from 'expo-router'
-import { useUser } from '@clerk/clerk-expo'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowDownWideNarrow, ArrowUpWideNarrow } from 'lucide-react-native'
 
@@ -8,21 +7,26 @@ import { SetGroupWithExerciseAndSets } from '@repo/db/schema'
 import AddExerciseButton from '@/components/session/addExerciseButton'
 import CompleteSessionButton from '@/components/session/completeSessionButton'
 import SetGroupBlock from '@/components/session/setGroupBlock'
-import { getSession } from '@/lib/dbFunctions'
+import { getSession, useSupabaseUser } from '@/lib/dbFunctions'
 import { useUpdateSetGroupOrderMutation } from '@/lib/mutations/setGroupMutations'
 
 export default function Page() {
   const { slug: sessionId } = useLocalSearchParams()
 
-  const user = useUser()
-  const userId = user.user!.id
+  const { data: user } = useSupabaseUser()
+
   const {
     data: session,
     isLoading,
     isError,
   } = useQuery({
+    enabled: user !== undefined,
     queryKey: ['sessions', sessionId],
-    queryFn: () => getSession({ userId, sessionId: sessionId as string }),
+    queryFn: () =>
+      getSession({
+        userId: user!.data.user?.id,
+        sessionId: sessionId as string,
+      }),
   })
   console.log({ session })
 

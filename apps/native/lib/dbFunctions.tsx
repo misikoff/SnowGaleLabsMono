@@ -1,3 +1,5 @@
+import { useQuery } from '@tanstack/react-query'
+
 import {
   Exercise,
   Program,
@@ -7,7 +9,6 @@ import {
   Session,
   User,
 } from '@repo/db/schema'
-import queryClient from '@/lib/queryClient'
 import { supabase } from '@/utils/supabase'
 
 // Note: security depends on RLS preventing access to records with user ids that do not match the asset
@@ -43,46 +44,15 @@ function toSnakeCase(obj: Record<string, any>) {
   return snakeCaseObj
 }
 
-async function toSupabaseUserPayload<T extends { userId?: User['clerkId'] }>(
-  obj: T,
-): Promise<T> {
-  if (obj.userId) {
-    obj.userId = await getCurrentUserId(obj.userId)
-  }
-  return obj
-}
-
-const getCurrentUserId = async (clerkId: string) => {
-  const result = await queryClient.fetchQuery({
-    queryKey: ['currentUser', clerkId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('users')
-        .select('id')
-        .eq('clerk_id', clerkId)
-      console.log({ data, error })
-
-      return getFirstOrNull({
-        data,
-        key: 'id',
-        onError: () => {
-          throw new Error('No user found')
-        },
-      })
-    },
-  })
-  return result
-}
-
 // maybe add id and return it
 export async function createUser(
-  clerkId: User['clerkId'],
+  id: User['id'],
   name: User['name'],
   prod: User['prod'],
 ) {
   // create user in subabase
   const { data, error } = await supabase.from('users').insert({
-    clerkId,
+    id,
     name,
     prod,
   })
@@ -93,7 +63,6 @@ export async function getSession(payload: {
   userId: User['id']
   sessionId: Session['id']
 }) {
-  payload = await toSupabaseUserPayload(payload)
   const { data, error } = await supabase
     .from('sessions')
     .select(
@@ -148,7 +117,6 @@ export async function getSession(payload: {
 }
 
 export async function getSessions(payload: { userId: User['id'] }) {
-  payload = await toSupabaseUserPayload(payload)
   const { data, error } = await supabase
     .from('sessions')
     .select(
@@ -198,8 +166,6 @@ export async function createSession(payload: {
   updatedAt?: Session['updatedAt']
   userId?: Session['userId']
 }) {
-  payload = await toSupabaseUserPayload(payload)
-
   // create session in subabase
   const { data, error } = await supabase
     .from('sessions')
@@ -218,8 +184,6 @@ export async function updateSession(payload: {
   date?: Session['date']
   userId?: Session['userId']
 }) {
-  payload = await toSupabaseUserPayload(payload)
-
   // create session in subabase
   const { data, error } = await supabase
     .from('sessions')
@@ -246,7 +210,6 @@ export async function createSetGroup(payload: {
   exerciseId?: Exercise['id']
   userId?: Session['userId']
 }) {
-  payload = await toSupabaseUserPayload(payload)
   // create session in subabase
   const { data, error } = await supabase
     .from('setGroups')
@@ -267,8 +230,6 @@ export async function updateSetGroup(payload: {
   order?: SetGroup['order']
   userId?: Session['userId']
 }) {
-  payload = await toSupabaseUserPayload(payload)
-
   // create session in subabase
   const { data, error } = await supabase
     .from('setGroups')
@@ -296,7 +257,6 @@ export async function createSet(payload: {
   setGroupId: Set['setGroupId']
   userId?: Session['userId']
 }) {
-  payload = await toSupabaseUserPayload(payload)
   console.log('set incoming')
   console.log({ payload })
   // remove id from payload if it is null
@@ -330,8 +290,6 @@ export async function updateSet(payload: {
   exerciseId?: Set['exerciseId']
   userId?: Set['userId']
 }) {
-  payload = await toSupabaseUserPayload(payload)
-
   // create session in subabase
   const { data, error } = await supabase
     .from('sets')
@@ -355,4 +313,11 @@ export async function getExercises() {
   }
 
   return data as Exercise[]
+}
+
+export function useSupabaseUser() {
+  return useQuery({
+    queryKey: ['user'],
+    queryFn: async () => supabase.auth.getUser(),
+  })
 }

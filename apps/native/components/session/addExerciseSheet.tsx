@@ -10,7 +10,6 @@ import {
 } from 'react-native'
 import * as Crypto from 'expo-crypto'
 import { useFocusEffect } from 'expo-router'
-import { useUser } from '@clerk/clerk-expo'
 import { FlashList } from '@shopify/flash-list'
 import { useQuery } from '@tanstack/react-query'
 import { clsx } from 'clsx'
@@ -18,7 +17,7 @@ import { GlassesIcon, InfoIcon, XIcon } from 'lucide-react-native'
 import { ScrollView, TextInput } from 'react-native-gesture-handler'
 
 import { SessionWithSetGroupWithExerciseAndSets } from '@repo/db/schema'
-import { getExercises } from '@/lib/dbFunctions'
+import { getExercises, useSupabaseUser } from '@/lib/dbFunctions'
 import { useCreateSetGroupMutation } from '@/lib/mutations/setGroupMutations'
 import { useCreateSetMutation } from '@/lib/mutations/setMutation'
 
@@ -30,8 +29,7 @@ export default function AddExerciseSheet({
   children: React.ReactNode
 }) {
   const [modalVisible, setModalVisible] = useState(false)
-  const user = useUser()
-  const userId = user.user!.id
+  const { data: user } = useSupabaseUser()
   const [nextOrder, setNextOrder] = useState(1)
 
   const [selectedExercises, setSelectedExercises] = useState<string[]>([])
@@ -117,7 +115,7 @@ export default function AddExerciseSheet({
                             exerciseId,
                             sessionId: session.id,
                             order: nextOrder + index,
-                            userId,
+                            userId: user?.data.user?.id || '',
                           })
                           .then(() => {
                             // todo get this incorporated into the create set group mutation

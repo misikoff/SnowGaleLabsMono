@@ -1,88 +1,25 @@
-import { useState } from 'react'
-
-import {
-  View,
-  StyleSheet,
-  TextInput,
-  Button,
-  Pressable,
-  Text,
-  // Alert,
-} from 'react-native'
+import { View, Pressable, Text } from 'react-native'
 import { Link } from 'expo-router'
-import { useSignIn } from '@clerk/clerk-expo'
-// import Spinner from 'react-native-loading-spinner-overlay'
+
+import Auth from '@/components/auth'
 
 const Login = () => {
-  const { signIn, setActive, isLoaded } = useSignIn()
-
-  const [emailAddress, setEmailAddress] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-
-  const onSignInPress = async () => {
-    if (!isLoaded) {
-      return
-    }
-    setLoading(true)
-    try {
-      const completeSignIn = await signIn.create({
-        identifier: emailAddress,
-        password,
-      })
-
-      // This indicates the user is signed in
-      await setActive({ session: completeSignIn.createdSessionId })
-    } catch (err: any) {
-      alert(err.errors[0].message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   return (
     <View className='flex-1 content-center p-5'>
-      {loading && <Text>Loading...</Text>}
-      {/* <Spinner visible={loading} /> */}
-
-      <TextInput
-        autoCapitalize='none'
-        placeholder='example@domain.com'
-        value={emailAddress}
-        onChangeText={setEmailAddress}
-        className='my-4 h-14 rounded-md border-2 border-purple-600 bg-white p-4'
-      />
-      <Text>{emailAddress}</Text>
-      <TextInput
-        placeholder='password'
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        className='my-4 h-14 rounded-md border-2 border-purple-600 bg-white p-4'
-      />
-      <Text>{password}</Text>
-
-      <Button onPress={onSignInPress} title='Login' color={'#6c47ff'} />
+      <Auth />
 
       <Link href='/reset' asChild>
-        <Pressable style={styles.button}>
+        <Pressable className='m-2 items-center'>
           <Text>Forgot password?</Text>
         </Pressable>
       </Link>
-      <Link href='/sign-up' asChild>
-        <Pressable style={styles.button}>
+      {/* <Link href='/sign-up' asChild>
+        <Pressable className='m-2 items-center'>
           <Text>Create Account</Text>
         </Pressable>
-      </Link>
+      </Link> */}
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  button: {
-    margin: 8,
-    alignItems: 'center',
-  },
-})
 
 export default Login

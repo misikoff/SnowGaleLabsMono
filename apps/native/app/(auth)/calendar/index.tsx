@@ -15,7 +15,6 @@ import {
 } from 'react-native'
 import * as Haptics from 'expo-haptics'
 import { Link, useFocusEffect } from 'expo-router'
-import { useUser } from '@clerk/clerk-expo'
 import { Picker as SelectPicker } from '@react-native-picker/picker'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
@@ -36,19 +35,25 @@ import {
 import AddSessionButton from '@/components/session/addSessionButton'
 import DeleteSetGroupButton from '@/components/session/deleteSetGroupButton'
 import { getSortedChunks } from '@/lib/calendarFunctions'
-import { getSessions } from '@/lib/dbFunctions'
+import { getSessions, useSupabaseUser } from '@/lib/dbFunctions'
 import { invalidateSessionQueries } from '@/lib/mutations/refetcher'
 import {
   useDeleteSessionMutation,
   useUpdateSessionDateMutation,
 } from '@/lib/mutations/sessionMutations'
 import { quotes } from '@/lib/quoteLib'
+import { supabase } from '@/utils/supabase'
 
 const weeks = getSortedChunks()
 
 export default function Calendar() {
-  const user = useUser()
-  const userId = user.user!.id
+  const {
+    data: user,
+    isLoading: userLoading,
+    isError: userError,
+  } = useSupabaseUser()
+
+  console.log({ user })
 
   const [curWeek, setCurWeek] = useState(4)
   const [selectedDate, setSelectedDate] = useState(weeks[4][3])
@@ -120,13 +125,21 @@ export default function Calendar() {
 
   const {
     data: sessions,
-    isLoading,
-    isError,
+    isLoading: sessionsLoading,
+    isError: sessionsError,
+    error,
   } = useQuery({
+    enabled: user !== undefined,
     queryKey: ['sessions'],
-    queryFn: async () => getSessions({ userId }),
+    queryFn: async () => getSessions({ userId: user!.data.user!.id }),
   })
-  console.log({ sessions })
+  console.log({
+    sessions,
+    id: user?.data.user!.id,
+    sessionsLoading,
+    sessionsError,
+    error,
+  })
 
   const scrollViewRef = useRef<any | null>(null)
   const subScrollViewRef = useRef<any | null>(null)
@@ -439,18 +452,23 @@ export default function Calendar() {
                     }}
                   />
                   <View className='absolute bottom-8 right-8 items-end gap-4'>
-                    <AddSessionButton userId={userId} date={date.day}>
-                      <View className='flex-row gap-4'>
-                        <View className='items-center justify-center rounded-md bg-white px-2'>
-                          <Text className='text-xl font-bold'>
-                            Create Session
-                          </Text>
+                    {user && (
+                      <AddSessionButton
+                        userId={user!.data.user!.id}
+                        date={date.day}
+                      >
+                        <View className='flex-row gap-4'>
+                          <View className='items-center justify-center rounded-md bg-white px-2'>
+                            <Text className='text-xl font-bold'>
+                              Create Session
+                            </Text>
+                          </View>
+                          <View className='rounded-full bg-white p-4'>
+                            <PlusSquareIcon color='black' size={24} />
+                          </View>
                         </View>
-                        <View className='rounded-full bg-white p-4'>
-                          <PlusSquareIcon color='black' size={24} />
-                        </View>
-                      </View>
-                    </AddSessionButton>
+                      </AddSessionButton>
+                    )}
                     <View>
                       <TouchableOpacity
                         onPress={() => {

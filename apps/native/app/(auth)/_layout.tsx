@@ -1,14 +1,19 @@
 import { Pressable } from 'react-native'
 import { Tabs } from 'expo-router'
-import { useAuth } from '@clerk/clerk-expo'
 import { Ionicons } from '@expo/vector-icons'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
 
-export const LogoutButton = () => {
-  const { signOut } = useAuth()
+import { useSupabaseUser } from '@/lib/dbFunctions'
+import { supabase } from '@/utils/supabase'
 
-  const doLogout = () => {
-    signOut()
+export const LogoutButton = () => {
+  const doLogout = async () => {
+    const { error } = await supabase.auth.signOut()
+    if (error) {
+      alert('Error logging out: ' + error.message)
+      console.error('Error logging out:', error.message)
+      return
+    }
   }
 
   return (
@@ -19,7 +24,7 @@ export const LogoutButton = () => {
 }
 
 export default function TabLayout() {
-  const { isSignedIn } = useAuth()
+  const { data: user, isLoading, isError } = useSupabaseUser()
 
   return (
     <Tabs screenOptions={{ tabBarActiveTintColor: 'blue' }}>
@@ -31,7 +36,7 @@ export default function TabLayout() {
             <FontAwesome6 size={24} name='house-chimney' color={color} />
           ),
         }}
-        redirect={!isSignedIn}
+        redirect={isError}
       />
       <Tabs.Screen
         name='session'
@@ -41,7 +46,7 @@ export default function TabLayout() {
             <FontAwesome6 size={24} name='dumbbell' color={color} />
           ),
         }}
-        redirect={!isSignedIn}
+        redirect={isError}
       />
       <Tabs.Screen
         name='calendar'
@@ -52,7 +57,7 @@ export default function TabLayout() {
           ),
           headerShown: false,
         }}
-        redirect={!isSignedIn}
+        redirect={isError}
       />
       <Tabs.Screen
         name='settings'
@@ -65,7 +70,7 @@ export default function TabLayout() {
 
           // headerRight: () => <LogoutButton />,
         }}
-        redirect={!isSignedIn}
+        redirect={isError}
       />
     </Tabs>
   )
