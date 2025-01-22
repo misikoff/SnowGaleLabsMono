@@ -11,7 +11,6 @@ import {
 } from 'react-native'
 import * as Crypto from 'expo-crypto'
 import { useFocusEffect } from 'expo-router'
-import { useUser } from '@clerk/clerk-expo'
 import { useQuery } from '@tanstack/react-query'
 
 import {
@@ -19,7 +18,7 @@ import {
   SessionWithSetGroupWithExerciseAndSets,
 } from '@repo/db/schema'
 import CustomSelect from '@/components/customSelect'
-import { getExercises } from '@/lib/dbFunctions'
+import { getExercises, useSupabaseUser } from '@/lib/dbFunctions'
 import { useCreateSetGroupMutation } from '@/lib/mutations/setGroupMutations'
 import { useCreateSetMutation } from '@/lib/mutations/setMutation'
 
@@ -33,8 +32,7 @@ export default function AddExerciseButton({
   const [modalVisible, setModalVisible] = useState(false)
   const [disabled, setDisabled] = useState(false)
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>()
-  const user = useUser()
-  const userId = user.user!.id
+  const { data: user } = useSupabaseUser()
   const [nextOrder, setNextOrder] = useState(0)
 
   useFocusEffect(() => {
@@ -133,7 +131,7 @@ export default function AddExerciseButton({
                         exerciseId: selectedExercise?.id || '',
                         sessionId: session.id,
                         order: nextOrder,
-                        userId,
+                        userId: user?.data.user?.id || '',
                       })
                       .then(() => {
                         // todo get this incorporated into the create set group mutation

@@ -34,7 +34,6 @@ export const users = pgTable(
       .default(sql`gen_random_uuid()`)
       .primaryKey(),
     name: text(),
-    clerkId: text(),
     createdAt: timestamp().notNull().defaultNow(),
     updatedAt: timestamp()
       .notNull()
@@ -42,9 +41,7 @@ export const users = pgTable(
       .$onUpdate(() => new Date()),
     prod: boolean().default(false),
   },
-  (table) => ({
-    usersClerkIdIndex: index().on(table.clerkId),
-  }),
+  (table) => [index('usersClerkIdIndex').on(table.id)],
 )
 
 export const equipmentEnum = [
@@ -83,11 +80,11 @@ export const exercises = pgTable(
     }).default('yards'),
     notes: text(),
   },
-  (table) => ({
-    exercisesIsMainExerciseIndex: index().on(table.isMainExercise),
-    exercisesUserIdIndex: index().on(table.userId),
-    exercisesClonedFromIdIndex: index().on(table.clonedFromId),
-  }),
+  (table) => [
+    index('exercisesIsMainExerciseIndex').on(table.isMainExercise),
+    index('exercisesUserIdIndex').on(table.userId),
+    index('exercisesClonedFromIdIndex').on(table.clonedFromId),
+  ],
 )
 
 export const programs = pgTable(
@@ -102,9 +99,7 @@ export const programs = pgTable(
     name: text(),
     description: text(),
   },
-  (table) => ({
-    programsUserIdIndex: index().on(table.userId),
-  }),
+  (table) => [index('programsUserIdIndex').on(table.userId)],
 )
 
 export const programsRelations = relations(programs, ({ one, many }) => ({
@@ -127,9 +122,7 @@ export const macrocycles = pgTable(
     name: text(),
     order: smallint('order').default(0),
   },
-  (table) => ({
-    macrocyclesUserIdIndex: index().on(table.userId),
-  }),
+  (table) => [index('macrocyclesUserIdIndex').on(table.userId)],
 )
 
 export const macrocyclesRelations = relations(macrocycles, ({ one, many }) => ({
@@ -155,9 +148,7 @@ export const microcycles = pgTable(
     name: text(),
     order: smallint().default(0),
   },
-  (table) => ({
-    microcyclesUserIdIndex: index().on(table.userId),
-  }),
+  (table) => [index('microcyclesUserIdIndex').on(table.userId)],
 )
 
 export const microcyclesRelations = relations(microcycles, ({ one, many }) => ({
@@ -192,9 +183,7 @@ export const sessions = pgTable(
     // set completed at when completed becomes true
     completedAt: timestamp(),
   },
-  (table) => ({
-    sessionsUserIdIndex: index().on(table.userId),
-  }),
+  (table) => [index('sessionsUserIdIndex').on(table.userId)],
 )
 
 export const sessionsRelations = relations(sessions, ({ one, many }) => ({
@@ -232,10 +221,10 @@ export const setGroups = pgTable(
     exerciseId: uuid().references(() => exercises.id),
     order: smallint().default(0),
   },
-  (table) => ({
-    setGroupsUserIdIndex: index().on(table.userId),
-    setGroupsSessionIdIndex: index().on(table.sessionId),
-  }),
+  (table) => [
+    index('setGroupsUserIdIndex').on(table.userId),
+    index('setGroupsSessionIdIndex').on(table.sessionId),
+  ],
 )
 
 export const setGroupsRelation = relations(setGroups, ({ one, many }) => ({
@@ -301,12 +290,12 @@ export const sets = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => ({
-    setsUserIdIndex: index().on(table.userId),
-    setsSessionIdIndex: index().on(table.sessionId),
-    setsExerciseIdIndex: index().on(table.exerciseId),
-    setsSetGroupIdIndex: index().on(table.setGroupId),
-  }),
+  (table) => [
+    index('setsUserIdIndex').on(table.userId),
+    index('setsSessionIdIndex').on(table.sessionId),
+    index('setsExerciseIdIndex').on(table.exerciseId),
+    index('setsSetGroupIdIndex').on(table.setGroupId),
+  ],
 )
 
 export const setsRelation = relations(sets, ({ one }) => ({

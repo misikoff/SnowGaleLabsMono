@@ -10,21 +10,24 @@ import {
 import * as Crypto from 'expo-crypto'
 import * as Haptics from 'expo-haptics'
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
-import { useUser } from '@clerk/clerk-expo'
 import { FlashList } from '@shopify/flash-list'
 import { useQuery } from '@tanstack/react-query'
 import { clsx } from 'clsx'
 import { GlassesIcon, InfoIcon, XIcon } from 'lucide-react-native'
 
-import { getExercises, getSession } from '@/lib/dbFunctions'
+import { getExercises, getSession, useSupabaseUser } from '@/lib/dbFunctions'
 import { useCreateSetGroupMutation } from '@/lib/mutations/setGroupMutations'
 import { useCreateSetMutation } from '@/lib/mutations/setMutation'
 export default function App() {
   const { sessionId } = useLocalSearchParams()
   console.log({ sessionId })
 
-  const user = useUser()
-  const userId = user.user!.id
+  const {
+    data: user,
+    isLoading: userLoading,
+    isError: userError,
+  } = useSupabaseUser()
+
   const [nextOrder, setNextOrder] = useState(1)
 
   const [selectedExercises, setSelectedExercises] = useState<string[]>([])
@@ -39,10 +42,11 @@ export default function App() {
     // isLoading,
     // isError,
   } = useQuery({
+    enabled: user !== undefined,
     queryKey: ['session', sessionId],
     queryFn: async () =>
       getSession({
-        userId,
+        userId: user!.data.user?.id as string,
         sessionId: sessionId as string,
       }),
   })
@@ -113,7 +117,7 @@ export default function App() {
                         exerciseId,
                         sessionId: session.id,
                         order: nextOrder + index,
-                        userId,
+                        userId: user?.data.user?.id as string,
                       })
                       .then(() => {
                         // todo get this incorporated into the create set group mutation
@@ -123,7 +127,7 @@ export default function App() {
                           sessionId: session.id,
                           setGroupId: newId,
                           order: 0,
-                          userId,
+                          userId: user?.data.user?.id as string,
                         })
                         // maybe not needed
                         // setDisabled(false)

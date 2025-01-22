@@ -1,40 +1,50 @@
 import { View, Text } from 'react-native'
 import { Link, router } from 'expo-router'
-import { useUser } from '@clerk/clerk-expo'
 import { useQuery } from '@tanstack/react-query'
 import { XCircleIcon } from 'lucide-react-native'
 
 import AddSessionButton from '@/components/session/addSessionButton'
 import DeleteSessionButton from '@/components/session/deleteSessionButton'
 import { getSessions } from '@/lib/dbFunctions'
+import { supabase } from '@/utils/supabase'
 
 export default function App() {
-  const user = useUser()
-  const userId = user.user!.id
   const {
-    data: sessions,
+    data: user,
     isLoading,
     isError,
   } = useQuery({
+    queryKey: ['user'],
+    queryFn: async () => supabase.auth.getUser(),
+  })
+
+  const {
+    data: sessions,
+    isLoading: sessionsLoading,
+    isError: sessionsError,
+  } = useQuery({
+    enabled: user !== undefined,
     queryKey: ['sessions'],
-    queryFn: async () => getSessions({ userId }),
+    queryFn: async () => getSessions({ userId: user!.data.user!.id }),
   })
 
   return (
     <View className='w-full flex-1'>
       <View className='items-center'>
-        <AddSessionButton
-          userId={userId}
-          onCreate={(newSessionId) =>
-            router.navigate(`/(auth)/session/${newSessionId}`)
-          }
-        >
-          <View className='rounded-md bg-blue-600 px-3 py-2 text-center'>
-            <Text className='text-center text-xl font-bold text-white'>
-              New Session
-            </Text>
-          </View>
-        </AddSessionButton>
+        {user && (
+          <AddSessionButton
+            userId={user.data.user!.id}
+            onCreate={(newSessionId) =>
+              router.navigate(`/(auth)/session/${newSessionId}`)
+            }
+          >
+            <View className='rounded-md bg-blue-600 px-3 py-2 text-center'>
+              <Text className='text-center text-xl font-bold text-white'>
+                New Session
+              </Text>
+            </View>
+          </AddSessionButton>
+        )}
       </View>
 
       {isLoading && <Text>Loading...</Text>}
