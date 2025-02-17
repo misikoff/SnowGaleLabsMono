@@ -193,7 +193,7 @@ export const useDeleteSetGroupMutation = () => {
       id,
       sessionId,
     }: Parameters<typeof deleteSetGroup>[0] & {
-      sessionId: Set['sessionId']
+      sessionId: Set['sessionId'] | null
     }) => deleteSetGroup({ id }),
     // When mutate is called:
     onMutate: async (vars) => {
@@ -217,11 +217,14 @@ export const useDeleteSetGroupMutation = () => {
       const nextSession = produce(
         previousSession,
         (draft: SessionWithSetGroupWithExerciseAndSets) => {
-          draft.setGroups = draft.setGroups.filter(
-            (curSetGroup: SetGroupWithExerciseAndSets) => {
+          draft.setGroups = draft.setGroups
+            .filter((curSetGroup: SetGroupWithExerciseAndSets) => {
               return curSetGroup.id !== vars.id
-            },
-          )
+            })
+            .map((setGroup, index) => {
+              setGroup.order = index + 1
+              return setGroup
+            })
         },
       ) as Session
       console.log({ nextSession })

@@ -10,12 +10,9 @@ export function invalidateSessionQueries(
   queryClient.invalidateQueries({
     queryKey: ['sessions'],
   })
-  // not needed, since the above also invalidates the below
-  // if (sessionId) {
-  //   queryClient.invalidateQueries({
-  //     queryKey: ['sessions', sessionId],
-  //   })
-  // }
+  queryClient.invalidateQueries({
+    queryKey: ['sessions'],
+  })
 }
 
 export function sessionRefetcher(
@@ -38,19 +35,18 @@ export function sessionRefetcher(
   if (refetchOptions.multiple) {
     // update session in sessions query
     const previousSessions = queryClient.getQueryData(['sessions']) as Session[]
-    const nextSessions = produce(previousSessions, (draft: any) => {
+    const nextSessions = produce(previousSessions, (draft) => {
       // delete or replace session
       if (updatedSession === null) {
         return draft.filter((session: Session) => session.id !== sessionId)
       } else {
-        draft.map((session: Session) => {
-          if (session.id === sessionId) {
-            return updatedSession
-          }
-          return session
-        })
+        const itemToUpdate = draft.find((session) => session.id === sessionId)
+        if (itemToUpdate) {
+          Object.assign(itemToUpdate, updatedSession)
+        }
       }
     })
+
     queryClient.setQueryData(['sessions'], nextSessions)
   }
 }

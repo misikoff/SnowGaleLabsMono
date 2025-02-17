@@ -29,15 +29,15 @@ const InitialLayout = () => {
   const router = useRouter()
 
   useEffect(() => {
-    console.log('in useEffect')
-    console.log({ isLoaded, isSignedIn, segments })
+    // console.log('in useEffect')
+    // console.log({ isLoaded, isSignedIn, segments })
     // if (!isLoaded) {
     //   return
     // }
 
     const inTabsGroup = segments[0] === '(auth)'
 
-    console.log('User changed: ', isSignedIn)
+    // console.log('User changed: ', isSignedIn)
 
     if (isSignedIn && !inTabsGroup) {
       // console.log('replacing to /session')

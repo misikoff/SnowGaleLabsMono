@@ -42,7 +42,6 @@ import {
   useUpdateSessionDateMutation,
 } from '@/lib/mutations/sessionMutations'
 import { quotes } from '@/lib/quoteLib'
-import { supabase } from '@/utils/supabase'
 
 const weeks = getSortedChunks()
 
@@ -53,7 +52,7 @@ export default function Calendar() {
     isError: userError,
   } = useSupabaseUser()
 
-  console.log({ user })
+  // console.log({ user })
 
   const [curWeek, setCurWeek] = useState(4)
   const [selectedDate, setSelectedDate] = useState(weeks[4][3])
@@ -373,9 +372,10 @@ export default function Calendar() {
                                 ))}
                             </View>
                           </View>
-
                           <View className='flex-row items-center gap-4'>
-                            {/* <AddExerciseBottomSheet session={session}>
+                            <Link
+                              href={`/(auth)/calendar/addExercise?sessionId=${session.id}`}
+                            >
                               <View className='flex-row items-center gap-4'>
                                 <View className='rounded-full border-2 border-blue-400 p-1'>
                                   <PlusIcon size={20} color='lightblue' />
@@ -384,14 +384,6 @@ export default function Calendar() {
                                   Add Exercise
                                 </Text>
                               </View>
-                            </AddExerciseBottomSheet> */}
-
-                            <Link
-                              href={`/(auth)/calendar/addExercise?sessionId=${session.id}`}
-                            >
-                              <Text className='text-xl font-bold text-blue-400'>
-                                {`/(auth)/calendar/addExercise?sessionId=${session.id}`}
-                              </Text>
                             </Link>
 
                             <TouchableOpacity>

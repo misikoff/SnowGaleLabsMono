@@ -32,7 +32,7 @@ export default function DeleteSetGroupButton({
                 )
                 await deleteSetGroupMutation.mutateAsync({
                   id: setGroup.id,
-                  sessionId: session.id,
+                  sessionId: setGroup.sessionId,
                 })
               },
             },

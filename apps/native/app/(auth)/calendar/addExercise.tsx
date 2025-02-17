@@ -20,7 +20,6 @@ import { useCreateSetGroupMutation } from '@/lib/mutations/setGroupMutations'
 import { useCreateSetMutation } from '@/lib/mutations/setMutation'
 export default function App() {
   const { sessionId } = useLocalSearchParams()
-  console.log({ sessionId })
 
   const {
     data: user,
