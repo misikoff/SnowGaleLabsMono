@@ -178,7 +178,7 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
 
-  apps/snowgalelabs.com:
+  apps/snowgalelabs:
     dependencies:
       next:
         specifier: 15.1.7
