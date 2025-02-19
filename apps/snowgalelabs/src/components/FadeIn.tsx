@@ -8,14 +8,13 @@ const FadeInStaggerContext = createContext(false)
 const viewport = { once: true, margin: '0px 0px -200px' }
 
 export function FadeIn(
-  props: React.ComponentPropsWithoutRef<typeof motion.div> & {className?: string}
+  props: React.ComponentPropsWithoutRef<typeof motion.div>
 ) {
   const shouldReduceMotion = useReducedMotion()
   const isInStaggerGroup = useContext(FadeInStaggerContext)
 
   return (
     <motion.div
-      className={props.className || ''}
       variants={{
         hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 24 },
         visible: { opacity: 1, y: 0 },
@@ -36,11 +35,10 @@ export function FadeIn(
 export function FadeInStagger({
   faster = false,
   ...props
-}: React.ComponentPropsWithoutRef<typeof motion.div> & { faster?: boolean, className?: string }) {
+}: React.ComponentPropsWithoutRef<typeof motion.div> & { faster?: boolean}) {
   return (
     <FadeInStaggerContext.Provider value={true}>
       <motion.div
-      className={props.className || ''}
         initial="hidden"
         whileInView="visible"
         viewport={viewport}
