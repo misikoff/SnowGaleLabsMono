@@ -2,7 +2,7 @@
 
 import {
   createContext,
-  useContext,
+  // useContext,
   useEffect,
   useId,
   useRef,
@@ -58,7 +58,7 @@ function Header({
   toggleRef: React.RefObject<HTMLButtonElement>
   invert?: boolean
 }) {
-  const { logoHovered, setLogoHovered } = useContext(RootLayoutContext)!
+  // const { logoHovered, setLogoHovered } = useContext(RootLayoutContext)!
 
   return (
     <Container>
@@ -66,18 +66,18 @@ function Header({
         <Link
           href="/"
           aria-label="Home"
-          onMouseEnter={() => setLogoHovered(true)}
-          onMouseLeave={() => setLogoHovered(false)}
+          // onMouseEnter={() => setLogoHovered(true)}
+          // onMouseLeave={() => setLogoHovered(false)}
         >
           <Logomark
             className="h-8 sm:hidden"
             invert={invert}
-            filled={logoHovered}
+            // filled={logoHovered}
           />
           <Logo
             className="hidden h-8 sm:block"
             invert={invert}
-            filled={logoHovered}
+            // filled={logoHovered}
           />
         </Link>
         <div className="flex items-center gap-x-8">
