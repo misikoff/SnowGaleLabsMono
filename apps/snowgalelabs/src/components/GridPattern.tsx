@@ -30,7 +30,6 @@ export function GridPattern({
 }) {
   const id = useId()
   const ref = useRef<React.ElementRef<'svg'>>(null)
-  // @ts-expect-error
   const currentBlock = useRef<[x: number, y: number]>()
   const counter = useRef(0)
   const [hoveredBlocks, setHoveredBlocks] = useState<

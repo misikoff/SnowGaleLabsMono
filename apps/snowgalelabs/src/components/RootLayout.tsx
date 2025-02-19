@@ -191,7 +191,6 @@ function RootLayoutInner({ children }: { children: React.ReactNode }) {
           <Header
             panelId={panelId}
             icon={MenuIcon}
-            // @ts-expect-error
             toggleRef={openRef}
             expanded={expanded}
             onToggle={() => {
@@ -205,7 +204,6 @@ function RootLayoutInner({ children }: { children: React.ReactNode }) {
 
         <motion.div
           layout
-          // @ts-expect-error
           id={panelId}
           style={{ height: expanded ? 'auto' : '0.5rem' }}
           className="relative z-50 overflow-hidden bg-neutral-950 pt-2"
@@ -213,14 +211,12 @@ function RootLayoutInner({ children }: { children: React.ReactNode }) {
           // @ts-ignore (https://github.com/facebook/react/issues/17157)
           inert={expanded ? undefined : true}
         >
-          {/* @ts-expect-error */}
           <motion.div layout className="bg-neutral-800">
             <div ref={navRef} className="bg-neutral-950 pt-14 pb-16">
               <Header
                 invert
                 panelId={panelId}
                 icon={XIcon}
-                // @ts-expect-error
                 toggleRef={closeRef}
                 expanded={expanded}
                 onToggle={() => {
@@ -260,12 +256,10 @@ function RootLayoutInner({ children }: { children: React.ReactNode }) {
       <motion.div
         layout
         style={{ borderTopLeftRadius: 40, borderTopRightRadius: 40 }}
-        // @ts-expect-error
         className="relative flex flex-auto overflow-hidden bg-white pt-14"
       >
         <motion.div
           layout
-          // @ts-expect-error
           className="relative isolate flex w-full flex-col pt-9"
         >
           <GridPattern
