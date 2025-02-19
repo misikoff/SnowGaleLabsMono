@@ -19,7 +19,6 @@ export function GrayscaleTransitionImage(
 ) {
   const ref = useRef<React.ElementRef<'div'>>(null)
   const { scrollYProgress } = useScroll({
-    // @ts-expect-error
     target: ref,
     offset: ['start 65%', 'end 35%'],
   })
