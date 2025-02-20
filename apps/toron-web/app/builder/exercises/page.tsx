@@ -1,8 +1,9 @@
 'use client'
 
-import { exercisesArray } from '../../../../../packages/toron-db/seedData'
 import { createExercise, deleteAllExercises } from '@/app/app/adminActions'
 import { Button } from '@/components/ui/button'
+
+import { exercisesArray } from '../../../../../packages/toron-db/seedData'
 
 export default function Home() {
   return (
