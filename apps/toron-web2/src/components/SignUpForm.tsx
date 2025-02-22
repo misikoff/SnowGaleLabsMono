@@ -1,3 +1,5 @@
+'use client'
+
 import { useId } from 'react'
 
 import { Button } from '@/components/Button'
@@ -6,7 +8,34 @@ export function SignUpForm() {
   let id = useId()
 
   return (
-    <form className="relative isolate mt-8 flex items-center pr-1">
+    <form className="relative isolate mt-8 flex items-center pr-1" onSubmit={(e) => {e.preventDefault()
+
+
+
+// alert('Thank you for signing up!')
+// log email address
+  // @ts-expect-error
+console.log(e.target.email.value)
+// make post to api route for subMitEmail
+fetch('/api/submitEmail', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({email: e.target.email.value}),
+})
+.then((res) => {
+  if (res.ok) {
+    alert('Thank you for signing up!')
+  } else {
+    alert('Something went wrong. Please try again.')
+  }
+})
+.catch(() => {
+  alert('Something went wrong. Please try again.')
+})
+
+    }}>
       <label htmlFor={id} className="sr-only">
         Email address
       </label>
