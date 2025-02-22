@@ -49,16 +49,14 @@ export function Intro() {
         </Link>
       </div>
       <h1 className="mt-14 font-display text-4xl/tight font-light text-white">
-        Open-source Git client{' '}
-        <span className="text-sky-300">for macOS minimalists</span>
+      Toron - Lift Log<br></br>
+        <span className="text-sky-300">for Muscle & Strength</span>
       </h1>
       <p className="mt-4 text-sm/6 text-gray-300">
-        Commit is a lightweight Git client you can open from anywhere any time
-        you’re ready to commit your work with a single keyboard shortcut. It’s
-        fast, beautiful, and completely unnecessary.
+      Toron is a focused, distraction-free workout tracker designed for those who train with intent. Log your workouts effortlessly, track muscle stimulus over time, and ensure your training aligns with your goals. No fluff, no social feeds—just powerful insights to help you progress.
       </p>
       <SignUpForm />
-      <div className="mt-8 flex flex-wrap justify-center gap-x-1 gap-y-3 sm:gap-x-2 lg:justify-start">
+      {/* <div className="mt-8 flex flex-wrap justify-center gap-x-1 gap-y-3 sm:gap-x-2 lg:justify-start">
         <IconLink href="#" icon={BookIcon} className="flex-none">
           Documentation
         </IconLink>
@@ -68,7 +66,7 @@ export function Intro() {
         <IconLink href="/feed.xml" icon={FeedIcon} className="flex-none">
           RSS
         </IconLink>
-      </div>
+      </div> */}
     </>
   )
 }
@@ -77,8 +75,8 @@ export function IntroFooter() {
   return (
     <p className="flex items-baseline gap-x-2 text-[0.8125rem]/6 text-gray-500">
       Brought to you by{' '}
-      <IconLink href="#" icon={XIcon} compact>
-        Joe Davola
+      <IconLink href="https://x.com/SnowGaleLabs" icon={XIcon} compact>
+        Snow Gale Labs
       </IconLink>
     </p>
   )
