@@ -22,7 +22,7 @@ fetch('/api/submitEmail', {
   headers: {
     'Content-Type': 'application/json',
   },
-  body: JSON.stringify({email: e.target.email.value}),
+  body: JSON.stringify({email: (e.target as any).email.value}),
 })
 .then((res) => {
   if (res.ok) {

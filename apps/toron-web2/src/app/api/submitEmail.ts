@@ -6,7 +6,6 @@ export async function POST(request: Request) {
   const { email } = body
 
   resend.contacts.create({
-    // @ts-expect-error
     email,
     firstName: 'SampleFirst',
     lastName: 'SampleLast',
@@ -14,7 +13,6 @@ export async function POST(request: Request) {
     audienceId: process.env.RESEND_AUDIENCE_ID as string,
   });
 
-  // @ts-expect-error
   console.log(email)
   return new Response('Thank you for signing up!')
 }
