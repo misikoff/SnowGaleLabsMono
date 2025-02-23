@@ -1,9 +1,9 @@
 import { Resend } from 'resend';
-const resend = new Resend(process.env.RESEND_API_KEY as string);
 
 export async function POST(request: Request) {
   const body = await request.json()
   const { email } = body
+  const resend = new Resend(process.env.RESEND_API_KEY as string);
 
   return resend.contacts.create({
     email,
