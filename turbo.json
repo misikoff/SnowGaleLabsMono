@@ -14,6 +14,13 @@
     "lint": {},
     "clean": {
       "cache": false
+    },
+    "toron-web#build": {
+      "env": [
+        "NEXT_PUBLIC_SITE_URL",
+        "RESEND_AUDIENCE_ID",
+        "RESEND_API_KEY"
+      ]
     }
   }
 }
