@@ -1,9 +1,9 @@
 {
-  "name": "toron-web2",
+  "name": "toron-web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 3008",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -14,9 +14,6 @@
     "@mdx-js/react": "^3.0.0",
     "@next/mdx": "^14.0.4",
     "@tailwindcss/postcss": "^4.0.6",
-    "@types/node": "^20.10.8",
-    "@types/react": "~18.3.1",
-    "@types/react-dom": "~18.3.1",
     "cheerio": "^1.0.0-rc.12",
     "clsx": "^2.1.0",
     "feed": "^4.2.2",
@@ -35,15 +32,19 @@
     "remark-unwrap-images": "^4.0.0",
     "resend": "^4.1.2",
     "shiki": "^0.14.7",
-    "tailwindcss": "^4.0.6",
-    "typescript": "^5.3.3",
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
-    "eslint": "^8.56.0",
-    "eslint-config-next": "^14.0.4",
+    "@types/node": "^20.10.8",
+    "@types/react": "~18.3.1",
+    "@types/react-dom": "~18.3.1",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^15.0.3",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
     "prettier": "^3.3.2",
     "prettier-plugin-tailwindcss": "^0.6.10",
-    "sharp": "0.33.1"
+    "tailwindcss": "^4.0.6",
+    "typescript": "^5.3.3"
   }
 }
