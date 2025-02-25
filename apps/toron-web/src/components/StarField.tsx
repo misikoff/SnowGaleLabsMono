@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useId, useRef } from 'react'
+
 import clsx from 'clsx'
 import { type TimelineSegment, animate, timeline } from 'motion'
 
@@ -109,7 +110,7 @@ function Star({
   }, [dim])
 
   return (
-    <g ref={groupRef} className="opacity-0">
+    <g ref={groupRef} className='opacity-0'>
       <circle
         ref={ref}
         cx={cx}
@@ -172,14 +173,14 @@ function Constellation({
     <>
       <path
         ref={ref}
-        stroke="white"
-        strokeOpacity="0.2"
+        stroke='white'
+        strokeOpacity='0.2'
         strokeDasharray={1}
         strokeDashoffset={1}
         pathLength={1}
-        fill="transparent"
+        fill='transparent'
         d={`M ${points.join('L')}`}
-        className="invisible"
+        className='invisible'
       />
       {uniquePoints.map((point, pointIndex) => (
         <Star key={pointIndex} point={point} blurId={blurId} />
@@ -193,9 +194,9 @@ export function StarField({ className }: { className?: string }) {
 
   return (
     <svg
-      viewBox="0 0 881 211"
-      fill="white"
-      aria-hidden="true"
+      viewBox='0 0 881 211'
+      fill='white'
+      aria-hidden='true'
       className={clsx(
         'pointer-events-none absolute w-[55.0625rem] origin-top-right rotate-[30deg] overflow-visible opacity-70',
         className,
@@ -203,7 +204,7 @@ export function StarField({ className }: { className?: string }) {
     >
       <defs>
         <filter id={blurId}>
-          <feGaussianBlur in="SourceGraphic" stdDeviation=".5" />
+          <feGaussianBlur in='SourceGraphic' stdDeviation='.5' />
         </filter>
       </defs>
       {constellations.map((points, constellationIndex) => (

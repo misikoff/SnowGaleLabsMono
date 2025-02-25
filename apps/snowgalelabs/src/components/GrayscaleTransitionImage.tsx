@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
+
 import Image, { type ImageProps } from 'next/image'
 import {
   motion,
@@ -26,13 +27,13 @@ export function GrayscaleTransitionImage(
   const filter = useMotionTemplate`grayscale(${grayscale})`
 
   return (
-    <div ref={ref} className="group relative">
-      <MotionImage alt="" style={{ filter } as any} {...props} />
+    <div ref={ref} className='group relative'>
+      <MotionImage alt='' style={{ filter } as any} {...props} />
       <div
-        className="pointer-events-none absolute top-0 left-0 w-full opacity-0 transition duration-300 group-hover:opacity-100"
-        aria-hidden="true"
+        className='pointer-events-none absolute top-0 left-0 w-full opacity-0 transition duration-300 group-hover:opacity-100'
+        aria-hidden='true'
       >
-        <Image alt="" {...props} />
+        <Image alt='' {...props} />
       </div>
     </div>
   )

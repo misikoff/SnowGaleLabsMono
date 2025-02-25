@@ -20,10 +20,10 @@ export function PageIntro({
     >
       <FadeIn>
         <h1>
-          <span className="block font-display text-base font-semibold text-neutral-950">
+          <span className='block font-display text-base font-semibold text-neutral-950'>
             {eyebrow}
           </span>
-          <span className="sr-only"> - </span>
+          <span className='sr-only'> - </span>
           <span
             className={clsx(
               'mt-6 block max-w-5xl font-display text-5xl font-medium tracking-tight [text-wrap:balance] text-neutral-950 sm:text-6xl',

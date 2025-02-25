@@ -9,11 +9,8 @@ import { List, ListItem } from '@/components/List'
 import { SectionIntro } from '@/components/SectionIntro'
 import { StylizedImage } from '@/components/StylizedImage'
 import { Testimonial } from '@/components/Testimonial'
-
 import imageLaptop from '@/images/laptop.jpg'
 import { type Project, type MDXEntry, loadProjects } from '@/lib/mdx'
-
-
 
 // function Clients() {
 //   return (
@@ -48,9 +45,9 @@ function Projects({ projects }: { projects: Array<MDXEntry<Project>> }) {
   return (
     <>
       <SectionIntro
-        title="Introducing Toron — A New Standard in Workout Tracking
-"
-        className="mt-24 sm:mt-32 lg:mt-40"
+        title='Introducing Toron — A New Standard in Workout Tracking
+'
+        className='mt-24 sm:mt-32 lg:mt-40'
       >
         <p>
           At Snow Gale Labs, we believe tracking your workouts should be
@@ -63,38 +60,38 @@ function Projects({ projects }: { projects: Array<MDXEntry<Project>> }) {
           heatmaps, and refine your approach with clear, actionable insights.
         </p>
       </SectionIntro>
-      <Container className="mt-16">
-        <FadeInStagger className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+      <Container className='mt-16'>
+        <FadeInStagger className='grid grid-cols-1 gap-8 lg:grid-cols-3'>
           {projects.map((project) => (
-            <FadeIn key={project.href} className="flex">
-              <article className="relative flex w-full flex-col rounded-3xl p-6 ring-1 ring-neutral-950/5 transition hover:bg-neutral-50 sm:p-8">
+            <FadeIn key={project.href} className='flex'>
+              <article className='relative flex w-full flex-col rounded-3xl p-6 ring-1 ring-neutral-950/5 transition hover:bg-neutral-50 sm:p-8'>
                 <h3>
                   <Link href={project.href}>
-                    <span className="absolute inset-0 rounded-3xl" />
+                    <span className='absolute inset-0 rounded-3xl' />
                     <Image
                       src={project.logo}
                       alt={project.client}
-                      className="h-16 w-16"
+                      className='h-16 w-16'
                       unoptimized
                     />
                   </Link>
                 </h3>
-                <p className="mt-6 flex gap-x-2 text-sm text-neutral-950">
+                <p className='mt-6 flex gap-x-2 text-sm text-neutral-950'>
                   <time
                     dateTime={project.date.split('-')[0]}
-                    className="font-semibold"
+                    className='font-semibold'
                   >
                     {project.date.split('-')[0]}
                   </time>
-                  <span className="text-neutral-300" aria-hidden="true">
+                  <span className='text-neutral-300' aria-hidden='true'>
                     /
                   </span>
                   <span>Project</span>
                 </p>
-                <p className="mt-6 font-display text-2xl font-semibold text-neutral-950">
+                <p className='mt-6 font-display text-2xl font-semibold text-neutral-950'>
                   {project.title}
                 </p>
-                <p className="mt-4 text-base text-neutral-600">
+                <p className='mt-4 text-base text-neutral-600'>
                   {project.description}
                 </p>
               </article>
@@ -110,40 +107,40 @@ function Services() {
   return (
     <>
       <SectionIntro
-        eyebrow="Lorem Ipsum"
-        title="We help you identify, explore and respond to new opportunities."
-        className="mt-24 sm:mt-32 lg:mt-40"
+        eyebrow='Lorem Ipsum'
+        title='We help you identify, explore and respond to new opportunities.'
+        className='mt-24 sm:mt-32 lg:mt-40'
       >
         <p>
           Lorem ipsum odor amet, consectetuer adipiscing elit. Nunc aenean
           elementum phasellus orci volutpat eget nibh proin nunc.
         </p>
       </SectionIntro>
-      <Container className="mt-16">
-        <div className="lg:flex lg:items-center lg:justify-end">
-          <div className="flex justify-center lg:w-1/2 lg:justify-end lg:pr-12">
-            <FadeIn className="w-[33.75rem] flex-none lg:w-[45rem]">
+      <Container className='mt-16'>
+        <div className='lg:flex lg:items-center lg:justify-end'>
+          <div className='flex justify-center lg:w-1/2 lg:justify-end lg:pr-12'>
+            <FadeIn className='w-[33.75rem] flex-none lg:w-[45rem]'>
               <StylizedImage
                 src={imageLaptop}
-                sizes="(min-width: 1024px) 41rem, 31rem"
-                className="justify-center lg:justify-end"
+                sizes='(min-width: 1024px) 41rem, 31rem'
+                className='justify-center lg:justify-end'
               />
             </FadeIn>
           </div>
-          <List className="mt-16 lg:mt-0 lg:w-1/2 lg:min-w-[33rem] lg:pl-4">
-            <ListItem title="Web development">
+          <List className='mt-16 lg:mt-0 lg:w-1/2 lg:min-w-[33rem] lg:pl-4'>
+            <ListItem title='Web development'>
               Lorem ipsum odor amet, consectetuer adipiscing elit. Nunc aenean
               elementum phasellus orci volutpat eget nibh proin nunc.
             </ListItem>
-            <ListItem title="Application development">
+            <ListItem title='Application development'>
               Lorem ipsum odor amet, consectetuer adipiscing elit. Nunc aenean
               elementum phasellus orci volutpat eget nibh proin nunc.
             </ListItem>
-            <ListItem title="E-commerce">
+            <ListItem title='E-commerce'>
               Lorem ipsum odor amet, consectetuer adipiscing elit. Nunc aenean
               elementum phasellus orci volutpat eget nibh proin nunc.
             </ListItem>
-            <ListItem title="Custom content management">
+            <ListItem title='Custom content management'>
               Lorem ipsum odor amet, consectetuer adipiscing elit. Nunc aenean
               elementum phasellus orci volutpat eget nibh proin nunc.
             </ListItem>
@@ -164,12 +161,12 @@ export default async function Home() {
 
   return (
     <>
-      <Container className="mt-24 sm:mt-32 md:mt-56">
-        <FadeIn className="max-w-3xl">
-          <h1 className="font-display text-5xl font-medium tracking-tight [text-wrap:balance] text-neutral-950 sm:text-7xl">
+      <Container className='mt-24 sm:mt-32 md:mt-56'>
+        <FadeIn className='max-w-3xl'>
+          <h1 className='font-display text-5xl font-medium tracking-tight [text-wrap:balance] text-neutral-950 sm:text-7xl'>
             Revealing the Signal in the Storm
           </h1>
-          <p className="mt-6 text-xl text-neutral-600">
+          <p className='mt-6 text-xl text-neutral-600'>
             The world is full of noise -- numbers piling up, charts without
             meaning, data with no direction. We build tools that cut through the
             chaos, shaping raw information into something clear, sharp, and

@@ -8,51 +8,52 @@ export function SignUpForm() {
   let id = useId()
 
   return (
-    <form className="relative isolate mt-8 flex items-center pr-1" onSubmit={(e) => {e.preventDefault()
+    <form
+      className='relative isolate mt-8 flex items-center pr-1'
+      onSubmit={(e) => {
+        e.preventDefault()
 
-
-
-// alert('Thank you for signing up!')
-// log email address
-  // @ts-expect-error
-console.log(e.target.email.value)
-// make post to api route for subMitEmail
-fetch('/api/submitEmail', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({email: (e.target as any).email.value}),
-})
-.then((res) => {
-  if (res.ok) {
-    alert('Thank you for signing up!')
-  } else {
-    alert('Something went wrong. Please try again.')
-  }
-})
-.catch(() => {
-  alert('Something went wrong. Please try again.')
-})
-
-    }}>
-      <label htmlFor={id} className="sr-only">
+        // alert('Thank you for signing up!')
+        // log email address
+        // @ts-expect-error
+        console.log(e.target.email.value)
+        // make post to api route for subMitEmail
+        fetch('/api/submitEmail', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: (e.target as any).email.value }),
+        })
+          .then((res) => {
+            if (res.ok) {
+              alert('Thank you for signing up!')
+            } else {
+              alert('Something went wrong. Please try again.')
+            }
+          })
+          .catch(() => {
+            alert('Something went wrong. Please try again.')
+          })
+      }}
+    >
+      <label htmlFor={id} className='sr-only'>
         Email address
       </label>
       <input
         required
-        type="email"
-        autoComplete="email"
-        name="email"
+        type='email'
+        autoComplete='email'
+        name='email'
         id={id}
-        placeholder="Email address"
-        className="peer w-0 flex-auto bg-transparent px-4 py-2.5 text-base text-white placeholder:text-gray-500 focus:outline-hidden sm:text-[0.8125rem]/6"
+        placeholder='Email address'
+        className='peer w-0 flex-auto bg-transparent px-4 py-2.5 text-base text-white placeholder:text-gray-500 focus:outline-hidden sm:text-[0.8125rem]/6'
       />
-      <Button type="submit" arrow>
+      <Button type='submit' arrow>
         Get updates
       </Button>
-      <div className="absolute inset-0 -z-10 rounded-lg transition peer-focus:ring-4 peer-focus:ring-sky-300/15" />
-      <div className="absolute inset-0 -z-10 rounded-lg bg-white/2.5 ring-1 ring-white/15 transition peer-focus:ring-sky-300" />
+      <div className='absolute inset-0 -z-10 rounded-lg transition peer-focus:ring-4 peer-focus:ring-sky-300/15' />
+      <div className='absolute inset-0 -z-10 rounded-lg bg-white/2.5 ring-1 ring-white/15 transition peer-focus:ring-sky-300' />
     </form>
   )
 }

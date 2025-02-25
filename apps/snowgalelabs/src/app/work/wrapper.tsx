@@ -21,19 +21,17 @@ export default async function ProjectLayout({
 
   return (
     <>
-      <article className="mt-24 sm:mt-32 lg:mt-40">
+      <article className='mt-24 sm:mt-32 lg:mt-40'>
         <header>
-          <PageIntro eyebrow="Project" title={project.title} centered>
+          <PageIntro eyebrow='Project' title={project.title} centered>
             <p>{project.description}</p>
           </PageIntro>
 
-<FadeIn>
-
-<div className='w-full text-lg text-center'>
-
-<div className='mx-auto'>Coming Soon</div>
-</div>
-</FadeIn>
+          <FadeIn>
+            <div className='w-full text-center text-lg'>
+              <div className='mx-auto'>Coming Soon</div>
+            </div>
+          </FadeIn>
           {/* <FadeIn>
             <div className="mt-24 border-t border-neutral-200 bg-white/50 sm:mt-32 lg:mt-40">
               <Container>

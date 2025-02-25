@@ -13,7 +13,7 @@ export function GridList({
   return (
     <FadeInStagger>
       <ul
-        role="list"
+        role='list'
         className={clsx(
           'grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3',
           className,
@@ -47,7 +47,7 @@ export function GridListItem({
       )}
     >
       <FadeIn>
-        <Border position="left" className="pl-8" invert={invert}>
+        <Border position='left' className='pl-8' invert={invert}>
           <strong
             className={clsx(
               'font-semibold',

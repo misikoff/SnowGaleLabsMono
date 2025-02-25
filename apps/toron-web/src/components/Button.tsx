@@ -10,9 +10,9 @@ function ButtonInner({
 }) {
   return (
     <>
-      <span className="absolute inset-0 rounded-md bg-linear-to-b from-white/80 to-white opacity-10 transition-opacity group-hover:opacity-15" />
-      <span className="absolute inset-0 rounded-md opacity-7.5 shadow-[inset_0_1px_1px_white] transition-opacity group-hover:opacity-10" />
-      {children} {arrow ? <span aria-hidden="true">&rarr;</span> : null}
+      <span className='absolute inset-0 rounded-md bg-linear-to-b from-white/80 to-white opacity-10 transition-opacity group-hover:opacity-15' />
+      <span className='absolute inset-0 rounded-md opacity-7.5 shadow-[inset_0_1px_1px_white] transition-opacity group-hover:opacity-10' />
+      {children} {arrow ? <span aria-hidden='true'>&rarr;</span> : null}
     </>
   )
 }
