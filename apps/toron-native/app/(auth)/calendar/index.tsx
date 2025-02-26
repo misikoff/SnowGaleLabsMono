@@ -28,20 +28,21 @@ import {
 } from 'lucide-react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import {
-  Session,
-  SessionWithSetGroupWithExerciseAndSets,
-} from '../../../../../packages/toron-db/schema'
 import AddSessionButton from '@/components/session/addSessionButton'
 import DeleteSetGroupButton from '@/components/session/deleteSetGroupButton'
 import { getSortedChunks } from '@/lib/calendarFunctions'
-import { getSessions, useSupabaseUser } from '@/lib/dbFunctions'
+import { getQuotes, getSessions, useSupabaseUser } from '@/lib/dbFunctions'
 import { invalidateSessionQueries } from '@/lib/mutations/refetcher'
 import {
   useDeleteSessionMutation,
   useUpdateSessionDateMutation,
 } from '@/lib/mutations/sessionMutations'
 import { quotes } from '@/lib/quoteLib'
+
+import {
+  Session,
+  SessionWithSetGroupWithExerciseAndSets,
+} from '../../../../../packages/toron-db/schema'
 
 const weeks = getSortedChunks()
 
@@ -140,6 +141,24 @@ export default function Calendar() {
     error,
   })
 
+  const {
+    data: realQuotes,
+    isLoading: quotesLoading,
+    isError: quotesError,
+    // error: quotesError,
+  } = useQuery({
+    queryKey: ['quotes'],
+    queryFn: async () => getQuotes(),
+  })
+
+  console.log({
+    sessions,
+    id: user?.data.user!.id,
+    sessionsLoading,
+    sessionsError,
+    error,
+  })
+
   const scrollViewRef = useRef<any | null>(null)
   const subScrollViewRef = useRef<any | null>(null)
   const DeviceSize = {
@@ -163,11 +182,11 @@ export default function Calendar() {
       // get sessions for each day
 
       const dates = selectedWeek.map((day, i) => {
-        const quote = quotes[i % quotes.length]
+        // const quote = quotes[i % quotes.length]
         return {
           day,
-          quote: quote.quote,
-          author: quote.author,
+          // text: quote.text,
+          // author: quote.author,
           adding: false,
           sessions: sessions?.filter((s) => s.date === day) || [],
         }
@@ -263,7 +282,7 @@ export default function Calendar() {
             setSelectedDate(trainingDays[Math.floor(page)].day)
           }}
         >
-          {trainingDays.map((date) => (
+          {trainingDays.map((date, i) => (
             <View
               key={date.day}
               className='relative w-screen items-center justify-center'
@@ -272,10 +291,11 @@ export default function Calendar() {
                 <View className='w-64 justify-center gap-2'>
                   {/* <Text className='text-center'>{date.day}</Text> */}
                   <Text className='text-center text-lg text-white'>
-                    {date.quote}
+                    {/* {date.text} */} {!quotesLoading && realQuotes[i].text}
                   </Text>
                   <Text className='text-center text-lg font-bold text-white'>
-                    {date.author}
+                    {/* {date.author} */}{' '}
+                    {!quotesLoading && realQuotes[i].author}
                   </Text>
                   <TouchableOpacity
                     onPress={() => {

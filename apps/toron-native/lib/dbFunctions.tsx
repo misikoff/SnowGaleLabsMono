@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { supabase } from '@/utils/supabase'
+
 import {
   Exercise,
   Program,
@@ -8,8 +10,8 @@ import {
   SetGroup,
   Session,
   User,
+  Quote,
 } from '../../../packages/toron-db/schema'
-import { supabase } from '@/utils/supabase'
 
 // Note: security depends on RLS preventing access to records with user ids that do not match the asset
 
@@ -313,6 +315,20 @@ export async function getExercises() {
   }
 
   return data as Exercise[]
+}
+
+export async function getQuotes() {
+  const { data, error } = await supabase.from('quotes').select()
+  // console.log({ data, error })
+  // console.log('done')
+  // if no error, return data as Exercise[]
+  if (error) {
+    console.error('Error fetching quotes:', error)
+    return []
+  }
+  console.log({ quotes: data })
+
+  return data as Quote[]
 }
 
 export function useSupabaseUser() {
