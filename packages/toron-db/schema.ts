@@ -322,6 +322,19 @@ export const setsRelation = relations(sets, ({ one }) => ({
   }),
 }))
 
+export const quotes = pgTable(
+  'quotes',
+  {
+    id: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey(),
+    text: text().notNull(),
+    author: text(),
+    category: text(),
+  },
+  (table) => [index('quotesCategoryIndex').on(table.category)],
+)
+
 export type User = typeof users.$inferSelect
 export type Exercise = typeof exercises.$inferSelect
 export type Program = typeof programs.$inferSelect
@@ -330,6 +343,7 @@ export type Microcycle = typeof microcycles.$inferSelect
 export type Session = typeof sessions.$inferSelect
 export type SetGroup = typeof setGroups.$inferSelect
 export type Set = typeof sets.$inferSelect
+export type Quote = typeof quotes.$inferSelect
 
 export interface SetGroupWithExerciseAndSets extends SetGroup {
   exercise: Exercise
