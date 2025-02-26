@@ -1,5 +1,5 @@
 {
-  "name": "centurion",
+  "name": "toron",
   "private": true,
   "workspaces": [
     "apps/*",
