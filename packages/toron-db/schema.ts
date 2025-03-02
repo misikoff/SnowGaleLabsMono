@@ -4,7 +4,6 @@ import {
   boolean,
   date,
   index,
-  integer,
   pgTable,
   real,
   smallint,
@@ -13,19 +12,19 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 
-export const repStyleEnum = ['high', 'medium', 'low'] as const
-export type RepStyle = (typeof repStyleEnum)[number]
-
 export const weightUnitsEnum = ['lbs', 'kg'] as const
 export type WeightUnits = (typeof weightUnitsEnum)[number]
 
-export const distanceUnitsEnum = ['yards', 'meters'] as const
-export type DistanceUnits = (typeof distanceUnitsEnum)[number]
-
-export const exerciseType = ['compound', 'isolation'] as const
-export type ExerciseType = (typeof exerciseType)[number]
-
-export const setGroupType = ['superset', 'circuit', 'normal'] as const
+export const equipmentEnum = [
+  'barbell',
+  'dumbbell',
+  'cable',
+  'machine',
+  'bodyweight',
+  'band',
+  'other',
+] as const
+export type EquipmentType = (typeof equipmentEnum)[number]
 
 export const users = pgTable(
   'users',
@@ -44,17 +43,6 @@ export const users = pgTable(
   (table) => [index('usersClerkIdIndex').on(table.id)],
 )
 
-export const equipmentEnum = [
-  'barbell',
-  'dumbbell',
-  'cable',
-  'machine',
-  'bodyweight',
-  'band',
-  'other',
-] as const
-export type EquipmentType = (typeof equipmentEnum)[number]
-
 export const exercises = pgTable(
   'exercises',
   {
@@ -62,26 +50,17 @@ export const exercises = pgTable(
       .default(sql`gen_random_uuid()`)
       .primaryKey(),
     userId: uuid().references(() => users.id, { onDelete: 'cascade' }),
-    isMainExercise: boolean().default(false),
     clonedFromId: uuid().references((): AnyPgColumn => exercises.id),
     name: text(),
     description: text(),
     equipmentType: text({ enum: equipmentEnum }),
-    defaultRepRange: text({ enum: repStyleEnum }).default('medium'),
     weightIncrement: real().default(5),
     weightUnits: text({
       enum: weightUnitsEnum,
     }).default('lbs'),
-    useWeight: boolean().default(true),
-    useDistance: boolean().default(false),
-    distanceIncrement: real().default(5),
-    distanceUnits: text({
-      enum: distanceUnitsEnum,
-    }).default('yards'),
     notes: text(),
   },
   (table) => [
-    index('exercisesIsMainExerciseIndex').on(table.isMainExercise),
     index('exercisesUserIdIndex').on(table.userId),
     index('exercisesClonedFromIdIndex').on(table.clonedFromId),
   ],
@@ -98,65 +77,45 @@ export const programs = pgTable(
     }),
     name: text(),
     description: text(),
+    rirTarget: smallint().default(0),
   },
   (table) => [index('programsUserIdIndex').on(table.userId)],
 )
 
 export const programsRelations = relations(programs, ({ one, many }) => ({
   user: one(users),
-  macrocycles: many(macrocycles),
-  microcycles: many(microcycles),
+  templates: many(templates),
 }))
 
-export const macrocycles = pgTable(
-  'macrocycles',
+// a program is made up of several, ordered workout templates which consist of a list of exercises, as well as the desired RIR, and a name
+export const templates = pgTable(
+  'templates',
   {
     id: uuid()
       .default(sql`gen_random_uuid()`)
       .primaryKey(),
-    userId: uuid()
-      .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
-    // TODO: should deletes cascade?,
-    programId: uuid().references(() => programs.id),
+    userId: uuid().references(() => users.id, {
+      onDelete: 'cascade',
+    }),
+    programId: uuid().references(() => programs.id, {
+      onDelete: 'cascade',
+    }),
     name: text(),
-    order: smallint('order').default(0),
-  },
-  (table) => [index('macrocyclesUserIdIndex').on(table.userId)],
-)
-
-export const macrocyclesRelations = relations(macrocycles, ({ one, many }) => ({
-  user: one(users),
-  program: one(programs),
-  microcycles: many(microcycles),
-  sessions: many(sessions),
-  many: many(setGroups),
-}))
-
-export const microcycles = pgTable(
-  'microcycles',
-  {
-    id: uuid()
-      .default(sql`gen_random_uuid()`)
-      .primaryKey(),
-    userId: uuid()
-      .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
-    // TODO: should deletes cascade?,
-    programId: uuid().references(() => programs.id),
-    macrocycleId: uuid().references(() => macrocycles.id),
-    name: text(),
+    description: text(),
     order: smallint().default(0),
   },
-  (table) => [index('microcyclesUserIdIndex').on(table.userId)],
+  (table) => [
+    index('templatesUserIdIndex').on(table.userId),
+    index('templatesProgramIdIndex').on(table.programId),
+  ],
 )
 
-export const microcyclesRelations = relations(microcycles, ({ one, many }) => ({
+// TODO: handle how templates each have multiple, ordered exercises
+
+export const templatesRelations = relations(templates, ({ one, many }) => ({
   user: one(users),
   program: one(programs),
-  macrocycle: one(macrocycles),
-  sessions: many(sessions),
-  many: many(setGroups),
+  exercises: many(exercises),
 }))
 
 export const sessions = pgTable(
@@ -170,8 +129,7 @@ export const sessions = pgTable(
     }),
     name: text(),
     programId: uuid().references(() => programs.id),
-    macrocycleId: uuid().references(() => macrocycles.id),
-    microcycleId: uuid().references(() => microcycles.id),
+    templateId: uuid().references(() => templates.id),
     order: smallint().default(0),
     completed: boolean().default(false),
     date: date().notNull().defaultNow(),
@@ -194,13 +152,9 @@ export const sessionsRelations = relations(sessions, ({ one, many }) => ({
     fields: [sessions.programId],
     references: [programs.id],
   }),
-  macrocycle: one(macrocycles, {
-    fields: [sessions.macrocycleId],
-    references: [macrocycles.id],
-  }),
-  microcycle: one(microcycles, {
-    fields: [sessions.microcycleId],
-    references: [microcycles.id],
+  template: one(templates, {
+    fields: [sessions.templateId],
+    references: [templates.id],
   }),
 }))
 
@@ -214,10 +168,6 @@ export const setGroups = pgTable(
     sessionId: uuid().references(() => sessions.id, {
       onDelete: 'cascade',
     }),
-    microcycleId: uuid().references(() => microcycles.id),
-    programId: uuid().references(() => programs.id),
-    type: text({ enum: setGroupType }).default('normal'),
-    // if type is not normal then set exerciseId to null, but dont generate the id automatically
     exerciseId: uuid().references(() => exercises.id),
     order: smallint().default(0),
   },
@@ -237,14 +187,6 @@ export const setGroupsRelation = relations(setGroups, ({ one, many }) => ({
     fields: [setGroups.sessionId],
     references: [sessions.id],
   }),
-  microcycle: one(microcycles, {
-    fields: [setGroups.microcycleId],
-    references: [microcycles.id],
-  }),
-  program: one(programs, {
-    fields: [setGroups.programId],
-    references: [programs.id],
-  }),
   sets: many(sets),
 }))
 
@@ -261,8 +203,8 @@ export const sets = pgTable(
       .references(() => sessions.id, {
         onDelete: 'cascade',
       }),
-    microcycleId: uuid().references(() => microcycles.id),
     programId: uuid().references(() => programs.id),
+    templateId: uuid().references(() => templates.id),
     exerciseId: uuid()
       .notNull()
       .references(() => exercises.id, {
@@ -275,13 +217,8 @@ export const sets = pgTable(
         onDelete: 'cascade',
       }),
     // attributes
-    prescribedReps: integer(),
-    prescribedRpe: real(),
-    prescribedRir: real(),
-    prescribedWeight: real(),
-    reps: integer(),
-    rpe: real(),
-    rir: integer(),
+    reps: smallint(),
+    rir: smallint(),
     weight: real(),
     order: smallint().default(0),
     createdAt: timestamp().notNull().defaultNow(),
@@ -304,9 +241,9 @@ export const setsRelation = relations(sets, ({ one }) => ({
     fields: [sets.sessionId],
     references: [sessions.id],
   }),
-  microcycle: one(microcycles, {
-    fields: [sets.microcycleId],
-    references: [microcycles.id],
+  template: one(templates, {
+    fields: [sets.templateId],
+    references: [templates.id],
   }),
   program: one(programs, {
     fields: [sets.programId],
@@ -337,9 +274,7 @@ export const quotes = pgTable(
 
 export type User = typeof users.$inferSelect
 export type Exercise = typeof exercises.$inferSelect
-export type Program = typeof programs.$inferSelect
-export type Macrocycle = typeof macrocycles.$inferSelect
-export type Microcycle = typeof microcycles.$inferSelect
+export type Template = typeof templates.$inferSelect
 export type Session = typeof sessions.$inferSelect
 export type SetGroup = typeof setGroups.$inferSelect
 export type Set = typeof sets.$inferSelect
@@ -352,10 +287,6 @@ export interface SetGroupWithExerciseAndSets extends SetGroup {
 
 export interface SessionWithSetGroupWithExerciseAndSets extends Session {
   setGroups: SetGroupWithExerciseAndSets[]
-}
-
-export interface ProgramWithMicrocycles extends Program {
-  microcycles: Microcycle[]
 }
 
 // TODO: determine if all relations can be removed because they are redundant for dribble query
