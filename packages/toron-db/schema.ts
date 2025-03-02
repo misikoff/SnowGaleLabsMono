@@ -1,6 +1,5 @@
 import { relations, sql } from 'drizzle-orm'
 import {
-  AnyPgColumn,
   boolean,
   date,
   index,
@@ -43,14 +42,34 @@ export const users = pgTable(
   (table) => [index('usersClerkIdIndex').on(table.id)],
 )
 
+export const quotes = pgTable(
+  'quotes',
+  {
+    id: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey(),
+    text: text().notNull(),
+    author: text(),
+    category: text(),
+  },
+  (table) => [index('quotesCategoryIndex').on(table.category)],
+)
+
+// 🔹 Muscle Groups (e.g., "Chest", "Back", "Quads")
+export const muscleGroups = pgTable('muscle_groups', {
+  id: uuid()
+    .default(sql`gen_random_uuid()`)
+    .primaryKey(),
+  name: text('name').notNull().unique(),
+})
+
 export const exercises = pgTable(
   'exercises',
   {
     id: uuid()
       .default(sql`gen_random_uuid()`)
       .primaryKey(),
-    userId: uuid().references(() => users.id, { onDelete: 'cascade' }),
-    clonedFromId: uuid().references((): AnyPgColumn => exercises.id),
+    muscleGroupId: uuid().references(() => muscleGroups.id),
     name: text(),
     description: text(),
     equipmentType: text({ enum: equipmentEnum }),
@@ -60,14 +79,16 @@ export const exercises = pgTable(
     }).default('lbs'),
     notes: text(),
   },
-  (table) => [
-    index('exercisesUserIdIndex').on(table.userId),
-    index('exercisesClonedFromIdIndex').on(table.clonedFromId),
-  ],
+  (table) => [index('exercisesMuscleGroupIdIndex').on(table.muscleGroupId)],
 )
 
-export const programs = pgTable(
-  'programs',
+export const exercisesRelation = relations(exercises, ({ one }) => ({
+  muscleGroups: one(muscleGroups),
+}))
+
+// 🔹 Splits (e.g., "Push/Pull/Legs")
+export const splits = pgTable(
+  'splits',
   {
     id: uuid()
       .default(sql`gen_random_uuid()`)
@@ -79,17 +100,16 @@ export const programs = pgTable(
     description: text(),
     rirTarget: smallint().default(0),
   },
-  (table) => [index('programsUserIdIndex').on(table.userId)],
+  (table) => [index('splitsUserIdIndex').on(table.userId)],
 )
 
-export const programsRelations = relations(programs, ({ one, many }) => ({
+export const splitsRelations = relations(splits, ({ one }) => ({
   user: one(users),
-  templates: many(templates),
 }))
 
-// a program is made up of several, ordered workout templates which consist of a list of exercises, as well as the desired RIR, and a name
-export const templates = pgTable(
-  'templates',
+// 🔹 Training Days (Part of a Split)
+export const trainingDays = pgTable(
+  'traingDays',
   {
     id: uuid()
       .default(sql`gen_random_uuid()`)
@@ -97,7 +117,7 @@ export const templates = pgTable(
     userId: uuid().references(() => users.id, {
       onDelete: 'cascade',
     }),
-    programId: uuid().references(() => programs.id, {
+    splitId: uuid().references(() => splits.id, {
       onDelete: 'cascade',
     }),
     name: text(),
@@ -105,12 +125,46 @@ export const templates = pgTable(
     order: smallint().default(0),
   },
   (table) => [
-    index('templatesUserIdIndex').on(table.userId),
-    index('templatesProgramIdIndex').on(table.programId),
+    index('trainingDaysUserIdIndex').on(table.userId),
+    index('trainingDaysSplitIdIndex').on(table.splitId),
   ],
 )
 
-// TODO: handle how templates each have multiple, ordered exercises
+export const trainingDaysRelations = relations(
+  trainingDays,
+  ({ one, many }) => ({
+    user: one(users),
+    program: one(programs),
+    exercises: many(exercises),
+  }),
+)
+
+// 🔹 Ordered Muscle Groups for a Training Day
+export const trainingDayMuscleGroups = pgTable('training_day_muscle_groups', {
+  id: uuid()
+    .default(sql`gen_random_uuid()`)
+    .primaryKey(),
+  trainingDayId: uuid()
+    .references(() => trainingDays.id)
+    .notNull(),
+  muscleGroupId: uuid()
+    .references(() => muscleGroups.id)
+    .notNull(),
+  order: smallint('order').notNull(),
+})
+
+// a program is made up of several, ordered workout templates which consist of a list of exercises, as well as the desired RIR, and a name
+export const templates = pgTable('templates', {
+  id: uuid()
+    .default(sql`gen_random_uuid()`)
+    .primaryKey(),
+  trainingDayId: uuid().references(() => trainingDays.id, {
+    onDelete: 'cascade',
+  }),
+  name: text(),
+  description: text(),
+  order: smallint().default(0),
+})
 
 export const templatesRelations = relations(templates, ({ one, many }) => ({
   user: one(users),
@@ -118,6 +172,24 @@ export const templatesRelations = relations(templates, ({ one, many }) => ({
   exercises: many(exercises),
 }))
 
+// 🔹 Exercises for Each Muscle Group in a Template
+export const templateExercises = pgTable('template_exercises', {
+  id: uuid()
+    .default(sql`gen_random_uuid()`)
+    .primaryKey(),
+  templateId: uuid()
+    .references(() => templates.id)
+    .notNull(),
+  exerciseId: uuid()
+    .references(() => exercises.id)
+    .notNull(),
+  muscleGroupId: uuid()
+    .references(() => muscleGroups.id)
+    .notNull(),
+  order: smallint('order').notNull(),
+})
+
+// 🔹 Sessions (Instances of a Workout Template)
 export const sessions = pgTable(
   'sessions',
   {
@@ -128,7 +200,6 @@ export const sessions = pgTable(
       onDelete: 'cascade',
     }),
     name: text(),
-    programId: uuid().references(() => programs.id),
     templateId: uuid().references(() => templates.id),
     order: smallint().default(0),
     completed: boolean().default(false),
@@ -148,14 +219,7 @@ export const sessionsRelations = relations(sessions, ({ one, many }) => ({
   user: one(users),
   sets: many(sets),
   setGroups: many(setGroups),
-  program: one(programs, {
-    fields: [sessions.programId],
-    references: [programs.id],
-  }),
-  template: one(templates, {
-    fields: [sessions.templateId],
-    references: [templates.id],
-  }),
+  templates: one(templates),
 }))
 
 export const setGroups = pgTable(
@@ -179,14 +243,8 @@ export const setGroups = pgTable(
 
 export const setGroupsRelation = relations(setGroups, ({ one, many }) => ({
   user: one(users),
-  exercise: one(exercises, {
-    fields: [setGroups.exerciseId],
-    references: [exercises.id],
-  }),
-  session: one(sessions, {
-    fields: [setGroups.sessionId],
-    references: [sessions.id],
-  }),
+  exercises: one(exercises),
+  session: one(sessions),
   sets: many(sets),
 }))
 
@@ -203,8 +261,6 @@ export const sets = pgTable(
       .references(() => sessions.id, {
         onDelete: 'cascade',
       }),
-    programId: uuid().references(() => programs.id),
-    templateId: uuid().references(() => templates.id),
     exerciseId: uuid()
       .notNull()
       .references(() => exercises.id, {
@@ -237,40 +293,12 @@ export const sets = pgTable(
 
 export const setsRelation = relations(sets, ({ one }) => ({
   user: one(users),
-  session: one(sessions, {
-    fields: [sets.sessionId],
-    references: [sessions.id],
-  }),
-  template: one(templates, {
-    fields: [sets.templateId],
-    references: [templates.id],
-  }),
-  program: one(programs, {
-    fields: [sets.programId],
-    references: [programs.id],
-  }),
-  exercise: one(exercises, {
-    fields: [sets.exerciseId],
-    references: [exercises.id],
-  }),
-  setGroup: one(setGroups, {
-    fields: [sets.setGroupId],
-    references: [setGroups.id],
-  }),
+  sessions: one(sessions),
+  templates: one(templates),
+  exercises: one(exercises),
+  setGroups: one(setGroups),
+  exercise: one(exercises),
 }))
-
-export const quotes = pgTable(
-  'quotes',
-  {
-    id: uuid()
-      .default(sql`gen_random_uuid()`)
-      .primaryKey(),
-    text: text().notNull(),
-    author: text(),
-    category: text(),
-  },
-  (table) => [index('quotesCategoryIndex').on(table.category)],
-)
 
 export type User = typeof users.$inferSelect
 export type Exercise = typeof exercises.$inferSelect
