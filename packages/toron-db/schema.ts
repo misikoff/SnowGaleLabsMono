@@ -30,6 +30,31 @@ export type EquipmentType = (typeof equipmentEnum)[number]
 
 const authSchema = pgSchema('auth')
 
+const usersOnlyPolicy = pgPolicy('Only Users can do anything', {
+  as: 'permissive',
+  to: authenticatedRole,
+  for: 'all',
+  using: sql`(( SELECT auth.uid() AS uid) = user_id)`,
+  withCheck: sql`true`,
+})
+
+const readOnlyPolicy = pgPolicy('Read Only Policy', {
+  as: 'permissive',
+  to: 'public',
+  for: 'select',
+  using: sql`true`,
+  withCheck: sql``,
+})
+
+const userDef = sql`auth.uid()`
+const primaryKeyDef = sql`gen_random_uuid()`
+const id = uuid().default(primaryKeyDef).primaryKey()
+const userId = uuid()
+  .default(userDef)
+  .references(() => users.id, {
+    onDelete: 'cascade',
+  })
+
 // existing supabase auth table
 const users = authSchema.table('users', {
   id: uuid('id').primaryKey(),
@@ -51,36 +76,43 @@ export const profiles = pgTable(
       .$onUpdate(() => new Date()),
     prod: boolean().default(false),
   },
-  (table) => [index('usersClerkIdIndex').on(table.id)],
+  (table) => [
+    index('usersClerkIdIndex').on(table.id),
+    pgPolicy('Only Users can do anything', {
+      as: 'permissive',
+      to: authenticatedRole,
+      for: 'all',
+      using: sql`(( SELECT auth.uid() AS uid) = id)`,
+      withCheck: sql`true`,
+    }),
+  ],
 )
 
 export const quotes = pgTable(
   'quotes',
   {
-    id: uuid()
-      .default(sql`gen_random_uuid()`)
-      .primaryKey(),
+    id,
     text: text().notNull(),
     author: text(),
     category: text(),
   },
-  (table) => [index('quotesCategoryIndex').on(table.category)],
+  (table) => [index('quotesCategoryIndex').on(table.category), readOnlyPolicy],
 )
 
 // 🔹 Muscle Groups (e.g., "Chest", "Back", "Quads")
-export const muscleGroups = pgTable('muscle_groups', {
-  id: uuid()
-    .default(sql`gen_random_uuid()`)
-    .primaryKey(),
-  name: text('name').notNull().unique(),
-})
+export const muscleGroups = pgTable(
+  'muscle_groups',
+  {
+    id,
+    name: text('name').notNull().unique(),
+  },
+  (table) => [readOnlyPolicy],
+)
 
 export const exercises = pgTable(
   'exercises',
   {
-    id: uuid()
-      .default(sql`gen_random_uuid()`)
-      .primaryKey(),
+    id,
     muscleGroupId: uuid().references(() => muscleGroups.id),
     name: text(),
     description: text(),
@@ -91,7 +123,10 @@ export const exercises = pgTable(
     }).default('lbs'),
     notes: text(),
   },
-  (table) => [index('exercisesMuscleGroupIdIndex').on(table.muscleGroupId)],
+  (table) => [
+    index('exercisesMuscleGroupIdIndex').on(table.muscleGroupId),
+    readOnlyPolicy,
+  ],
 )
 
 export const exercisesRelation = relations(exercises, ({ one }) => ({
@@ -102,17 +137,13 @@ export const exercisesRelation = relations(exercises, ({ one }) => ({
 export const splits = pgTable(
   'splits',
   {
-    id: uuid()
-      .default(sql`gen_random_uuid()`)
-      .primaryKey(),
-    userId: uuid().references(() => users.id, {
-      onDelete: 'cascade',
-    }),
+    id,
+    userId,
     name: text(),
     description: text(),
     rirTarget: smallint().default(0),
   },
-  (table) => [index('splitsUserIdIndex').on(table.userId)],
+  (table) => [index('splitsUserIdIndex').on(table.userId), usersOnlyPolicy],
 )
 
 export const splitsRelations = relations(splits, ({ one }) => ({
@@ -123,12 +154,8 @@ export const splitsRelations = relations(splits, ({ one }) => ({
 export const trainingDays = pgTable(
   'training_days',
   {
-    id: uuid()
-      .default(sql`gen_random_uuid()`)
-      .primaryKey(),
-    userId: uuid().references(() => users.id, {
-      onDelete: 'cascade',
-    }),
+    id,
+    userId,
     splitId: uuid().references(() => splits.id, {
       onDelete: 'cascade',
     }),
@@ -139,6 +166,7 @@ export const trainingDays = pgTable(
   (table) => [
     index('trainingDaysUserIdIndex').on(table.userId),
     index('trainingDaysSplitIdIndex').on(table.splitId),
+    usersOnlyPolicy,
   ],
 )
 
@@ -151,34 +179,37 @@ export const trainingDaysRelations = relations(
 )
 
 // 🔹 Ordered Muscle Groups for a Training Day
-export const trainingDayMuscleGroups = pgTable('training_day_muscle_groups', {
-  id: uuid()
-    .default(sql`gen_random_uuid()`)
-    .primaryKey(),
-  trainingDayId: uuid()
-    .references(() => trainingDays.id)
-    .notNull(),
-  muscleGroupId: uuid()
-    .references(() => muscleGroups.id)
-    .notNull(),
-  order: smallint('order').notNull(),
-})
+export const trainingDayMuscleGroups = pgTable(
+  'training_day_muscle_groups',
+  {
+    id,
+    trainingDayId: uuid()
+      .references(() => trainingDays.id)
+      .notNull(),
+    userId,
+    muscleGroupId: uuid()
+      .references(() => muscleGroups.id)
+      .notNull(),
+    order: smallint('order').notNull(),
+  },
+  (table) => [usersOnlyPolicy],
+)
 
 // a program is made up of several, ordered workout templates which consist of a list of exercises, as well as the desired RIR, and a name
-export const templates = pgTable('templates', {
-  id: uuid()
-    .default(sql`gen_random_uuid()`)
-    .primaryKey(),
-  trainingDayId: uuid().references(() => trainingDays.id, {
-    onDelete: 'cascade',
-  }),
-  userId: uuid().references(() => users.id, {
-    onDelete: 'cascade',
-  }),
-  name: text(),
-  description: text(),
-  order: smallint().default(0),
-})
+export const templates = pgTable(
+  'templates',
+  {
+    id,
+    trainingDayId: uuid().references(() => trainingDays.id, {
+      onDelete: 'cascade',
+    }),
+    userId,
+    name: text(),
+    description: text(),
+    order: smallint().default(0),
+  },
+  (table) => [usersOnlyPolicy],
+)
 
 export const templatesRelations = relations(templates, ({ one, many }) => ({
   user: one(users),
@@ -186,32 +217,31 @@ export const templatesRelations = relations(templates, ({ one, many }) => ({
 }))
 
 // 🔹 Exercises for Each Muscle Group in a Template
-export const templateExercises = pgTable('template_exercises', {
-  id: uuid()
-    .default(sql`gen_random_uuid()`)
-    .primaryKey(),
-  templateId: uuid()
-    .references(() => templates.id)
-    .notNull(),
-  exerciseId: uuid()
-    .references(() => exercises.id)
-    .notNull(),
-  muscleGroupId: uuid()
-    .references(() => muscleGroups.id)
-    .notNull(),
-  order: smallint('order').notNull(),
-})
+export const templateExercises = pgTable(
+  'template_exercises',
+  {
+    id,
+    templateId: uuid()
+      .references(() => templates.id)
+      .notNull(),
+    exerciseId: uuid()
+      .references(() => exercises.id)
+      .notNull(),
+    muscleGroupId: uuid()
+      .references(() => muscleGroups.id)
+      .notNull(),
+    userId,
+    order: smallint('order').notNull(),
+  },
+  (table) => [usersOnlyPolicy],
+)
 
 // 🔹 Sessions (Instances of a Workout Template)
 export const sessions = pgTable(
   'sessions',
   {
-    id: uuid()
-      .default(sql`gen_random_uuid()`)
-      .primaryKey(),
-    userId: uuid().references(() => users.id, {
-      onDelete: 'cascade',
-    }),
+    id,
+    userId,
     name: text(),
     templateId: uuid().references(() => templates.id),
     order: smallint().default(0),
@@ -225,7 +255,7 @@ export const sessions = pgTable(
     // set completed at when completed becomes true
     completedAt: timestamp(),
   },
-  (table) => [index('sessionsUserIdIndex').on(table.userId)],
+  (table) => [index('sessionsUserIdIndex').on(table.userId), usersOnlyPolicy],
 )
 
 export const sessionsRelations = relations(sessions, ({ one, many }) => ({
@@ -238,10 +268,8 @@ export const sessionsRelations = relations(sessions, ({ one, many }) => ({
 export const setGroups = pgTable(
   'set_groups',
   {
-    id: uuid()
-      .default(sql`gen_random_uuid()`)
-      .primaryKey(),
-    userId: uuid().references(() => users.id, { onDelete: 'cascade' }),
+    id,
+    userId,
     sessionId: uuid().references(() => sessions.id, {
       onDelete: 'cascade',
     }),
@@ -251,13 +279,7 @@ export const setGroups = pgTable(
   (table) => [
     index('setGroupsUserIdIndex').on(table.userId),
     index('setGroupsSessionIdIndex').on(table.sessionId),
-    pgPolicy('policy', {
-      as: 'permissive',
-      to: authenticatedRole,
-      for: 'delete',
-      using: sql`(( SELECT auth.uid() AS uid) = user_id)`,
-      // withCheck: sql``,
-    }),
+    usersOnlyPolicy,
   ],
 )
 
@@ -271,11 +293,9 @@ export const setGroupsRelation = relations(setGroups, ({ one, many }) => ({
 export const sets = pgTable(
   'sets',
   {
-    id: uuid()
-      .default(sql`gen_random_uuid()`)
-      .primaryKey(),
+    id,
     // relations
-    userId: uuid().references(() => users.id, { onDelete: 'cascade' }),
+    userId,
     sessionId: uuid()
       .notNull()
       .references(() => sessions.id, {
@@ -308,6 +328,7 @@ export const sets = pgTable(
     index('setsSessionIdIndex').on(table.sessionId),
     index('setsExerciseIdIndex').on(table.exerciseId),
     index('setsSetGroupIdIndex').on(table.setGroupId),
+    usersOnlyPolicy,
   ],
 )
 
