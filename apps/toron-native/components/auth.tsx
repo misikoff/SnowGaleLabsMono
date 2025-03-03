@@ -2,7 +2,6 @@ import { useState } from 'react'
 
 import { Alert, View, AppState, TextInput, Button, Text } from 'react-native'
 
-// import { createUser } from '@/lib/dbFunctions'
 import { supabase } from '@/utils/supabase'
 
 // Tells Supabase Auth to continuously refresh the session automatically if
@@ -30,7 +29,6 @@ export default function Auth() {
     })
 
     if (error) {
-      Alert.alert('wow')
       Alert.alert(error.message)
     }
     setLoading(false)

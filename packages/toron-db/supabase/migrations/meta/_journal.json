@@ -183,6 +183,20 @@
       "when": 1741039527237,
       "tag": "0025_naive_marvel_zombies",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1741040082668,
+      "tag": "0026_odd_xorn",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1741040687315,
+      "tag": "0027_hot_eddie_brock",
+      "breakpoints": true
     }
   ]
 }
