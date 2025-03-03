@@ -25,7 +25,7 @@ export default function App() {
   } = useQuery({
     enabled: user !== undefined,
     queryKey: ['sessions'],
-    queryFn: async () => getSessions({ userId: user!.data.user!.id }),
+    queryFn: async () => getSessions(),
   })
 
   return (
@@ -33,7 +33,6 @@ export default function App() {
       <View className='items-center'>
         {user && (
           <AddSessionButton
-            userId={user.data.user!.id}
             onCreate={(newSessionId) =>
               router.navigate(`/(auth)/session/${newSessionId}`)
             }

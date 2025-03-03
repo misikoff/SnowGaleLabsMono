@@ -3,6 +3,7 @@ import {
   boolean,
   date,
   index,
+  pgSchema,
   pgTable,
   real,
   smallint,
@@ -25,12 +26,21 @@ export const equipmentEnum = [
 ] as const
 export type EquipmentType = (typeof equipmentEnum)[number]
 
-export const users = pgTable(
-  'users',
+const authSchema = pgSchema('auth')
+
+// existing supabase auth table
+const users = authSchema.table('users', {
+  id: uuid('id').primaryKey(),
+  email: text('email').notNull(),
+})
+
+// need to link this to auth.users creation, deletion, and updates with a hook
+export const profiles = pgTable(
+  'profiles',
   {
-    id: uuid()
-      .default(sql`gen_random_uuid()`)
-      .primaryKey(),
+    id: uuid('id')
+      .primaryKey()
+      .references(() => users.id),
     name: text(),
     createdAt: timestamp().notNull().defaultNow(),
     updatedAt: timestamp()
@@ -109,7 +119,7 @@ export const splitsRelations = relations(splits, ({ one }) => ({
 
 // 🔹 Training Days (Part of a Split)
 export const trainingDays = pgTable(
-  'traingDays',
+  'training_days',
   {
     id: uuid()
       .default(sql`gen_random_uuid()`)
@@ -134,7 +144,6 @@ export const trainingDaysRelations = relations(
   trainingDays,
   ({ one, many }) => ({
     user: one(users),
-    program: one(programs),
     exercises: many(exercises),
   }),
 )
@@ -161,6 +170,9 @@ export const templates = pgTable('templates', {
   trainingDayId: uuid().references(() => trainingDays.id, {
     onDelete: 'cascade',
   }),
+  userId: uuid().references(() => users.id, {
+    onDelete: 'cascade',
+  }),
   name: text(),
   description: text(),
   order: smallint().default(0),
@@ -168,7 +180,6 @@ export const templates = pgTable('templates', {
 
 export const templatesRelations = relations(templates, ({ one, many }) => ({
   user: one(users),
-  program: one(programs),
   exercises: many(exercises),
 }))
 
@@ -223,7 +234,7 @@ export const sessionsRelations = relations(sessions, ({ one, many }) => ({
 }))
 
 export const setGroups = pgTable(
-  'setGroups',
+  'set_groups',
   {
     id: uuid()
       .default(sql`gen_random_uuid()`)
@@ -307,6 +318,11 @@ export type Session = typeof sessions.$inferSelect
 export type SetGroup = typeof setGroups.$inferSelect
 export type Set = typeof sets.$inferSelect
 export type Quote = typeof quotes.$inferSelect
+export type MuscleGroup = typeof muscleGroups.$inferSelect
+export type Split = typeof splits.$inferSelect
+export type TrainingDay = typeof trainingDays.$inferSelect
+export type TemplateExercise = typeof templateExercises.$inferSelect
+export type TrainingDayMuscleGroup = typeof trainingDayMuscleGroups.$inferSelect
 
 export interface SetGroupWithExerciseAndSets extends SetGroup {
   exercise: Exercise

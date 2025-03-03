@@ -4,8 +4,6 @@ import { supabase } from '@/utils/supabase'
 
 import {
   Exercise,
-  Program,
-  Microcycle,
   Set,
   SetGroup,
   Session,
@@ -61,10 +59,7 @@ export async function createUser(
   console.log({ data, error })
 }
 
-export async function getSession(payload: {
-  userId: User['id']
-  sessionId: Session['id']
-}) {
+export async function getSession(payload: { sessionId: Session['id'] }) {
   const { data, error } = await supabase
     .from('sessions')
     .select(
@@ -108,7 +103,6 @@ export async function getSession(payload: {
   // const { data, error } = await supabase
   //   .from('sessions')
   //   .select('*')
-  //   .eq('user_id', payload.userId)
   //   .eq('id', payload.sessionId)
   // // .limit(10)
   // if (error) {
@@ -118,11 +112,9 @@ export async function getSession(payload: {
   // return getFirstOrNull({ data }) as Session
 }
 
-export async function getSessions(payload: { userId: User['id'] }) {
-  const { data, error } = await supabase
-    .from('sessions')
-    .select(
-      `
+export async function getSessions() {
+  const { data, error } = await supabase.from('sessions').select(
+    `
     id,
     name,
     date,
@@ -147,8 +139,7 @@ export async function getSessions(payload: { userId: User['id'] }) {
       )
     )
   `,
-    )
-    .eq('user_id', payload.userId)
+  )
   // .limit(10)
   if (error) {
     console.error('Error fetching sessions:', error)
@@ -161,12 +152,9 @@ export async function createSession(payload: {
   id?: Session['id']
   name?: Session['name']
   order?: Session['order']
-  programId?: Program['id']
-  microcycleId?: Microcycle['id']
   date?: Session['date']
   createdAt?: Session['createdAt']
   updatedAt?: Session['updatedAt']
-  userId?: Session['userId']
 }) {
   // create session in subabase
   const { data, error } = await supabase
@@ -184,7 +172,6 @@ export async function updateSession(payload: {
   order?: Session['order']
   completed?: Session['completed']
   date?: Session['date']
-  userId?: Session['userId']
 }) {
   // create session in subabase
   const { data, error } = await supabase
@@ -206,11 +193,8 @@ export async function deleteSession({ id }: { id: Session['id'] }) {
 export async function createSetGroup(payload: {
   id?: SetGroup['id']
   order?: SetGroup['order']
-  programId?: Program['id']
-  microcycleId?: Microcycle['id']
   sessionId?: Session['id']
   exerciseId?: Exercise['id']
-  userId?: Session['userId']
 }) {
   // create session in subabase
   const { data, error } = await supabase
@@ -226,11 +210,8 @@ export async function createSetGroup(payload: {
 export async function updateSetGroup(payload: {
   id: Set['id']
   sessionId?: Session['id']
-  // microcycleId?: Microcycle['id']
-  // programId?: Program['id']
   exerciseId?: Exercise['id']
   order?: SetGroup['order']
-  userId?: Session['userId']
 }) {
   // create session in subabase
   const { data, error } = await supabase
@@ -252,12 +233,9 @@ export async function deleteSetGroup({ id }: { id: SetGroup['id'] }) {
 export async function createSet(payload: {
   id?: Set['id']
   order?: Set['order']
-  programId?: Set['programId']
-  microcycleId?: Set['microcycleId']
   sessionId: Set['sessionId']
   exerciseId?: Set['exerciseId']
   setGroupId: Set['setGroupId']
-  userId?: Session['userId']
 }) {
   console.log('set incoming')
   console.log({ payload })
@@ -286,11 +264,9 @@ export async function deleteSet({ id }: { id: Set['id'] }) {
 export async function updateSet(payload: {
   id: Set['id']
   reps?: Set['reps']
-  rpe?: Set['rpe']
   rir?: Set['rir']
   weight?: Set['weight']
   exerciseId?: Set['exerciseId']
-  userId?: Set['userId']
 }) {
   // create session in subabase
   const { data, error } = await supabase
