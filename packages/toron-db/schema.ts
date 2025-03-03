@@ -3,6 +3,7 @@ import {
   boolean,
   date,
   index,
+  pgPolicy,
   pgSchema,
   pgTable,
   real,
@@ -11,6 +12,7 @@ import {
   timestamp,
   uuid,
 } from 'drizzle-orm/pg-core'
+import { authenticatedRole } from 'drizzle-orm/supabase'
 
 export const weightUnitsEnum = ['lbs', 'kg'] as const
 export type WeightUnits = (typeof weightUnitsEnum)[number]
@@ -249,6 +251,13 @@ export const setGroups = pgTable(
   (table) => [
     index('setGroupsUserIdIndex').on(table.userId),
     index('setGroupsSessionIdIndex').on(table.sessionId),
+    pgPolicy('policy', {
+      as: 'permissive',
+      to: authenticatedRole,
+      for: 'delete',
+      using: sql`(( SELECT auth.uid() AS uid) = user_id)`,
+      // withCheck: sql``,
+    }),
   ],
 )
 
