@@ -10,9 +10,8 @@ module.exports = {
   ],
   plugins: ['@typescript-eslint', 'prettier'],
   settings: {
-    "import/no-named-as-default": 0,
-    'import/parsers'
-    : {
+    'import/no-named-as-default': 0,
+    'import/parsers': {
       '@typescript-eslint/parser': ['.ts', '.tsx'],
     },
     'import/resolver': {
@@ -21,7 +20,7 @@ module.exports = {
       typescript: {
         alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
         // use <root>/path/to/folder/tsconfig.json
-        project: 'apps/native/tsconfig.json',
+        project: 'apps/toron-native/tsconfig.json',
       },
       node: true,
     },

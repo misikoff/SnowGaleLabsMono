@@ -37,7 +37,6 @@ import {
   useDeleteSessionMutation,
   useUpdateSessionDateMutation,
 } from '@/lib/mutations/sessionMutations'
-import { quotes } from '@/lib/quoteLib'
 
 import {
   Session,
