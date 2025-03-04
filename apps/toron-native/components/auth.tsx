@@ -43,8 +43,6 @@ export default function Auth() {
       email: email,
       password: password,
     })
-    // TODO: maybe for supabase conversion: create or match user
-    // createUser
 
     if (error) {
       Alert.alert(error.message)

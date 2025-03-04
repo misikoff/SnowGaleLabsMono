@@ -61,15 +61,17 @@ const users = authSchema.table('users', {
   email: text('email').notNull(),
 })
 
-// Links to auth.users creation
-// TODO: handle deletion, and updates with triggers
 // https://supabase.com/docs/guides/auth/managing-user-data
+// Links to auth.users creation (via trigger) and deletion (via cascade)
+// TODO: handle updates with triggers
 export const profiles = pgTable(
   'profiles',
   {
     id: uuid('id')
       .primaryKey()
-      .references(() => users.id),
+      .references(() => users.id, {
+        onDelete: 'cascade',
+      }),
     firstName: text(),
     lastName: text(),
     createdAt: timestamp().notNull().defaultNow(),

@@ -197,6 +197,13 @@
       "when": 1741040687315,
       "tag": "0027_hot_eddie_brock",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1741100419345,
+      "tag": "0028_pale_turbo",
+      "breakpoints": true
     }
   ]
 }
