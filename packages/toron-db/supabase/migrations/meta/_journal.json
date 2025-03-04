@@ -106,6 +106,97 @@
       "when": 1740530225913,
       "tag": "0014_sudden_ben_urich",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1740876605208,
+      "tag": "0015_colorful_baron_zemo",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1740926588715,
+      "tag": "0016_ambiguous_lilith",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1740969063900,
+      "tag": "0017_kind_masked_marvel",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1740969160683,
+      "tag": "0018_giant_robbie_robertson",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1741013249685,
+      "tag": "0019_supreme_spitfire",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1741013361751,
+      "tag": "0020_simple_ken_ellis",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1741013983660,
+      "tag": "0021_lumpy_random",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1741014122920,
+      "tag": "0022_parched_thena",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1741019596257,
+      "tag": "0023_oval_thing",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1741039226802,
+      "tag": "0024_milky_meteorite",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1741039527237,
+      "tag": "0025_naive_marvel_zombies",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1741040082668,
+      "tag": "0026_odd_xorn",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1741040687315,
+      "tag": "0027_hot_eddie_brock",
+      "breakpoints": true
     }
   ]
 }

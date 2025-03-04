@@ -1,0 +1,2 @@
+ALTER TABLE "set_groups" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+CREATE POLICY "policy" ON "set_groups" AS PERMISSIVE FOR DELETE TO "authenticated" USING ((( SELECT auth.uid() AS uid) = user_id));

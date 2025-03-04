@@ -5,12 +5,10 @@ import * as Haptics from 'expo-haptics'
 import { useCreateSessionMutation } from '@/lib/mutations/sessionMutations'
 
 export default function AddSessionButton({
-  userId,
   date = '2-2-2022',
   children,
   onCreate,
 }: {
-  userId: string
   date?: string
   children: React.ReactNode
   onCreate?: (sessionId: string) => void
@@ -29,7 +27,6 @@ export default function AddSessionButton({
           date,
           createdAt: new Date(),
           updatedAt: new Date(),
-          userId,
           date,
         })
         if (onCreate) {

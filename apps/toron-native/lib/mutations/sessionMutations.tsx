@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { produce } from 'immer'
 
 import { Session } from '../../../../packages/toron-db/schema'
-
 import { createSession, deleteSession, updateSession } from '../dbFunctions'
 import { mutationSettings } from './mutationSettings'
 import { invalidateSessionQueries, sessionRefetcher } from './refetcher'
@@ -17,14 +16,12 @@ export const useCreateSessionMutation = () => {
       date,
       createdAt,
       updatedAt,
-      userId,
     }: Parameters<typeof createSession>[0]) =>
       createSession({
         id,
         date,
         createdAt,
         updatedAt,
-        userId,
       }),
     onMutate: async ({ id, date, createdAt, updatedAt }) => {
       if (!mutationSettings.optimisticUpdate) {

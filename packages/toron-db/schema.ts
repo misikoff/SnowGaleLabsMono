@@ -1,10 +1,10 @@
 import { relations, sql } from 'drizzle-orm'
 import {
-  AnyPgColumn,
   boolean,
   date,
   index,
-  integer,
+  pgPolicy,
+  pgSchema,
   pgTable,
   real,
   smallint,
@@ -12,37 +12,10 @@ import {
   timestamp,
   uuid,
 } from 'drizzle-orm/pg-core'
-
-export const repStyleEnum = ['high', 'medium', 'low'] as const
-export type RepStyle = (typeof repStyleEnum)[number]
+import { authenticatedRole } from 'drizzle-orm/supabase'
 
 export const weightUnitsEnum = ['lbs', 'kg'] as const
 export type WeightUnits = (typeof weightUnitsEnum)[number]
-
-export const distanceUnitsEnum = ['yards', 'meters'] as const
-export type DistanceUnits = (typeof distanceUnitsEnum)[number]
-
-export const exerciseType = ['compound', 'isolation'] as const
-export type ExerciseType = (typeof exerciseType)[number]
-
-export const setGroupType = ['superset', 'circuit', 'normal'] as const
-
-export const users = pgTable(
-  'users',
-  {
-    id: uuid()
-      .default(sql`gen_random_uuid()`)
-      .primaryKey(),
-    name: text(),
-    createdAt: timestamp().notNull().defaultNow(),
-    updatedAt: timestamp()
-      .notNull()
-      .defaultNow()
-      .$onUpdate(() => new Date()),
-    prod: boolean().default(false),
-  },
-  (table) => [index('usersClerkIdIndex').on(table.id)],
-)
 
 export const equipmentEnum = [
   'barbell',
@@ -55,123 +28,225 @@ export const equipmentEnum = [
 ] as const
 export type EquipmentType = (typeof equipmentEnum)[number]
 
+const authSchema = pgSchema('auth')
+
+const usersOnlyPolicy = pgPolicy('Only Users can do anything', {
+  as: 'permissive',
+  to: authenticatedRole,
+  for: 'all',
+  using: sql`(( SELECT auth.uid() AS uid) = user_id)`,
+  withCheck: sql`true`,
+})
+
+const readOnlyPolicy = pgPolicy('Read Only Policy', {
+  as: 'permissive',
+  to: 'public',
+  for: 'select',
+  using: sql`true`,
+  withCheck: sql``,
+})
+
+const userDef = sql`auth.uid()`
+const primaryKeyDef = sql`gen_random_uuid()`
+const id = uuid().default(primaryKeyDef).primaryKey()
+const userId = uuid()
+  .default(userDef)
+  .references(() => users.id, {
+    onDelete: 'cascade',
+  })
+
+// existing supabase auth table
+const users = authSchema.table('users', {
+  id: uuid('id').primaryKey(),
+  email: text('email').notNull(),
+})
+
+// Links to auth.users creation
+// TODO: handle deletion, and updates with triggers
+// https://supabase.com/docs/guides/auth/managing-user-data
+export const profiles = pgTable(
+  'profiles',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .references(() => users.id),
+    firstName: text(),
+    lastName: text(),
+    createdAt: timestamp().notNull().defaultNow(),
+    updatedAt: timestamp()
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+    prod: boolean().default(false),
+  },
+  (table) => [
+    index('usersClerkIdIndex').on(table.id),
+    pgPolicy('Only Users can do anything', {
+      as: 'permissive',
+      to: authenticatedRole,
+      for: 'all',
+      using: sql`(( SELECT auth.uid() AS uid) = id)`,
+      withCheck: sql`true`,
+    }),
+  ],
+)
+
+export const quotes = pgTable(
+  'quotes',
+  {
+    id,
+    text: text().notNull(),
+    author: text(),
+    category: text(),
+  },
+  (table) => [index('quotesCategoryIndex').on(table.category), readOnlyPolicy],
+)
+
+// 🔹 Muscle Groups (e.g., "Chest", "Back", "Quads")
+export const muscleGroups = pgTable(
+  'muscle_groups',
+  {
+    id,
+    name: text('name').notNull().unique(),
+  },
+  (table) => [readOnlyPolicy],
+)
+
 export const exercises = pgTable(
   'exercises',
   {
-    id: uuid()
-      .default(sql`gen_random_uuid()`)
-      .primaryKey(),
-    userId: uuid().references(() => users.id, { onDelete: 'cascade' }),
-    isMainExercise: boolean().default(false),
-    clonedFromId: uuid().references((): AnyPgColumn => exercises.id),
+    id,
+    muscleGroupId: uuid().references(() => muscleGroups.id),
     name: text(),
     description: text(),
     equipmentType: text({ enum: equipmentEnum }),
-    defaultRepRange: text({ enum: repStyleEnum }).default('medium'),
     weightIncrement: real().default(5),
     weightUnits: text({
       enum: weightUnitsEnum,
     }).default('lbs'),
-    useWeight: boolean().default(true),
-    useDistance: boolean().default(false),
-    distanceIncrement: real().default(5),
-    distanceUnits: text({
-      enum: distanceUnitsEnum,
-    }).default('yards'),
     notes: text(),
   },
   (table) => [
-    index('exercisesIsMainExerciseIndex').on(table.isMainExercise),
-    index('exercisesUserIdIndex').on(table.userId),
-    index('exercisesClonedFromIdIndex').on(table.clonedFromId),
+    index('exercisesMuscleGroupIdIndex').on(table.muscleGroupId),
+    readOnlyPolicy,
   ],
 )
 
-export const programs = pgTable(
-  'programs',
+export const exercisesRelation = relations(exercises, ({ one }) => ({
+  muscleGroups: one(muscleGroups),
+}))
+
+// 🔹 Splits (e.g., "Push/Pull/Legs")
+export const splits = pgTable(
+  'splits',
   {
-    id: uuid()
-      .default(sql`gen_random_uuid()`)
-      .primaryKey(),
-    userId: uuid().references(() => users.id, {
+    id,
+    userId,
+    name: text(),
+    description: text(),
+    rirTarget: smallint().default(0),
+  },
+  (table) => [index('splitsUserIdIndex').on(table.userId), usersOnlyPolicy],
+)
+
+export const splitsRelations = relations(splits, ({ one }) => ({
+  user: one(users),
+}))
+
+// 🔹 Training Days (Part of a Split)
+export const trainingDays = pgTable(
+  'training_days',
+  {
+    id,
+    userId,
+    splitId: uuid().references(() => splits.id, {
       onDelete: 'cascade',
     }),
     name: text(),
     description: text(),
-  },
-  (table) => [index('programsUserIdIndex').on(table.userId)],
-)
-
-export const programsRelations = relations(programs, ({ one, many }) => ({
-  user: one(users),
-  macrocycles: many(macrocycles),
-  microcycles: many(microcycles),
-}))
-
-export const macrocycles = pgTable(
-  'macrocycles',
-  {
-    id: uuid()
-      .default(sql`gen_random_uuid()`)
-      .primaryKey(),
-    userId: uuid()
-      .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
-    // TODO: should deletes cascade?,
-    programId: uuid().references(() => programs.id),
-    name: text(),
-    order: smallint('order').default(0),
-  },
-  (table) => [index('macrocyclesUserIdIndex').on(table.userId)],
-)
-
-export const macrocyclesRelations = relations(macrocycles, ({ one, many }) => ({
-  user: one(users),
-  program: one(programs),
-  microcycles: many(microcycles),
-  sessions: many(sessions),
-  many: many(setGroups),
-}))
-
-export const microcycles = pgTable(
-  'microcycles',
-  {
-    id: uuid()
-      .default(sql`gen_random_uuid()`)
-      .primaryKey(),
-    userId: uuid()
-      .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
-    // TODO: should deletes cascade?,
-    programId: uuid().references(() => programs.id),
-    macrocycleId: uuid().references(() => macrocycles.id),
-    name: text(),
     order: smallint().default(0),
   },
-  (table) => [index('microcyclesUserIdIndex').on(table.userId)],
+  (table) => [
+    index('trainingDaysUserIdIndex').on(table.userId),
+    index('trainingDaysSplitIdIndex').on(table.splitId),
+    usersOnlyPolicy,
+  ],
 )
 
-export const microcyclesRelations = relations(microcycles, ({ one, many }) => ({
+export const trainingDaysRelations = relations(
+  trainingDays,
+  ({ one, many }) => ({
+    user: one(users),
+    exercises: many(exercises),
+  }),
+)
+
+// 🔹 Ordered Muscle Groups for a Training Day
+export const trainingDayMuscleGroups = pgTable(
+  'training_day_muscle_groups',
+  {
+    id,
+    trainingDayId: uuid()
+      .references(() => trainingDays.id)
+      .notNull(),
+    userId,
+    muscleGroupId: uuid()
+      .references(() => muscleGroups.id)
+      .notNull(),
+    order: smallint('order').notNull(),
+  },
+  (table) => [usersOnlyPolicy],
+)
+
+// a program is made up of several, ordered workout templates which consist of a list of exercises, as well as the desired RIR, and a name
+export const templates = pgTable(
+  'templates',
+  {
+    id,
+    trainingDayId: uuid().references(() => trainingDays.id, {
+      onDelete: 'cascade',
+    }),
+    userId,
+    name: text(),
+    description: text(),
+    order: smallint().default(0),
+  },
+  (table) => [usersOnlyPolicy],
+)
+
+export const templatesRelations = relations(templates, ({ one, many }) => ({
   user: one(users),
-  program: one(programs),
-  macrocycle: one(macrocycles),
-  sessions: many(sessions),
-  many: many(setGroups),
+  exercises: many(exercises),
 }))
 
+// 🔹 Exercises for Each Muscle Group in a Template
+export const templateExercises = pgTable(
+  'template_exercises',
+  {
+    id,
+    templateId: uuid()
+      .references(() => templates.id)
+      .notNull(),
+    exerciseId: uuid()
+      .references(() => exercises.id)
+      .notNull(),
+    muscleGroupId: uuid()
+      .references(() => muscleGroups.id)
+      .notNull(),
+    userId,
+    order: smallint('order').notNull(),
+  },
+  (table) => [usersOnlyPolicy],
+)
+
+// 🔹 Sessions (Instances of a Workout Template)
 export const sessions = pgTable(
   'sessions',
   {
-    id: uuid()
-      .default(sql`gen_random_uuid()`)
-      .primaryKey(),
-    userId: uuid().references(() => users.id, {
-      onDelete: 'cascade',
-    }),
+    id,
+    userId,
     name: text(),
-    programId: uuid().references(() => programs.id),
-    macrocycleId: uuid().references(() => macrocycles.id),
-    microcycleId: uuid().references(() => microcycles.id),
+    templateId: uuid().references(() => templates.id),
     order: smallint().default(0),
     completed: boolean().default(false),
     date: date().notNull().defaultNow(),
@@ -183,86 +258,52 @@ export const sessions = pgTable(
     // set completed at when completed becomes true
     completedAt: timestamp(),
   },
-  (table) => [index('sessionsUserIdIndex').on(table.userId)],
+  (table) => [index('sessionsUserIdIndex').on(table.userId), usersOnlyPolicy],
 )
 
 export const sessionsRelations = relations(sessions, ({ one, many }) => ({
   user: one(users),
   sets: many(sets),
   setGroups: many(setGroups),
-  program: one(programs, {
-    fields: [sessions.programId],
-    references: [programs.id],
-  }),
-  macrocycle: one(macrocycles, {
-    fields: [sessions.macrocycleId],
-    references: [macrocycles.id],
-  }),
-  microcycle: one(microcycles, {
-    fields: [sessions.microcycleId],
-    references: [microcycles.id],
-  }),
+  templates: one(templates),
 }))
 
 export const setGroups = pgTable(
-  'setGroups',
+  'set_groups',
   {
-    id: uuid()
-      .default(sql`gen_random_uuid()`)
-      .primaryKey(),
-    userId: uuid().references(() => users.id, { onDelete: 'cascade' }),
+    id,
+    userId,
     sessionId: uuid().references(() => sessions.id, {
       onDelete: 'cascade',
     }),
-    microcycleId: uuid().references(() => microcycles.id),
-    programId: uuid().references(() => programs.id),
-    type: text({ enum: setGroupType }).default('normal'),
-    // if type is not normal then set exerciseId to null, but dont generate the id automatically
     exerciseId: uuid().references(() => exercises.id),
     order: smallint().default(0),
   },
   (table) => [
     index('setGroupsUserIdIndex').on(table.userId),
     index('setGroupsSessionIdIndex').on(table.sessionId),
+    usersOnlyPolicy,
   ],
 )
 
 export const setGroupsRelation = relations(setGroups, ({ one, many }) => ({
   user: one(users),
-  exercise: one(exercises, {
-    fields: [setGroups.exerciseId],
-    references: [exercises.id],
-  }),
-  session: one(sessions, {
-    fields: [setGroups.sessionId],
-    references: [sessions.id],
-  }),
-  microcycle: one(microcycles, {
-    fields: [setGroups.microcycleId],
-    references: [microcycles.id],
-  }),
-  program: one(programs, {
-    fields: [setGroups.programId],
-    references: [programs.id],
-  }),
+  exercises: one(exercises),
+  session: one(sessions),
   sets: many(sets),
 }))
 
 export const sets = pgTable(
   'sets',
   {
-    id: uuid()
-      .default(sql`gen_random_uuid()`)
-      .primaryKey(),
+    id,
     // relations
-    userId: uuid().references(() => users.id, { onDelete: 'cascade' }),
+    userId,
     sessionId: uuid()
       .notNull()
       .references(() => sessions.id, {
         onDelete: 'cascade',
       }),
-    microcycleId: uuid().references(() => microcycles.id),
-    programId: uuid().references(() => programs.id),
     exerciseId: uuid()
       .notNull()
       .references(() => exercises.id, {
@@ -275,13 +316,8 @@ export const sets = pgTable(
         onDelete: 'cascade',
       }),
     // attributes
-    prescribedReps: integer(),
-    prescribedRpe: real(),
-    prescribedRir: real(),
-    prescribedWeight: real(),
-    reps: integer(),
-    rpe: real(),
-    rir: integer(),
+    reps: smallint(),
+    rir: smallint(),
     weight: real(),
     order: smallint().default(0),
     createdAt: timestamp().notNull().defaultNow(),
@@ -295,55 +331,31 @@ export const sets = pgTable(
     index('setsSessionIdIndex').on(table.sessionId),
     index('setsExerciseIdIndex').on(table.exerciseId),
     index('setsSetGroupIdIndex').on(table.setGroupId),
+    usersOnlyPolicy,
   ],
 )
 
 export const setsRelation = relations(sets, ({ one }) => ({
   user: one(users),
-  session: one(sessions, {
-    fields: [sets.sessionId],
-    references: [sessions.id],
-  }),
-  microcycle: one(microcycles, {
-    fields: [sets.microcycleId],
-    references: [microcycles.id],
-  }),
-  program: one(programs, {
-    fields: [sets.programId],
-    references: [programs.id],
-  }),
-  exercise: one(exercises, {
-    fields: [sets.exerciseId],
-    references: [exercises.id],
-  }),
-  setGroup: one(setGroups, {
-    fields: [sets.setGroupId],
-    references: [setGroups.id],
-  }),
+  sessions: one(sessions),
+  templates: one(templates),
+  exercises: one(exercises),
+  setGroups: one(setGroups),
+  exercise: one(exercises),
 }))
-
-export const quotes = pgTable(
-  'quotes',
-  {
-    id: uuid()
-      .default(sql`gen_random_uuid()`)
-      .primaryKey(),
-    text: text().notNull(),
-    author: text(),
-    category: text(),
-  },
-  (table) => [index('quotesCategoryIndex').on(table.category)],
-)
 
 export type User = typeof users.$inferSelect
 export type Exercise = typeof exercises.$inferSelect
-export type Program = typeof programs.$inferSelect
-export type Macrocycle = typeof macrocycles.$inferSelect
-export type Microcycle = typeof microcycles.$inferSelect
+export type Template = typeof templates.$inferSelect
 export type Session = typeof sessions.$inferSelect
 export type SetGroup = typeof setGroups.$inferSelect
 export type Set = typeof sets.$inferSelect
 export type Quote = typeof quotes.$inferSelect
+export type MuscleGroup = typeof muscleGroups.$inferSelect
+export type Split = typeof splits.$inferSelect
+export type TrainingDay = typeof trainingDays.$inferSelect
+export type TemplateExercise = typeof templateExercises.$inferSelect
+export type TrainingDayMuscleGroup = typeof trainingDayMuscleGroups.$inferSelect
 
 export interface SetGroupWithExerciseAndSets extends SetGroup {
   exercise: Exercise
@@ -352,10 +364,6 @@ export interface SetGroupWithExerciseAndSets extends SetGroup {
 
 export interface SessionWithSetGroupWithExerciseAndSets extends Session {
   setGroups: SetGroupWithExerciseAndSets[]
-}
-
-export interface ProgramWithMicrocycles extends Program {
-  microcycles: Microcycle[]
 }
 
 // TODO: determine if all relations can be removed because they are redundant for dribble query

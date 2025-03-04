@@ -465,10 +465,7 @@ export default function Calendar() {
                   />
                   <View className='absolute bottom-8 right-8 items-end gap-4'>
                     {user && (
-                      <AddSessionButton
-                        userId={user!.data.user!.id}
-                        date={date.day}
-                      >
+                      <AddSessionButton date={date.day}>
                         <View className='flex-row gap-4'>
                           <View className='items-center justify-center rounded-md bg-white px-2'>
                             <Text className='text-xl font-bold'>
