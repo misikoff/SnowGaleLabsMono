@@ -9,6 +9,7 @@ import {
   Session,
   User,
   Quote,
+  Split,
 } from '../../../packages/toron-db/schema'
 
 // Note: security depends on RLS preventing access to records with user ids that do not match the asset
@@ -110,6 +111,16 @@ export async function getSession(payload: { sessionId: Session['id'] }) {
   //   return []
   // }
   // return getFirstOrNull({ data }) as Session
+}
+
+export async function getSplits() {
+  const { data, error } = await supabase.from('splits').select('*')
+  // .limit(10)
+  if (error) {
+    console.error('Error fetching splits:', error)
+    return []
+  }
+  return data as any as Split[]
 }
 
 export async function getSessions() {

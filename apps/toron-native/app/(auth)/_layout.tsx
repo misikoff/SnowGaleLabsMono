@@ -60,13 +60,26 @@ export default function TabLayout() {
         redirect={isError}
       />
       <Tabs.Screen
+        name='split'
+        options={{
+          title: 'Split',
+          tabBarIcon: ({ color }) => (
+            <FontAwesome6 size={24} name='table-columns' color={color} />
+          ),
+          // headerShown: false,
+
+          // headerRight: () => <LogoutButton />,
+        }}
+        redirect={isError}
+      />
+      <Tabs.Screen
         name='settings'
         options={{
           title: 'Settings',
           tabBarIcon: ({ color }) => (
-            <FontAwesome6 size={24} name='sliders' color={color} />
+            <FontAwesome6 size={24} name='cog' color={color} />
           ),
-          headerShown: false,
+          // headerShown: false,
 
           // headerRight: () => <LogoutButton />,
         }}

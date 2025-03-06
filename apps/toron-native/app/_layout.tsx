@@ -1,7 +1,7 @@
 import '@/global.css'
 import { useEffect, useState } from 'react'
 
-import { Slot, useRouter, useSegments } from 'expo-router'
+import { useRouter, useSegments, Stack } from 'expo-router'
 import { Session } from '@supabase/supabase-js'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -9,7 +9,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import queryClient from '@/lib/queryClient'
 import { supabase } from '@/utils/supabase'
 
-const InitialLayout = () => {
+const InitialLayout = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null)
 
   useEffect(() => {
@@ -35,35 +35,41 @@ const InitialLayout = () => {
     //   return
     // }
 
-    const inTabsGroup = segments[0] === '(auth)'
+    const inTabsGroup =
+      segments[0] === '(auth)' || segments[0] === '(auth-modal)'
 
     // console.log('User changed: ', isSignedIn)
 
     if (isSignedIn && !inTabsGroup) {
-      // console.log('replacing to /session')
       router.replace('/calendar')
     } else if (!isSignedIn && inTabsGroup) {
-      // console.log('replacing to /login')
       router.replace('/login')
-    }
-    // TODO: fix this. not sure if the condition is wrong or should be removed
-    else if (!isSignedIn && segments.length === 0) {
-      // console.log('replacing to /login')
+    } else if (!isSignedIn && segments.length === 0) {
       router.replace('/login')
     }
   }, [isLoaded, isSignedIn, router, segments])
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <Slot />
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
 }
 
 export default function HomeLayout() {
   return (
     <GestureHandlerRootView>
-      <InitialLayout />
+      <InitialLayout>
+        <Stack>
+          <Stack.Screen name='(auth)' options={{ headerShown: false }} />
+          <Stack.Screen
+            name='(auth-modal)'
+            options={{
+              presentation: 'modal',
+              headerShown: false,
+              // headerBackTitle: 'Back',
+            }}
+          />
+        </Stack>
+      </InitialLayout>
     </GestureHandlerRootView>
   )
 }
