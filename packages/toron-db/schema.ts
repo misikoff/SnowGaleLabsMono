@@ -1,5 +1,6 @@
 import { relations, sql } from 'drizzle-orm'
 import {
+  AnyPgColumn,
   boolean,
   date,
   index,
@@ -172,6 +173,7 @@ export const trainingDays = pgTable(
     splitId: uuid().references(() => splits.id, {
       onDelete: 'cascade',
     }),
+    templateSessionId: uuid().references(() => sessions.id),
     name: text(),
     description: text(),
     order: smallint().default(0),
@@ -240,9 +242,10 @@ export const sessions = pgTable(
       onDelete: 'cascade',
     }),
     description: text(),
-    trainingDayId: uuid().references(() => trainingDays.id),
+    trainingDayId: uuid().references((): AnyPgColumn => trainingDays.id, {
+      onDelete: 'set null',
+    }),
     isTemplate: boolean().default(false),
-    order: smallint().default(0),
     completed: boolean().default(false),
     date: date().notNull().defaultNow(),
     createdAt: timestamp().notNull().defaultNow(),

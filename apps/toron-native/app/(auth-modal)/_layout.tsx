@@ -3,17 +3,19 @@ import { Stack } from 'expo-router'
 export default function AuthModalLayout() {
   return (
     <Stack
-      screenOptions={{
-        //  presentation: 'modal',
-        // headerShown: false,
-        headerStyle: {
-          backgroundColor: '#f4511e',
-        },
-        headerTintColor: '#fff',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-      }}
+      screenOptions={
+        {
+          //  presentation: 'modal',
+          // headerShown: false,
+          // headerStyle: {
+          //   backgroundColor: '#f4511e',
+          // },
+          // headerTintColor: '#fff',
+          // headerTitleStyle: {
+          //   fontWeight: 'bold',
+          // },
+        }
+      }
     />
   )
 }
