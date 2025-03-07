@@ -218,6 +218,20 @@
       "when": 1741307896235,
       "tag": "0030_thin_madripoor",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1741319203314,
+      "tag": "0031_flimsy_bill_hollister",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1741319434290,
+      "tag": "0032_solid_galactus",
+      "breakpoints": true
     }
   ]
 }

@@ -1,16 +1,46 @@
 import { View, Text } from 'react-native'
 import { Link } from 'expo-router'
+import { useQuery } from '@tanstack/react-query'
 
-import { useSupabaseUser } from '@/lib/dbFunctions'
+import { useSupabaseUser, getProfile, getSplit } from '@/lib/dbFunctions'
 
 export default function Tab() {
-  const { data: user, isLoading, isError } = useSupabaseUser()
+  const {
+    data: user,
+    isLoading: userLoading,
+    isError: userError,
+  } = useSupabaseUser()
+
+  const {
+    data: profile,
+    isLoading: profileLoading,
+    isError: profileError,
+  } = useQuery({
+    queryKey: ['profile'],
+    queryFn: async () => getProfile(),
+    enabled: !!user,
+  })
+
+  const {
+    data: split,
+    isLoading: splitLoading,
+    isError: splitError,
+  } = useQuery({
+    queryKey: ['split', profile?.currentSplitId],
+    queryFn: () => getSplit({ id: profile?.currentSplitId }),
+    enabled: !!profile?.currentSplitId,
+  })
 
   return (
     <View className='flex-1 items-center justify-center gap-y-8'>
       <Text className='text-center text-xl font-extrabold'>
         {user && `Welcome to Toron,\n${user.data.user?.email}`}
       </Text>
+      {split && (
+        <Text className='text-center text-lg font-bold'>
+          Current Split: {split.name}
+        </Text>
+      )}
       <Link href='/session'>
         <View className='rounded-md bg-blue-600 px-3 py-2 text-center'>
           {/* show sessions from current split as a selector */}

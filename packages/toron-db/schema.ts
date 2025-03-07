@@ -157,8 +157,10 @@ export const splits = pgTable(
   (table) => [index('splitsUserIdIndex').on(table.userId), usersOnlyPolicy],
 )
 
-export const splitsRelations = relations(splits, ({ one }) => ({
+export const splitsRelations = relations(splits, ({ one, many }) => ({
   user: one(users),
+  trainingDays: many(trainingDays),
+  sessions: many(sessions),
 }))
 
 // 🔹 Training Days (Part of a Split)
@@ -185,17 +187,19 @@ export const trainingDaysRelations = relations(
   trainingDays,
   ({ one, many }) => ({
     user: one(users),
+    split: one(splits),
+    sessions: many(sessions),
     exercises: many(exercises),
   }),
 )
 
 // 🔹 Ordered Muscle Groups for a Training Day
-export const trainingDayMuscleGroups = pgTable(
-  'training_day_muscle_groups',
+export const sessionMuscleGroups = pgTable(
+  'session_muscle_groups',
   {
     id,
-    trainingDayId: uuid()
-      .references(() => trainingDays.id)
+    sessionId: uuid()
+      .references(() => sessions.id)
       .notNull(),
     userId,
     muscleGroupId: uuid()
@@ -206,34 +210,13 @@ export const trainingDayMuscleGroups = pgTable(
   (table) => [usersOnlyPolicy],
 )
 
-// a program is made up of several, ordered workout templates which consist of a list of exercises, as well as the desired RIR, and a name
-export const templates = pgTable(
-  'templates',
+// 🔹 Exercises for Each Muscle Group in a Session
+export const sessionExercises = pgTable(
+  'session_exercises',
   {
     id,
-    trainingDayId: uuid().references(() => trainingDays.id, {
-      onDelete: 'cascade',
-    }),
-    userId,
-    name: text(),
-    description: text(),
-    order: smallint().default(0),
-  },
-  (table) => [usersOnlyPolicy],
-)
-
-export const templatesRelations = relations(templates, ({ one, many }) => ({
-  user: one(users),
-  exercises: many(exercises),
-}))
-
-// 🔹 Exercises for Each Muscle Group in a Template
-export const templateExercises = pgTable(
-  'template_exercises',
-  {
-    id,
-    templateId: uuid()
-      .references(() => templates.id)
+    sessionId: uuid()
+      .references(() => sessions.id)
       .notNull(),
     exerciseId: uuid()
       .references(() => exercises.id)
@@ -247,14 +230,18 @@ export const templateExercises = pgTable(
   (table) => [usersOnlyPolicy],
 )
 
-// 🔹 Sessions (Instances of a Workout Template)
 export const sessions = pgTable(
   'sessions',
   {
     id,
     userId,
     name: text(),
-    templateId: uuid().references(() => templates.id),
+    splitId: uuid().references(() => splits.id, {
+      onDelete: 'cascade',
+    }),
+    description: text(),
+    trainingDayId: uuid().references(() => trainingDays.id),
+    isTemplate: boolean().default(false),
     order: smallint().default(0),
     completed: boolean().default(false),
     date: date().notNull().defaultNow(),
@@ -266,14 +253,22 @@ export const sessions = pgTable(
     // set completed at when completed becomes true
     completedAt: timestamp(),
   },
-  (table) => [index('sessionsUserIdIndex').on(table.userId), usersOnlyPolicy],
+  (table) => [
+    index('sessionsUserIdIndex').on(table.userId),
+    index('sessionsSplitIdIndex').on(table.splitId),
+    index('sessionsTrainingDayIdIndex').on(table.trainingDayId),
+    usersOnlyPolicy,
+  ],
 )
 
 export const sessionsRelations = relations(sessions, ({ one, many }) => ({
   user: one(users),
   sets: many(sets),
   setGroups: many(setGroups),
-  templates: one(templates),
+  exercises: many(exercises),
+  muscleGroups: many(muscleGroups),
+  split: one(splits),
+  trainingDay: one(trainingDays),
 }))
 
 export const setGroups = pgTable(
@@ -346,7 +341,6 @@ export const sets = pgTable(
 export const setsRelation = relations(sets, ({ one }) => ({
   user: one(users),
   sessions: one(sessions),
-  templates: one(templates),
   exercises: one(exercises),
   setGroups: one(setGroups),
   exercise: one(exercises),
@@ -355,7 +349,6 @@ export const setsRelation = relations(sets, ({ one }) => ({
 export type User = typeof users.$inferSelect
 export type Profile = typeof profiles.$inferSelect
 export type Exercise = typeof exercises.$inferSelect
-export type Template = typeof templates.$inferSelect
 export type Session = typeof sessions.$inferSelect
 export type SetGroup = typeof setGroups.$inferSelect
 export type Set = typeof sets.$inferSelect
@@ -363,8 +356,8 @@ export type Quote = typeof quotes.$inferSelect
 export type MuscleGroup = typeof muscleGroups.$inferSelect
 export type Split = typeof splits.$inferSelect
 export type TrainingDay = typeof trainingDays.$inferSelect
-export type TemplateExercise = typeof templateExercises.$inferSelect
-export type TrainingDayMuscleGroup = typeof trainingDayMuscleGroups.$inferSelect
+export type SessionExercise = typeof sessionExercises.$inferSelect
+export type SessionMuscleGroup = typeof sessionMuscleGroups.$inferSelect
 
 export interface SetGroupWithExerciseAndSets extends SetGroup {
   exercise: Exercise

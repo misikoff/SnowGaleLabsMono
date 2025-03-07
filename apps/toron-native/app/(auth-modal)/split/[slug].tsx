@@ -36,11 +36,6 @@ export default function Page() {
     if (profileLoading || !profile) {
       return
     } else {
-      console.log('update profile')
-      console.log({ profile, splitId })
-      Alert.alert('update profile', profile.id)
-      Alert.alert('split id', splitId)
-
       updateProfileMutation.mutate(
         {
           id: profile.id, // Replace with the actual user ID
@@ -76,7 +71,6 @@ export default function Page() {
           )}
         </View>
         // TODO: edit button to enter edit mode
-        // TODO: select split button thats sets the user's profile current split id to this one
       )}
     </ScrollView>
   )
