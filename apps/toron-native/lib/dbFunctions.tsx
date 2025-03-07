@@ -229,6 +229,24 @@ export async function getTrainingDays() {
   return data.map((d) => toCamelCase(d)) as TrainingDay[]
 }
 
+export async function getTrainingDaysForSplit(payload: {
+  splitId: TrainingDay['splitId']
+}) {
+  const { data, error } = await supabase
+    .from('training_days')
+    .select('*')
+    .eq('split_id', payload.splitId)
+    // order by order
+    .order('order', { ascending: true })
+  // .limit(10)
+  if (error) {
+    console.error('Error fetching training days:', error)
+    return []
+  }
+  console.log({ data })
+  return data.map((d) => toCamelCase(d)) as TrainingDay[]
+}
+
 export async function updateTrainingDay(payload: {
   id: TrainingDay['id']
   name?: TrainingDay['name']
