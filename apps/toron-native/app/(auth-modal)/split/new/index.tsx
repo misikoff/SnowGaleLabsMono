@@ -6,6 +6,7 @@ import { useNavigation } from 'expo-router'
 import { FlashList } from '@shopify/flash-list'
 
 import { useCreateSplitMutation } from '@/lib/mutations/splitMutations'
+import { useCreateTrainingDayMutation } from '@/lib/mutations/trainingDayMutations'
 
 const ModalScreen = () => {
   const [splitName, setSplitName] = useState('')
@@ -17,6 +18,7 @@ const ModalScreen = () => {
   const [editingDayId, setEditingDayId] = useState<string | null>(null)
   const [editingDayName, setEditingDayName] = useState<string>('')
   const createSplitMutation = useCreateSplitMutation()
+  const createTrainingDayMutation = useCreateTrainingDayMutation()
   const navigation = useNavigation()
 
   const handleTrainingDayNameChange = (id: string, name: string) => {
@@ -56,10 +58,20 @@ const ModalScreen = () => {
   }
 
   const handleSubmit = () => {
+    const splitId = Crypto.randomUUID()
     createSplitMutation.mutate(
-      { id: Crypto.randomUUID(), name: splitName, rirTarget },
+      { id: splitId, name: splitName, rirTarget },
       {
         onSuccess: () => {
+          console.log('split created!!!!!!!!!!!!!!!!')
+          trainingDays.forEach((day) => {
+            createTrainingDayMutation.mutate({
+              id: Crypto.randomUUID(),
+              splitId,
+              name: day.name,
+              order: day.order,
+            })
+          })
           navigation.goBack() // Dismiss the route / pop the stack
         },
       },
@@ -175,12 +187,7 @@ const ModalScreen = () => {
         onPress={handleSubmit}
         className='rounded-md bg-green-400 p-4'
       >
-        <Text
-          className='text-lg font-bold text-white'
-          onPress={() => navigation.goBack()}
-        >
-          Create Split
-        </Text>
+        <Text className='text-lg font-bold text-white'>Create Split</Text>
       </TouchableOpacity>
     </View>
   )

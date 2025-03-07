@@ -10,6 +10,7 @@ import {
   Quote,
   Split,
   Profile,
+  TrainingDay,
 } from '../../../packages/toron-db/schema'
 
 // Note: security depends on RLS preventing access to records with user ids that do not match the asset
@@ -196,6 +197,61 @@ export async function updateSplit(payload: {
 export async function deleteSplit({ id }: { id: Split['id'] }) {
   // delete split in supabase
   const { data, error } = await supabase.from('splits').delete().eq('id', id)
+  console.log({ data, error })
+}
+
+export async function createTrainingDay(payload: {
+  id?: TrainingDay['id']
+  name: TrainingDay['name']
+  splitId: TrainingDay['splitId']
+  order?: TrainingDay['order']
+  // createdAt?: TrainingDay['createdAt']
+  // updatedAt?: TrainingDay['updatedAt']
+}) {
+  console.log({ id: payload.id })
+  // create split in supabase
+  const { data, error } = await supabase
+    .from('training_days')
+    .insert(toSnakeCase(payload))
+    .select('id')
+  console.log({ data, error })
+
+  return getFirstOrNull({ data, key: 'id' })
+}
+
+export async function getTrainingDays() {
+  const { data, error } = await supabase.from('training_days').select('*')
+  // .limit(10)
+  if (error) {
+    console.error('Error fetching training days:', error)
+    return []
+  }
+  return data.map((d) => toCamelCase(d)) as TrainingDay[]
+}
+
+export async function updateTrainingDay(payload: {
+  id: TrainingDay['id']
+  name?: TrainingDay['name']
+  order?: TrainingDay['order']
+  // updatedAt?: TrainingDay['updatedAt']
+}) {
+  // update split in supabase
+  const { data, error } = await supabase
+    .from('training_days')
+    .update(toSnakeCase(payload))
+    .eq('id', payload.id)
+    .select()
+  console.log({ data, error })
+
+  return getFirstOrNull({ data })
+}
+
+export async function deleteTrainingDay({ id }: { id: TrainingDay['id'] }) {
+  // delete split in supabase
+  const { data, error } = await supabase
+    .from('training_days')
+    .delete()
+    .eq('id', id)
   console.log({ data, error })
 }
 
