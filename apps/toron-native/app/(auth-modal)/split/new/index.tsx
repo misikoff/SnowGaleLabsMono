@@ -17,7 +17,6 @@ const ModalScreen = () => {
       { id: Crypto.randomUUID(), name: splitName, rirTarget },
       {
         onSuccess: () => {
-          // TODO: if this is the first split, set it as the user's current split
           navigation.goBack() // Dismiss the route / pop the stack
         },
       },

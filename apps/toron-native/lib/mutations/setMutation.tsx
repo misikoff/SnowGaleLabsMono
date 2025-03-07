@@ -6,7 +6,6 @@ import {
   Set,
   SetGroupWithExerciseAndSets,
 } from '../../../../packages/toron-db/schema'
-
 import { createSet, deleteSet, updateSet } from '../dbFunctions'
 import { mutationSettings } from './mutationSettings'
 import { invalidateSessionQueries } from './refetcher'
@@ -19,7 +18,6 @@ export const useCreateSetMutation = () => {
       exerciseId,
       sessionId,
       setGroupId,
-      userId,
       order,
     }: Parameters<typeof createSet>[0]) =>
       createSet({
@@ -27,7 +25,6 @@ export const useCreateSetMutation = () => {
         exerciseId,
         sessionId,
         setGroupId,
-        userId,
         order,
       }),
     // When mutate is called:

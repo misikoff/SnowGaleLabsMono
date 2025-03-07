@@ -50,3 +50,17 @@ export function sessionRefetcher(
     queryClient.setQueryData(['sessions'], nextSessions)
   }
 }
+
+export const invalidateSplitQueries = (queryClient: QueryClient) => {
+  queryClient.invalidateQueries(['splits'])
+}
+
+export const splitRefetcher = (queryClient: QueryClient, split: any) => {
+  queryClient.setQueryData(['splits'], (old: any) =>
+    old.map((s: any) => (s.id === split.id ? split : s)),
+  )
+}
+
+export const invalidateProfileQueries = (queryClient: QueryClient) => {
+  queryClient.invalidateQueries(['profile'])
+}

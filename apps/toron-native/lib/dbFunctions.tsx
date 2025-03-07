@@ -7,9 +7,9 @@ import {
   Set,
   SetGroup,
   Session,
-  User,
   Quote,
   Split,
+  Profile,
 } from '../../../packages/toron-db/schema'
 
 // Note: security depends on RLS preventing access to records with user ids that do not match the asset
@@ -45,19 +45,12 @@ function toSnakeCase(obj: Record<string, any>) {
   return snakeCaseObj
 }
 
-// maybe add id and return it
-export async function createUser(
-  id: User['id'],
-  name: User['name'],
-  prod: User['prod'],
-) {
-  // create user in subabase
-  const { data, error } = await supabase.from('users').insert({
-    id,
-    name,
-    prod,
-  })
-  console.log({ data, error })
+function toCamelCase(obj: Record<string, any>) {
+  const camelCaseObj: Record<string, any> = {}
+  for (const key in obj) {
+    camelCaseObj[key.replace(/_([a-z])/g, (g) => g[1].toUpperCase())] = obj[key]
+  }
+  return camelCaseObj
 }
 
 export async function getSession(payload: { sessionId: Session['id'] }) {
@@ -68,7 +61,7 @@ export async function getSession(payload: { sessionId: Session['id'] }) {
     id,
     name,
     date,
-    setGroups (
+    set_groups (
       id,
       order,
       sessionId:session_id,
@@ -82,7 +75,6 @@ export async function getSession(payload: { sessionId: Session['id'] }) {
         setGroupId:set_group_id,
         order,
         reps,
-        rpe,
         rir,
         weight,
         sessionId:session_id
@@ -99,7 +91,7 @@ export async function getSession(payload: { sessionId: Session['id'] }) {
     return []
   }
 
-  return data[0] as any
+  return toCamelCase(data[0]) as any
   // console.log({ sessionId: payload.sessionId })
   // const { data, error } = await supabase
   //   .from('sessions')
@@ -113,6 +105,35 @@ export async function getSession(payload: { sessionId: Session['id'] }) {
   // return getFirstOrNull({ data }) as Session
 }
 
+export async function getProfile() {
+  const { data, error } = await supabase.from('profiles').select('*').single()
+  console.log('//////')
+  console.log({ data, error })
+  if (error) {
+    console.error('Error fetching profile:', error)
+    return null
+  }
+
+  return toCamelCase(data) as Profile
+}
+
+export async function updateProfile(payload: {
+  id: Profile['id']
+  currentSplitId?: Profile['currentSplitId']
+  updatedAt?: Profile['updatedAt']
+}) {
+  // update split in supabase
+  const { data, error } = await supabase
+    .from('profiles')
+    .update(toSnakeCase(payload))
+    .eq('id', payload.id)
+    .select()
+  console.log('*********************')
+  console.log({ data, error })
+
+  return getFirstOrNull({ data })
+}
+
 export async function getSplits() {
   const { data, error } = await supabase.from('splits').select('*')
   // .limit(10)
@@ -120,7 +141,62 @@ export async function getSplits() {
     console.error('Error fetching splits:', error)
     return []
   }
-  return data as any as Split[]
+  return data.map((d) => toCamelCase(d)) as Split[]
+}
+
+export async function getSplit(payload: { id: Split['id'] }) {
+  const { data, error } = await supabase
+    .from('splits')
+    .select('*')
+    .eq('id', payload.id)
+    .single()
+
+  if (error) {
+    console.error('Error fetching split:', error)
+    return null
+  }
+
+  return toCamelCase(data) as Split
+}
+
+export async function createSplit(payload: {
+  id?: Split['id']
+  name: Split['name']
+  rirTarget?: Split['rirTarget']
+  createdAt?: Split['createdAt']
+  updatedAt?: Split['updatedAt']
+}) {
+  console.log({ id: payload.id })
+  // create split in supabase
+  const { data, error } = await supabase
+    .from('splits')
+    .insert(toSnakeCase(payload))
+    .select('id')
+  console.log({ data, error })
+
+  return getFirstOrNull({ data, key: 'id' })
+}
+
+export async function updateSplit(payload: {
+  id: Split['id']
+  name?: Split['name']
+  updatedAt?: Split['updatedAt']
+}) {
+  // update split in supabase
+  const { data, error } = await supabase
+    .from('splits')
+    .update(toSnakeCase(payload))
+    .eq('id', payload.id)
+    .select()
+  console.log({ data, error })
+
+  return getFirstOrNull({ data })
+}
+
+export async function deleteSplit({ id }: { id: Split['id'] }) {
+  // delete split in supabase
+  const { data, error } = await supabase.from('splits').delete().eq('id', id)
+  console.log({ data, error })
 }
 
 export async function getSessions() {
@@ -129,24 +205,23 @@ export async function getSessions() {
     id,
     name,
     date,
-    setGroups (
+    set_groups (
       id,
       order,
-      sessionId:session_id,
+      session_id,
       exercise:exercises (
         id,
         name
       ),
       sets (
         id,
-        exerciseId:exercise_id,
-        setGroupId:set_group_id,
+        exercise_id,
+        set_group_id,
         order,
         reps,
-        rpe,
         rir,
         weight,
-        sessionId:session_id
+        session_id
       )
     )
   `,
@@ -156,7 +231,7 @@ export async function getSessions() {
     console.error('Error fetching sessions:', error)
     return []
   }
-  return data as any as Session[]
+  return data.map((d) => toCamelCase(d)) as Session[]
 }
 
 export async function createSession(payload: {
@@ -209,7 +284,7 @@ export async function createSetGroup(payload: {
 }) {
   // create session in subabase
   const { data, error } = await supabase
-    .from('setGroups')
+    .from('set_groups')
     .insert(toSnakeCase(payload))
     .eq('id', payload.id)
     .select()
@@ -226,7 +301,7 @@ export async function updateSetGroup(payload: {
 }) {
   // create session in subabase
   const { data, error } = await supabase
-    .from('setGroups')
+    .from('set_groups')
     .update(toSnakeCase(payload))
     .eq('id', payload.id)
     .select()
@@ -237,7 +312,10 @@ export async function updateSetGroup(payload: {
 
 export async function deleteSetGroup({ id }: { id: SetGroup['id'] }) {
   // deletes all set groups and sets associated with the session
-  const { data, error } = await supabase.from('setGroups').delete().eq('id', id)
+  const { data, error } = await supabase
+    .from('set_groups')
+    .delete()
+    .eq('id', id)
   console.log({ data, error })
 }
 
@@ -301,7 +379,7 @@ export async function getExercises() {
     return []
   }
 
-  return data as Exercise[]
+  return data.map((d) => toCamelCase(d)) as Exercise[]
 }
 
 export async function getQuotes() {
@@ -313,9 +391,9 @@ export async function getQuotes() {
     console.error('Error fetching quotes:', error)
     return []
   }
-  console.log({ quotes: data })
+  // console.log({ quotes: data })
 
-  return data as Quote[]
+  return data.map((d) => toCamelCase(d)) as Quote[]
 }
 
 export function useSupabaseUser() {

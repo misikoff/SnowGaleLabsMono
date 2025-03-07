@@ -10,6 +10,7 @@ import { LogoutButton } from '../_layout'
 const DeleteAccountButton = () => {
   const doLogout = async () => {
     const { error } = await supabase.auth.signOut()
+    // TODO: clear query cache
     if (error) {
       alert('Error logging out: ' + error.message)
       console.error('Error logging out:', error.message)

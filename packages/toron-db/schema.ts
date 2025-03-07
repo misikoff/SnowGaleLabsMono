@@ -80,6 +80,7 @@ export const profiles = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
     prod: boolean().default(false),
+    currentSplitId: uuid().references(() => splits.id),
   },
   (table) => [
     index('usersClerkIdIndex').on(table.id),
@@ -147,6 +148,11 @@ export const splits = pgTable(
     name: text(),
     description: text(),
     rirTarget: smallint().default(0),
+    createdAt: timestamp().notNull().defaultNow(),
+    updatedAt: timestamp()
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
   },
   (table) => [index('splitsUserIdIndex').on(table.userId), usersOnlyPolicy],
 )
@@ -347,6 +353,7 @@ export const setsRelation = relations(sets, ({ one }) => ({
 }))
 
 export type User = typeof users.$inferSelect
+export type Profile = typeof profiles.$inferSelect
 export type Exercise = typeof exercises.$inferSelect
 export type Template = typeof templates.$inferSelect
 export type Session = typeof sessions.$inferSelect

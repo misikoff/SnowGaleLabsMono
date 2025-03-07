@@ -31,7 +31,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import AddSessionButton from '@/components/session/addSessionButton'
 import DeleteSetGroupButton from '@/components/session/deleteSetGroupButton'
 import { getSortedChunks } from '@/lib/calendarFunctions'
-import { getQuotes, getSessions, useSupabaseUser } from '@/lib/dbFunctions'
+import { getQuotes, getSessions } from '@/lib/dbFunctions'
 import { invalidateSessionQueries } from '@/lib/mutations/refetcher'
 import {
   useDeleteSessionMutation,
@@ -46,14 +46,6 @@ import {
 const weeks = getSortedChunks()
 
 export default function Calendar() {
-  const {
-    data: user,
-    isLoading: userLoading,
-    isError: userError,
-  } = useSupabaseUser()
-
-  // console.log({ user })
-
   const [curWeek, setCurWeek] = useState(4)
   const [selectedDate, setSelectedDate] = useState(weeks[4][3])
   const [selectedWeek, setSelectedWeek] = useState(weeks[4])
@@ -128,13 +120,11 @@ export default function Calendar() {
     isError: sessionsError,
     error,
   } = useQuery({
-    enabled: user !== undefined,
     queryKey: ['sessions'],
-    queryFn: async () => getSessions({ userId: user!.data.user!.id }),
+    queryFn: async () => getSessions(),
   })
   console.log({
     sessions,
-    id: user?.data.user!.id,
     sessionsLoading,
     sessionsError,
     error,
@@ -152,7 +142,6 @@ export default function Calendar() {
 
   console.log({
     sessions,
-    id: user?.data.user!.id,
     sessionsLoading,
     sessionsError,
     error,
@@ -463,20 +452,19 @@ export default function Calendar() {
                     }}
                   />
                   <View className='absolute bottom-8 right-8 items-end gap-4'>
-                    {user && (
-                      <AddSessionButton date={date.day}>
-                        <View className='flex-row gap-4'>
-                          <View className='items-center justify-center rounded-md bg-white px-2'>
-                            <Text className='text-xl font-bold'>
-                              Create Session
-                            </Text>
-                          </View>
-                          <View className='rounded-full bg-white p-4'>
-                            <PlusSquareIcon color='black' size={24} />
-                          </View>
+                    <AddSessionButton date={date.day}>
+                      <View className='flex-row gap-4'>
+                        <View className='items-center justify-center rounded-md bg-white px-2'>
+                          <Text className='text-xl font-bold'>
+                            Create Session
+                          </Text>
                         </View>
-                      </AddSessionButton>
-                    )}
+                        <View className='rounded-full bg-white p-4'>
+                          <PlusSquareIcon color='black' size={24} />
+                        </View>
+                      </View>
+                    </AddSessionButton>
+
                     <View>
                       <TouchableOpacity
                         onPress={() => {

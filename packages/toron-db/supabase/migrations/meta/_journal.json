@@ -204,6 +204,20 @@
       "when": 1741100419345,
       "tag": "0028_pale_turbo",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1741294152820,
+      "tag": "0029_crazy_blur",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1741307896235,
+      "tag": "0030_thin_madripoor",
+      "breakpoints": true
     }
   ]
 }
