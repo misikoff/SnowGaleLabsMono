@@ -13,20 +13,7 @@ import { invalidateSessionQueries } from './refetcher'
 export const useCreateSetMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({
-      id,
-      exerciseId,
-      sessionId,
-      setGroupId,
-      order,
-    }: Parameters<typeof createSet>[0]) =>
-      createSet({
-        id,
-        exerciseId,
-        sessionId,
-        setGroupId,
-        order,
-      }),
+    mutationFn: createSet,
     // When mutate is called:
     // TODO: better typing with a simple set or dummy set, but still may require casting
     onMutate: async (vars) => {
@@ -96,14 +83,14 @@ export const useUpdateSetMutation = () => {
       id,
       reps,
       weight,
-      rpe,
+      rir,
       sessionId,
     }: Parameters<typeof updateSet>[0] & { sessionId: string }) =>
       updateSet({
         id,
         reps,
         weight,
-        rpe,
+        rir,
       }),
 
     // When mutate is called:
@@ -132,8 +119,8 @@ export const useUpdateSetMutation = () => {
                 if (vars.weight) {
                   s.weight = vars.weight
                 }
-                if (vars.rpe) {
-                  s.rpe = vars.rpe
+                if (vars.rir) {
+                  s.rir = vars.rir
                 }
               }
               return s

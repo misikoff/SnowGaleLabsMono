@@ -108,8 +108,7 @@ export async function getSession(payload: { sessionId: Session['id'] }) {
 
 export async function getProfile() {
   const { data, error } = await supabase.from('profiles').select('*').single()
-  console.log('//////')
-  console.log({ data, error })
+  // console.log({ data, error })
   if (error) {
     console.error('Error fetching profile:', error)
     return null
@@ -208,7 +207,6 @@ export async function createTrainingDay(payload: {
   // createdAt?: TrainingDay['createdAt']
   // updatedAt?: TrainingDay['updatedAt']
 }) {
-  console.log({ id: payload.id })
   // create split in supabase
   const { data, error } = await supabase
     .from('training_days')
@@ -300,6 +298,47 @@ export async function getSessions() {
     )
   `,
   )
+  // .limit(10)
+  if (error) {
+    console.error('Error fetching sessions:', error)
+    return []
+  }
+  return data.map((d) => toCamelCase(d)) as Session[]
+}
+
+// get sessions from last 14 days
+export async function getSessionsForCalendar() {
+  const { data, error } = await supabase
+    .from('sessions')
+    .select(
+      `
+    id,
+    name,
+    date,
+    trainingDayId: training_day_id,
+    set_groups (
+      id,
+      order,
+      session_id,
+      exercise:exercises (
+        id,
+        name
+      ),
+      sets (
+        id,
+        exercise_id,
+        set_group_id,
+        order,
+        reps,
+        rir,
+        weight,
+        session_id
+      )
+    )
+  `,
+    )
+    .gte('date', new Date(new Date().setDate(new Date().getDate() - 14)))
+    .order('date', { ascending: false })
   // .limit(10)
   if (error) {
     console.error('Error fetching sessions:', error)

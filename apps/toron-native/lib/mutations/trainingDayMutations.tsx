@@ -1,13 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { Split } from '../../../../packages/toron-db/schema'
+import { TrainingDay } from '../../../../packages/toron-db/schema'
 import {
   createTrainingDay,
   updateTrainingDay,
   deleteTrainingDay,
 } from '../dbFunctions'
 import { mutationSettings } from './mutationSettings'
-// import { invalidateSplitQueries, splitRefetcher } from './refetcher'
 
 export const useCreateTrainingDayMutation = () => {
   const queryClient = useQueryClient()
@@ -18,19 +17,29 @@ export const useCreateTrainingDayMutation = () => {
         return
       }
       await queryClient.cancelQueries({ queryKey: ['trainingDays'] })
-      const previousTrainingDays = queryClient.getQueryData(['trainingDays'])
-      const newSplit = { ...vars, id: Date.now().toString() }
-      queryClient.setQueryData(['splits'], (old: any) => [...old, newSplit])
+      const previousTrainingDays = queryClient.getQueryData([
+        'trainingDays',
+      ]) as TrainingDay[] | undefined
+      const newTrainingDay = { ...vars }
+      queryClient.setQueryData(
+        ['trainingDays'],
+        previousTrainingDays
+          ? [...previousTrainingDays, newTrainingDay]
+          : [newTrainingDay],
+      )
       return { previousTrainingDays }
     },
     onError: (err, vars, context) => {
       queryClient.setQueryData(['trainingDays'], context?.previousTrainingDays)
+      console.error('error creating training day1', err)
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['trainingDays'])
+      // console.log('training day created1')
     },
     onSettled: () => {
       queryClient.invalidateQueries(['trainingDays'])
+      // console.log('training day settled1')
     },
   })
 }
@@ -45,9 +54,11 @@ export const useUpdateTrainingDayMutation = () => {
       }
       await queryClient.cancelQueries({ queryKey: ['trainingDays'] })
       const previousTrainingDays = queryClient.getQueryData(['trainingDays'])
-      queryClient.setQueryData(['splits'], (old: any) =>
-        old.map((split: Split) =>
-          split.id === vars.id ? { ...split, ...vars } : split,
+      queryClient.setQueryData(['trainingDays'], (old: any) =>
+        old.map((trainingDay: TrainingDay) =>
+          trainingDay.id === vars.id
+            ? { ...trainingDay, ...vars }
+            : trainingDay,
         ),
       )
       return { previousTrainingDays }
@@ -74,13 +85,13 @@ export const useDeleteTrainingDayMutation = () => {
       }
       await queryClient.cancelQueries({ queryKey: ['trainingDays'] })
       const previousTrainingDays = queryClient.getQueryData(['trainingDays'])
-      queryClient.setQueryData(['splits'], (old: any) =>
-        old.filter((split: Split) => split.id !== vars.id),
+      queryClient.setQueryData(['trainingDays'], (old: any) =>
+        old.filter((trainingDay: TrainingDay) => trainingDay.id !== vars.id),
       )
       return { previousTrainingDays }
     },
     onError: (err, vars, context) => {
-      queryClient.setQueryData(['splits'], context?.previousTrainingDays)
+      queryClient.setQueryData(['trainingDays'], context?.previousTrainingDays)
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['trainingDays'])

@@ -11,18 +11,7 @@ import { invalidateSessionQueries, sessionRefetcher } from './refetcher'
 export const useCreateSessionMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({
-      id,
-      date,
-      createdAt,
-      updatedAt,
-    }: Parameters<typeof createSession>[0]) =>
-      createSession({
-        id,
-        date,
-        createdAt,
-        updatedAt,
-      }),
+    mutationFn: createSession,
     onMutate: async ({ id, date, createdAt, updatedAt }) => {
       if (!mutationSettings.optimisticUpdate) {
         return
@@ -69,11 +58,7 @@ export const useCreateSessionMutation = () => {
 export const useUpdateSessionDateMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, date }: Parameters<typeof updateSession>[0]) =>
-      updateSession({
-        id,
-        date,
-      }),
+    mutationFn: updateSession,
     // When mutate is called:
     // TODO: better typing with a simple set or dummy set, but still may require casting
     onMutate: async (vars) => {
@@ -152,8 +137,7 @@ export const useUpdateSessionDateMutation = () => {
 export const useDeleteSessionMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id }: Parameters<typeof deleteSession>[0]) =>
-      deleteSession({ id }),
+    mutationFn: deleteSession,
     onMutate: async (vars) => {
       if (!mutationSettings.optimisticUpdate) {
         return
@@ -193,11 +177,7 @@ export const useDeleteSessionMutation = () => {
 export const useCompleteSessionMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, completed }: Parameters<typeof updateSession>[0]) =>
-      updateSession({
-        id,
-        completed,
-      }),
+    mutationFn: updateSession,
     // When mutate is called:
     // TODO: better typing with a simple set or dummy set, but still may require casting
     onMutate: async (vars) => {

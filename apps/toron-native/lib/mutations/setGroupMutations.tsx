@@ -8,7 +8,6 @@ import {
   SetGroup,
   SetGroupWithExerciseAndSets,
 } from '../../../../packages/toron-db/schema'
-
 import {
   createSetGroup,
   deleteSetGroup,
@@ -22,20 +21,7 @@ export const useCreateSetGroupMutation = () => {
   const queryClient = useQueryClient()
   // TODO: add exercise name for optimistic update
   return useMutation({
-    mutationFn: ({
-      id,
-      exerciseId,
-      sessionId,
-      order,
-      userId,
-    }: Parameters<typeof createSetGroup>[0]) =>
-      createSetGroup({
-        id,
-        exerciseId,
-        sessionId,
-        order,
-        userId,
-      }),
+    mutationFn: createSetGroup,
     // When mutate is called:
     // TODO: better typing with a simple set or dummy set, but still may require casting
     onMutate: async (vars) => {

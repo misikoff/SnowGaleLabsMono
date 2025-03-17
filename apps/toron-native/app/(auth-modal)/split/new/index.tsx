@@ -43,7 +43,7 @@ const ModalScreen = () => {
   }
 
   const handleDecrementRir = () => {
-    setRirTarget((prev) => Math.max(prev - 1, 0))
+    setRirTarget((prev) => Math.max(prev - 1, 1))
   }
 
   const handleIncrementTrainingDays = () => {
@@ -63,16 +63,35 @@ const ModalScreen = () => {
       { id: splitId, name: splitName, rirTarget },
       {
         onSuccess: () => {
-          console.log('split created!!!!!!!!!!!!!!!!')
           trainingDays.forEach((day) => {
-            createTrainingDayMutation.mutate({
-              id: Crypto.randomUUID(),
-              splitId,
-              name: day.name,
-              order: day.order,
-            })
+            console.log('creating training day', day.name)
+            createTrainingDayMutation.mutate(
+              {
+                id: Crypto.randomUUID(),
+                splitId,
+                name: day.name,
+                order: day.order,
+              },
+              {
+                onError: (error) => {
+                  console.error('Error creating training day', error)
+                },
+                onSettled: () => {
+                  // console.log('training day creation settled')
+                },
+                onSuccess: () => {
+                  // console.log('training day created')
+                },
+              },
+            )
           })
           navigation.goBack() // Dismiss the route / pop the stack
+        },
+        onError: (error) => {
+          console.error('Error creating split', error)
+        },
+        onSettled: () => {
+          // console.log('split creation settled')
         },
       },
     )
@@ -124,7 +143,7 @@ const ModalScreen = () => {
           <Button
             title='-'
             onPress={handleDecrementTrainingDays}
-            disabled={numTrainingDays <= 0}
+            disabled={numTrainingDays <= 1}
           />
           <Text className='mt-1 w-8 text-center text-lg'>
             {numTrainingDays}
@@ -136,7 +155,6 @@ const ModalScreen = () => {
           />
         </View>
       </View>
-      <Text>{editingDayName}</Text>
 
       <View className='mt-2 flex w-4/5 flex-row items-center justify-between rounded-md bg-gray-400 p-2'>
         <FlashList

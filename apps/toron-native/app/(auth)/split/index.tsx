@@ -1,17 +1,13 @@
 import { View, Text, Button, Alert } from 'react-native'
 import { Link, useRouter } from 'expo-router'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import {
-  getProfile,
-  getSplits,
-  deleteSplit,
-  updateProfile,
-} from '@/lib/dbFunctions'
+import { getProfile, getSplits } from '@/lib/dbFunctions'
+import { useUpdateProfileMutation } from '@/lib/mutations/profileMutations'
+import { useDeleteSplitMutation } from '@/lib/mutations/splitMutations'
 
 function HomeScreen() {
   const router = useRouter()
-  const queryClient = useQueryClient()
 
   const {
     data: profile,
@@ -31,20 +27,9 @@ function HomeScreen() {
     queryFn: async () => getSplits(),
   })
 
-  const deleteSplitMutation = useMutation({
-    mutationFn: deleteSplit,
-    onSuccess: () => {
-      queryClient.invalidateQueries(['splits'])
-      queryClient.invalidateQueries(['profile'])
-    },
-  })
+  const deleteSplitMutation = useDeleteSplitMutation()
 
-  const updateProfileMutation = useMutation({
-    mutationFn: updateProfile,
-    onSuccess: () => {
-      queryClient.invalidateQueries(['profile'])
-    },
-  })
+  const updateProfileMutation = useUpdateProfileMutation()
 
   const handleDeleteSplit = (splitId: string) => {
     Alert.alert(
@@ -121,17 +106,17 @@ function HomeScreen() {
       </View>
 
       <Button
-        title='Show Split Modal'
+        title='Create Split'
         onPress={() => router.push('/(auth-modal)/split/new')}
       />
-      <Button
+      {/* <Button
         title='Show Test Modal'
         onPress={() => router.push('/(auth-modal)/test')}
       />
       <Button
         title='Show Auth Modal Index'
         onPress={() => router.push('/(auth-modal)')}
-      />
+      /> */}
     </View>
   )
 }

@@ -1,15 +1,21 @@
+import { useState, useEffect } from 'react'
+
 import { View, Text } from 'react-native'
-import { Link } from 'expo-router'
+import { Link, router } from 'expo-router'
 import { useQuery } from '@tanstack/react-query'
 
+import AddSessionButton from '@/components/session/addSessionButton'
 import {
   useSupabaseUser,
   getProfile,
   getSplit,
   getTrainingDaysForSplit,
+  getSessionsForCalendar,
 } from '@/lib/dbFunctions'
 
 export default function Tab() {
+  const [nextTrainingDay, setNextTrainingDay] = useState(null)
+
   const {
     data: user,
     isLoading: userLoading,
@@ -23,7 +29,7 @@ export default function Tab() {
   } = useQuery({
     queryKey: ['profile'],
     queryFn: async () => getProfile(),
-    enabled: !!user,
+    // enabled: !!user,
   })
 
   const {
@@ -36,7 +42,6 @@ export default function Tab() {
     enabled: !!profile?.currentSplitId,
   })
 
-  // loading training days
   const {
     data: trainingDays,
     isLoading: trainingDaysLoading,
@@ -47,6 +52,41 @@ export default function Tab() {
       getTrainingDaysForSplit({ splitId: profile?.currentSplitId }),
     enabled: !!profile?.currentSplitId,
   })
+
+  const {
+    data: sessions,
+    isLoading: sessionsLoading,
+    isError: sessionsError,
+  } = useQuery({
+    queryKey: ['sessions', profile?.currentSplitId],
+    queryFn: () => getSessionsForCalendar({ splitId: profile?.currentSplitId }),
+    enabled: !!profile?.currentSplitId,
+  })
+
+  useEffect(() => {
+    if (sessions && trainingDays) {
+      if (sessions.length === 0) {
+        setNextTrainingDay(trainingDays[0])
+        return
+      }
+      const lastSession = sessions[sessions.length - 1]
+
+      const lastTrainingDay = trainingDays.find(
+        (day) => day.id === lastSession?.trainingDayId,
+      )
+
+      if (!lastTrainingDay) {
+        // set next training day to the first training day
+        setNextTrainingDay(trainingDays[0])
+      }
+      const nextTrainingDayOrder =
+        (lastTrainingDay.order + 1) % trainingDays.length
+      const nextTrainingDay = trainingDays.find(
+        (day) => day.order === nextTrainingDayOrder,
+      )
+      setNextTrainingDay(nextTrainingDay)
+    }
+  }, [sessions, trainingDays])
 
   return (
     <View className='flex-1 items-center justify-center gap-y-8'>
@@ -72,26 +112,43 @@ export default function Tab() {
           ))}
         </>
       )}
+      {nextTrainingDay && (
+        <Text className='text-center text-lg font-bold'>
+          Next Training Day: {nextTrainingDay.name}
+        </Text>
+      )}
 
-      <Link href='/session'>
+      {/* if split is undefined show link to splits */}
+      {split ? (
+        <Link href='/session'>
+          <View className='rounded-md bg-blue-600 px-3 py-2 text-center'>
+            <Text className='text-center text-xl font-bold text-white'>
+              Start Next Split Session
+            </Text>
+          </View>
+        </Link>
+      ) : (
+        <Link href='/(auth)/split'>
+          <View className='rounded-md bg-blue-600 px-3 py-2 text-center'>
+            {/* TODO: if no splits make this go directly to creating a split */}
+            <Text className='text-center text-xl font-bold text-white'>
+              Pick or Create a Split
+            </Text>
+          </View>
+        </Link>
+      )}
+
+      <AddSessionButton
+        onCreate={(newSessionId) =>
+          router.navigate(`/(auth)/session/${newSessionId}`)
+        }
+      >
         <View className='rounded-md bg-blue-600 px-3 py-2 text-center'>
-          {/* show sessions from current split as a selector */}
-          {/*this should default to the next session in the split*/}
-          {/* if no split selected show link to pick a split */}
-          {/* if no splits exist show a link to create a split */}
           <Text className='text-center text-xl font-bold text-white'>
-            Start Next Split Session
+            New Session
           </Text>
         </View>
-      </Link>
-
-      <Link href='/session'>
-        <View className='rounded-md bg-blue-600 px-3 py-2 text-center'>
-          <Text className='text-center text-xl font-bold text-white'>
-            Start Empty Session
-          </Text>
-        </View>
-      </Link>
+      </AddSessionButton>
     </View>
   )
 }

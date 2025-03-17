@@ -123,12 +123,12 @@ export default function Calendar() {
     queryKey: ['sessions'],
     queryFn: async () => getSessions(),
   })
-  console.log({
-    sessions,
-    sessionsLoading,
-    sessionsError,
-    error,
-  })
+  // console.log({
+  //   sessions,
+  //   sessionsLoading,
+  //   sessionsError,
+  //   error,
+  // })
 
   const {
     data: realQuotes,
@@ -140,12 +140,12 @@ export default function Calendar() {
     queryFn: async () => getQuotes(),
   })
 
-  console.log({
-    sessions,
-    sessionsLoading,
-    sessionsError,
-    error,
-  })
+  // console.log({
+  //   sessions,
+  //   sessionsLoading,
+  //   sessionsError,
+  //   error,
+  // })
 
   const scrollViewRef = useRef<any | null>(null)
   const subScrollViewRef = useRef<any | null>(null)

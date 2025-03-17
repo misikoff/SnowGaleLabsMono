@@ -2,7 +2,11 @@ import { ScrollView, Text, View, Button, Alert } from 'react-native'
 import { useLocalSearchParams, useNavigation } from 'expo-router'
 import { useQuery } from '@tanstack/react-query'
 
-import { getProfile, getSplit } from '@/lib/dbFunctions'
+import {
+  getProfile,
+  getSplit,
+  getTrainingDaysForSplit,
+} from '@/lib/dbFunctions'
 import { useUpdateProfileMutation } from '@/lib/mutations/profileMutations'
 
 export default function Page() {
@@ -21,8 +25,8 @@ export default function Page() {
 
   const {
     data: split,
-    isLoading,
-    isError,
+    isLoading: splitLoading,
+    isError: splitError,
   } = useQuery({
     queryKey: ['splits', splitId],
     queryFn: () =>
@@ -30,7 +34,16 @@ export default function Page() {
         id: splitId as string,
       }),
   })
-  console.log({ split })
+
+  const {
+    data: trainingDays,
+    isLoading: trainingDaysLoading,
+    isError: trainingDaysError,
+  } = useQuery({
+    queryKey: ['trainingDays', splitId],
+    queryFn: () => getTrainingDaysForSplit({ splitId: splitId as string }),
+    enabled: !!splitId,
+  })
 
   const handleSelectSplit = () => {
     if (profileLoading || !profile) {
@@ -53,8 +66,8 @@ export default function Page() {
   return (
     <ScrollView>
       {/* <Link href='/(auth)/session'>Back</Link> */}
-      {isLoading && <Text>Loading...</Text>}
-      {isError && <Text>Error</Text>}
+      {splitLoading && <Text>Loading...</Text>}
+      {splitError && <Text>Error</Text>}
       {split && (
         <View>
           <Text>{split.id}</Text>
@@ -70,7 +83,20 @@ export default function Page() {
             />
           )}
         </View>
-        // TODO: edit button to enter edit mode
+      )}
+      {trainingDaysLoading && <Text>Loading training days...</Text>}
+      {trainingDaysError && <Text>Error loading training days</Text>}
+      {trainingDays && (
+        <View>
+          <Text>Training Days:</Text>
+          {trainingDays.map((day) => (
+            <View key={day.id}>
+              <Text>
+                {day.order}: {day.name}
+              </Text>
+            </View>
+          ))}
+        </View>
       )}
     </ScrollView>
   )
