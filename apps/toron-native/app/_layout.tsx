@@ -41,7 +41,7 @@ const InitialLayout = ({ children }: { children: React.ReactNode }) => {
     // console.log('User changed: ', isSignedIn)
 
     if (isSignedIn && !inTabsGroup) {
-      router.replace('/calendar')
+      router.replace('/(auth)')
     } else if (!isSignedIn && inTabsGroup) {
       router.replace('/login')
     } else if (!isSignedIn && segments.length === 0) {

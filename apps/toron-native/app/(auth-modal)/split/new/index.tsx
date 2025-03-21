@@ -1,10 +1,22 @@
 import { useEffect, useState } from 'react'
 
-import { View, Text, TextInput, Button, TouchableOpacity } from 'react-native'
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  TouchableOpacity,
+  Modal,
+} from 'react-native'
 import * as Crypto from 'expo-crypto'
 import { useNavigation } from 'expo-router'
+import { Picker } from '@react-native-picker/picker'
 import { FlashList } from '@shopify/flash-list'
+import { useQuery } from '@tanstack/react-query'
+import { PencilIcon } from 'lucide-react-native'
 
+import { createSessionMuscleGroup, getMuscleGroups } from '@/lib/dbFunctions'
+import { useCreateSessionMutation } from '@/lib/mutations/sessionMutations'
 import { useCreateSplitMutation } from '@/lib/mutations/splitMutations'
 import { useCreateTrainingDayMutation } from '@/lib/mutations/trainingDayMutations'
 
@@ -12,19 +24,53 @@ const ModalScreen = () => {
   const [splitName, setSplitName] = useState('')
   const [rirTarget, setRirTarget] = useState(1)
   const [trainingDays, setTrainingDays] = useState<
-    { id: string; name: string; order: number }[]
+    { id: string; name: string; order: number; muscleGroups?: string[] }[]
   >([])
   const [numTrainingDays, setNumTrainingDays] = useState(0)
   const [editingDayId, setEditingDayId] = useState<string | null>(null)
   const [editingDayName, setEditingDayName] = useState<string>('')
+  const [selectedTrainingDayId, setSelectedTrainingDayId] = useState<
+    string | null
+  >(null)
+  const [selectedMuscleGroupId, setSelectedMuscleGroupId] = useState<
+    string | null
+  >(null)
   const createSplitMutation = useCreateSplitMutation()
   const createTrainingDayMutation = useCreateTrainingDayMutation()
+  const createSessionMutation = useCreateSessionMutation()
   const navigation = useNavigation()
+
+  const {
+    data: muscleGroups,
+    isLoading: muscleGroupsLoading,
+    isError: muscleGroupsError,
+  } = useQuery({
+    queryKey: ['muscleGroups'],
+    queryFn: async () => getMuscleGroups(),
+  })
 
   const handleTrainingDayNameChange = (id: string, name: string) => {
     setTrainingDays(
       trainingDays.map((day) => (day.id === id ? { ...day, name } : day)),
     )
+  }
+
+  const handleMuscleGroupChange = (id: string, muscleGroupId: string) => {
+    setTrainingDays(
+      trainingDays.map((day) =>
+        day.id === id
+          ? {
+              ...day,
+              muscleGroups: day.muscleGroups
+                ? [...day.muscleGroups, muscleGroupId]
+                : [muscleGroupId],
+            }
+          : day,
+      ),
+    )
+    console.log('muscle group added to training day')
+    setSelectedTrainingDayId(null)
+    setSelectedMuscleGroupId(null)
   }
 
   const handleEditTrainingDay = (id: string, name: string) => {
@@ -59,6 +105,7 @@ const ModalScreen = () => {
 
   const handleSubmit = () => {
     const splitId = Crypto.randomUUID()
+    const sessionId = Crypto.randomUUID()
     createSplitMutation.mutate(
       { id: splitId, name: splitName, rirTarget },
       {
@@ -71,6 +118,7 @@ const ModalScreen = () => {
                 splitId,
                 name: day.name,
                 order: day.order,
+                // muscleGroups: day.muscleGroups,
               },
               {
                 onError: (error) => {
@@ -81,6 +129,33 @@ const ModalScreen = () => {
                 },
                 onSuccess: () => {
                   // console.log('training day created')
+                  // create template session and then session muscle groups
+
+                  createSessionMutation.mutate(
+                    {
+                      id: Crypto.randomUUID(),
+                      splitId,
+                      trainingDayId: day.id,
+                      istemplate: true,
+                    },
+                    {
+                      onError: (error) => {
+                        console.error('Error creating session', error)
+                      },
+                      onSettled: () => {
+                        // console.log('session creation settled')
+                      },
+                      onSuccess: () => {
+                        // console.log('session created')
+                        // create session muscle groups
+                        createSessionMuscleGroup({
+                          id: Crypto.randomUUID(),
+                          sessionId: sessionId,
+                          muscleGroupId: Crypto.randomUUID(),
+                        })
+                      },
+                    },
+                  )
                 },
               },
             )
@@ -109,6 +184,19 @@ const ModalScreen = () => {
   useEffect(() => {
     setNumTrainingDays(trainingDays.length)
   }, [trainingDays])
+
+  const muscleGroupFrequency = muscleGroups?.reduce(
+    (acc, group) => {
+      const count = trainingDays.reduce((count, day) => {
+        return count + (day.muscleGroups?.includes(group.id) ? 1 : 0)
+      }, 0)
+      if (count > 0) {
+        acc[group.name] = count
+      }
+      return acc
+    },
+    {} as Record<string, number>,
+  )
 
   return (
     <View className='flex flex-1 items-center gap-5 p-4'>
@@ -156,45 +244,62 @@ const ModalScreen = () => {
         </View>
       </View>
 
-      <View className='mt-2 flex w-4/5 flex-row items-center justify-between rounded-md bg-gray-400 p-2'>
+      <View className='mt-2 flex flex-row items-center justify-between rounded-md bg-gray-400 p-2'>
         <FlashList
           data={trainingDays}
           keyExtractor={(item) => item.id}
-          extraData={{ editingDayName, editingDayId }}
+          extraData={{ editingDayName, editingDayId, selectedTrainingDayId }}
           renderItem={({ item, index }) => (
-            <View
-              key={item.id}
-              className='flex flex-row items-center justify-between'
-            >
-              {editingDayId === item.id ? (
-                <>
-                  <TextInput
-                    placeholder='Name'
-                    value={editingDayName || ''}
-                    onChangeText={(text) => setEditingDayName(text)}
-                    style={{ borderWidth: 1, padding: 5, marginVertical: 5 }}
-                  />
-                  <Button
-                    title='Save'
-                    onPress={() => handleSaveTrainingDayName(item.id)}
-                  />
-                </>
-              ) : (
-                <>
-                  <Text>{item.name ? item.name : 'Day ' + (index + 1)}</Text>
-                  <Button
-                    title='Edit'
-                    onPress={() => handleEditTrainingDay(item.id, item.name)}
-                  />
-                </>
-              )}
+            <View key={item.id} className='flex justify-between'>
+              <View className='flex flex-row items-center justify-between'>
+                {editingDayId === item.id ? (
+                  <>
+                    <TextInput
+                      placeholder='Name'
+                      value={editingDayName || ''}
+                      onChangeText={(text) => setEditingDayName(text)}
+                      style={{ borderWidth: 1, padding: 5, marginVertical: 5 }}
+                    />
+                    <Button
+                      title='Save'
+                      onPress={() => handleSaveTrainingDayName(item.id)}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Text>{item.name ? item.name : 'Day ' + (index + 1)}</Text>
+
+                    <TouchableOpacity
+                      // title='Edit'
+                      onPress={() => handleEditTrainingDay(item.id, item.name)}
+                    >
+                      <PencilIcon size={16} />
+                    </TouchableOpacity>
+                  </>
+                )}
+
+                <Button
+                  title='-'
+                  onPress={() => {
+                    setTrainingDays(
+                      trainingDays.filter((day) => day.id !== item.id),
+                    )
+                  }}
+                />
+              </View>
+              <View className=''>
+                {/* show all muscle groups */}
+                <View className='flex gap-2'>
+                  {item.muscleGroups?.map((groupId) => (
+                    <Text key={groupId}>
+                      {muscleGroups?.find((g) => g.id === groupId)?.name}
+                    </Text>
+                  ))}
+                </View>
+              </View>
               <Button
-                title='Delete'
-                onPress={() => {
-                  setTrainingDays(
-                    trainingDays.filter((day) => day.id !== item.id),
-                  )
-                }}
+                title='+'
+                onPress={() => setSelectedTrainingDayId(item.id)}
               />
             </View>
           )}
@@ -207,6 +312,65 @@ const ModalScreen = () => {
       >
         <Text className='text-lg font-bold text-white'>Create Split</Text>
       </TouchableOpacity>
+      {muscleGroupsLoading && <Text>Loading muscle groups...</Text>}
+      {muscleGroupsError && <Text>Error loading muscle groups...</Text>}
+      <Modal
+        visible={!!selectedTrainingDayId}
+        transparent={true}
+        animationType='slide'
+      >
+        <View className='flex-1 justify-end'>
+          <View className='w-full rounded-t-md bg-white p-4'>
+            <Text className='text-lg font-bold'>Select Muscle Group</Text>
+            <Picker
+              selectedValue={selectedMuscleGroupId}
+              onValueChange={(value) => setSelectedMuscleGroupId(value)}
+              style={{ height: 200, width: '100%' }}
+            >
+              <Picker.Item label='Select Muscle Group' value={null} />
+              {muscleGroups?.map((group) => (
+                <Picker.Item
+                  key={group.id}
+                  label={group.name}
+                  value={group.id}
+                />
+              ))}
+            </Picker>
+            <View className='mt-4 flex-row justify-between'>
+              <Button
+                title='Cancel'
+                onPress={() => {
+                  setSelectedTrainingDayId(null)
+                  setSelectedMuscleGroupId(null)
+                }}
+              />
+              <Button
+                title='Add'
+                onPress={() => {
+                  if (selectedTrainingDayId && selectedMuscleGroupId) {
+                    handleMuscleGroupChange(
+                      selectedTrainingDayId,
+                      selectedMuscleGroupId,
+                    )
+                  }
+                }}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
+      <View className='mt-4 w-full'>
+        <Text className='text-lg font-bold text-black'>
+          Muscle Group Frequency:
+        </Text>
+        {muscleGroupFrequency &&
+          Object.entries(muscleGroupFrequency).map(([name, count]) => (
+            <View key={name} className='flex flex-row justify-between'>
+              <Text>{name}</Text>
+              <Text>{count}</Text>
+            </View>
+          ))}
+      </View>
     </View>
   )
 }

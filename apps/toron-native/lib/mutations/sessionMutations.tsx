@@ -12,7 +12,15 @@ export const useCreateSessionMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: createSession,
-    onMutate: async ({ id, date, createdAt, updatedAt }) => {
+    onMutate: async ({
+      id,
+      date,
+      splitId,
+      trainingDayId,
+      istemplate,
+      createdAt,
+      updatedAt,
+    }) => {
       if (!mutationSettings.optimisticUpdate) {
         return
       }
@@ -29,6 +37,9 @@ export const useCreateSessionMutation = () => {
         draft.push({
           id,
           date,
+          splitId,
+          trainingDayId,
+          istemplate,
           createdAt,
           updatedAt,
           setGroups: [],

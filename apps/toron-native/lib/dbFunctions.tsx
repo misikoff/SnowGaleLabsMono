@@ -11,6 +11,8 @@ import {
   Split,
   Profile,
   TrainingDay,
+  MuscleGroup,
+  SessionMuscleGroup,
 } from '../../../packages/toron-db/schema'
 
 // Note: security depends on RLS preventing access to records with user ids that do not match the asset
@@ -350,7 +352,9 @@ export async function getSessionsForCalendar() {
 export async function createSession(payload: {
   id?: Session['id']
   name?: Session['name']
-  order?: Session['order']
+  splitId?: Session['splitId']
+  trainingDayId?: Session['trainingDayId']
+  istemplate?: Session['isTemplate']
   date?: Session['date']
   createdAt?: Session['createdAt']
   updatedAt?: Session['updatedAt']
@@ -368,7 +372,6 @@ export async function createSession(payload: {
 export async function updateSession(payload: {
   id: Session['id']
   name?: Session['name']
-  order?: Session['order']
   completed?: Session['completed']
   date?: Session['date']
 }) {
@@ -482,6 +485,22 @@ export async function updateSet(payload: {
   return getFirstOrNull({ data })
 }
 
+export async function createSessionMuscleGroup(payload: {
+  id?: SessionMuscleGroup['id']
+  sessionId: SessionMuscleGroup['sessionId']
+  muscleGroupId: SessionMuscleGroup['muscleGroupId']
+  order?: SessionMuscleGroup['order']
+}) {
+  // create session in subabase
+  const { data, error } = await supabase
+    .from('session_muscle_groups')
+    .insert(toSnakeCase(payload))
+    .select()
+  console.log({ data, error })
+
+  return getFirstOrNull({ data })
+}
+
 export async function getExercises() {
   const { data, error } = await supabase.from('exercises').select()
   // console.log({ data, error })
@@ -493,6 +512,19 @@ export async function getExercises() {
   }
 
   return data.map((d) => toCamelCase(d)) as Exercise[]
+}
+
+export async function getMuscleGroups() {
+  const { data, error } = await supabase.from('muscle_groups').select()
+  // console.log({ data, error })
+  // console.log('done')
+  // if no error, return data as MuscleGroup[]
+  if (error) {
+    console.error('Error fetching muscle groups:', error)
+    return []
+  }
+
+  return data.map((d) => toCamelCase(d)) as MuscleGroup[]
 }
 
 export async function getQuotes() {

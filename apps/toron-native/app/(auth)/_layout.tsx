@@ -30,37 +30,6 @@ export default function TabLayout() {
   return (
     <Tabs screenOptions={{ tabBarActiveTintColor: 'blue' }}>
       <Tabs.Screen
-        name='index'
-        options={{
-          title: 'Main',
-          tabBarIcon: ({ color }) => (
-            <FontAwesome6 size={24} name='house-chimney' color={color} />
-          ),
-        }}
-        redirect={isError}
-      />
-      <Tabs.Screen
-        name='session'
-        options={{
-          title: 'Session',
-          tabBarIcon: ({ color }) => (
-            <FontAwesome6 size={24} name='dumbbell' color={color} />
-          ),
-        }}
-        redirect={isError}
-      />
-      <Tabs.Screen
-        name='calendar'
-        options={{
-          title: 'Calendar',
-          tabBarIcon: ({ color }) => (
-            <FontAwesome6 size={24} name='calendar' color={color} />
-          ),
-          headerShown: false,
-        }}
-        redirect={isError}
-      />
-      <Tabs.Screen
         name='split'
         options={{
           title: 'Split',
@@ -73,12 +42,46 @@ export default function TabLayout() {
         }}
         redirect={isError}
       />
+
+      <Tabs.Screen
+        name='session'
+        options={{
+          title: 'Session',
+          tabBarIcon: ({ color }) => (
+            <FontAwesome6 size={24} name='dumbbell' color={color} />
+          ),
+        }}
+        redirect={isError}
+      />
+
+      <Tabs.Screen
+        name='index'
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ color }) => (
+            <FontAwesome6 size={24} name='signal' color={color} />
+          ),
+        }}
+        redirect={isError}
+      />
+      <Tabs.Screen
+        name='history'
+        options={{
+          title: 'History',
+          tabBarIcon: ({ color }) => (
+            <FontAwesome6 size={24} name='book' color={color} />
+          ),
+          // headerShown: false,
+        }}
+        redirect={isError}
+      />
+
       <Tabs.Screen
         name='settings'
         options={{
           title: 'Settings',
           tabBarIcon: ({ color }) => (
-            <FontAwesome6 size={24} name='cog' color={color} />
+            <FontAwesome6 size={24} name='gear' color={color} />
           ),
           // headerShown: false,
 

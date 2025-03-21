@@ -63,6 +63,23 @@ export default function Page() {
     }
   }
 
+  const handledDeselectSplit = () => {
+    if (profileLoading || !profile) {
+      return
+    }
+    updateProfileMutation.mutate(
+      {
+        id: profile.id,
+        currentSplitId: null,
+      },
+      {
+        onSuccess: () => {
+          navigation.goBack() // Dismiss the route / pop the stack
+        },
+      },
+    )
+  }
+
   return (
     <ScrollView>
       {/* <Link href='/(auth)/session'>Back</Link> */}
@@ -74,7 +91,14 @@ export default function Page() {
           <Text>{split.name}</Text>
           <Text>{split.rirTarget}</Text>
           {profile?.currentSplitId === split.id ? (
-            <Text>Current Split</Text>
+            <>
+              <Text>Current Split</Text>
+              <Button
+                title='Deselect Split'
+                onPress={handledDeselectSplit}
+                disabled={!profile}
+              />
+            </>
           ) : (
             <Button
               title='Select Split'
