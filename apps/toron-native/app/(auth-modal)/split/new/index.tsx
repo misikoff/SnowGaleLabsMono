@@ -18,7 +18,6 @@ import { PencilIcon } from 'lucide-react-native'
 import { createSessionMuscleGroup, getMuscleGroups } from '@/lib/dbFunctions'
 import { useCreateSessionMutation } from '@/lib/mutations/sessionMutations'
 import { useCreateSplitMutation } from '@/lib/mutations/splitMutations'
-import { useCreateTrainingDayMutation } from '@/lib/mutations/trainingDayMutations'
 
 const ModalScreen = () => {
   const [splitName, setSplitName] = useState('')
@@ -36,7 +35,6 @@ const ModalScreen = () => {
     string | null
   >(null)
   const createSplitMutation = useCreateSplitMutation()
-  const createTrainingDayMutation = useCreateTrainingDayMutation()
   const createSessionMutation = useCreateSessionMutation()
   const navigation = useNavigation()
 
@@ -110,50 +108,33 @@ const ModalScreen = () => {
       { id: splitId, name: splitName, rirTarget },
       {
         onSuccess: () => {
-          trainingDays.forEach((day) => {
-            console.log('creating training day', day.name)
-            createTrainingDayMutation.mutate(
+          trainingDays.forEach((day, dayIndex) => {
+            console.log('creating training day123', day.name)
+            createSessionMutation.mutate(
               {
-                id: Crypto.randomUUID(),
-                splitId,
+                id: sessionId,
+                splitTemplateId: splitId,
                 name: day.name,
-                order: day.order,
-                // muscleGroups: day.muscleGroups,
+                order: dayIndex,
               },
               {
                 onError: (error) => {
                   console.error('Error creating training day', error)
                 },
                 onSettled: () => {
-                  // console.log('training day creation settled')
+                  console.log('training day creation settled')
                 },
                 onSuccess: () => {
-                  // console.log('training day created')
+                  console.log('training day created')
                   // create template session and then session muscle groups
-
-                  createSessionMutation.mutate(
-                    {
-                      id: Crypto.randomUUID(),
-                      splitId,
-                      trainingDayId: day.id,
-                      istemplate: true,
-                    },
-                    {
-                      onError: (error) => {
-                        console.error('Error creating session', error)
-                      },
-                      onSettled: () => {
-                        // console.log('session creation settled')
-                      },
-                      onSuccess: () => {
-                        // console.log('session created')
-                        // create session muscle groups
-                        createSessionMuscleGroup({
-                          id: Crypto.randomUUID(),
-                          sessionId: sessionId,
-                          muscleGroupId: Crypto.randomUUID(),
-                        })
-                      },
+                  day.muscleGroups?.forEach(
+                    async (muscleGroupId, muscleGroupIndex) => {
+                      const x = await createSessionMuscleGroup({
+                        sessionId,
+                        muscleGroupId,
+                        order: muscleGroupIndex,
+                      })
+                      console.log({ result: x })
                     },
                   )
                 },

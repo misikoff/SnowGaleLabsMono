@@ -168,12 +168,15 @@ export const sessionMuscleGroups = pgTable(
   {
     id,
     sessionId: uuid()
-      .references(() => sessions.id)
+      .references(() => sessions.id, {
+        onDelete: 'cascade',
+      })
       .notNull(),
     userId,
-    muscleGroupId: uuid()
-      .references(() => muscleGroups.id)
-      .notNull(),
+    muscleGroupId: uuid().references(() => muscleGroups.id, {
+      onDelete: 'set null',
+    }),
+
     order: smallint('order').notNull(),
   },
   (table) => [usersOnlyPolicy],
@@ -207,12 +210,12 @@ export const sessions = pgTable(
     name: text(),
     // only set if this session is a template
     splitTemplateId: uuid().references(() => splits.id, {
-      onDelete: 'set null',
+      onDelete: 'cascade',
     }),
     // indicates what split this session was created from
     // may delete this if we don't use it
     splitId: uuid().references(() => splits.id, {
-      onDelete: 'cascade',
+      onDelete: 'set null',
     }),
     description: text(),
     // for use with templates only

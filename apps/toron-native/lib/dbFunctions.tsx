@@ -5,14 +5,13 @@ import { supabase } from '@/utils/supabase'
 import {
   Exercise,
   Set,
-  SetGroup,
   Session,
   Quote,
   Split,
   Profile,
-  TrainingDay,
   MuscleGroup,
   SessionMuscleGroup,
+  SessionExercise,
 } from '../../../packages/toron-db/schema'
 
 // Note: security depends on RLS preventing access to records with user ids that do not match the asset
@@ -64,7 +63,7 @@ export async function getSession(payload: { sessionId: Session['id'] }) {
     id,
     name,
     date,
-    set_groups (
+    session_exercises (
       id,
       order,
       sessionId:session_id,
@@ -75,7 +74,7 @@ export async function getSession(payload: { sessionId: Session['id'] }) {
       sets (
         id,
         exerciseId:exercise_id,
-        setGroupId:set_group_id,
+        sessionExerciseId:session_exercise_id,
         order,
         reps,
         rir,
@@ -86,7 +85,7 @@ export async function getSession(payload: { sessionId: Session['id'] }) {
   `,
     )
     .eq('id', payload.sessionId)
-    // order by setGroups.order
+    // order by sessionExercises.order
     .order('order', { ascending: false })
 
   if (error) {
@@ -201,91 +200,20 @@ export async function deleteSplit({ id }: { id: Split['id'] }) {
   console.log({ data, error })
 }
 
-export async function createTrainingDay(payload: {
-  id?: TrainingDay['id']
-  name: TrainingDay['name']
-  splitId: TrainingDay['splitId']
-  order?: TrainingDay['order']
-  // createdAt?: TrainingDay['createdAt']
-  // updatedAt?: TrainingDay['updatedAt']
-}) {
-  // create split in supabase
-  const { data, error } = await supabase
-    .from('training_days')
-    .insert(toSnakeCase(payload))
-    .select('id')
-  console.log({ data, error })
-
-  return getFirstOrNull({ data, key: 'id' })
-}
-
-export async function getTrainingDays() {
-  const { data, error } = await supabase.from('training_days').select('*')
-  // .limit(10)
-  if (error) {
-    console.error('Error fetching training days:', error)
-    return []
-  }
-  return data.map((d) => toCamelCase(d)) as TrainingDay[]
-}
-
-export async function getTrainingDaysForSplit(payload: {
-  splitId: TrainingDay['splitId']
-}) {
-  const { data, error } = await supabase
-    .from('training_days')
-    .select('*')
-    .eq('split_id', payload.splitId)
-    // order by order
-    .order('order', { ascending: true })
-  // .limit(10)
-  if (error) {
-    console.error('Error fetching training days:', error)
-    return []
-  }
-  console.log({ data })
-  return data.map((d) => toCamelCase(d)) as TrainingDay[]
-}
-
-export async function updateTrainingDay(payload: {
-  id: TrainingDay['id']
-  name?: TrainingDay['name']
-  order?: TrainingDay['order']
-  // updatedAt?: TrainingDay['updatedAt']
-}) {
-  // update split in supabase
-  const { data, error } = await supabase
-    .from('training_days')
-    .update(toSnakeCase(payload))
-    .eq('id', payload.id)
-    .select()
-  console.log({ data, error })
-
-  return getFirstOrNull({ data })
-}
-
-export async function deleteTrainingDay({ id }: { id: TrainingDay['id'] }) {
-  // delete split in supabase
-  const { data, error } = await supabase
-    .from('training_days')
-    .delete()
-    .eq('id', id)
-  console.log({ data, error })
-}
-
 export async function getSessions(payload: {
   sessionId?: Session['id']
   splitId?: Session['splitId']
-  isTemplate?: Session['isTemplate']
+  splitTemplateId?: Session['splitTemplateId']
 }) {
   let query = supabase.from('sessions').select(
     `
     id,
     name,
     date,
+    order,
     splitId:split_id,
     isTemplate:is_template,
-    set_groups (
+    session_exercises (
       id,
       order,
       sessionId:session_id,
@@ -296,7 +224,7 @@ export async function getSessions(payload: {
       sets (
         id,
         exerciseId:exercise_id,
-        setGroupId:set_group_id,
+        sessionExerciseId:session_exercise_id,
         order,
         reps,
         rir,
@@ -314,9 +242,11 @@ export async function getSessions(payload: {
   if (payload.splitId) {
     query = query.eq('split_id', payload.splitId)
   }
-  if (payload.isTemplate !== undefined) {
-    query = query.eq('is_template', payload.isTemplate)
+  if (payload.splitTemplateId !== undefined) {
+    query = query.eq('split_template_id', payload.splitTemplateId)
   }
+
+  query = query.order('order', { ascending: true })
 
   // Execute the query
   const { data, error } = await query
@@ -338,8 +268,7 @@ export async function getSessionsForCalendar() {
     id,
     name,
     date,
-    trainingDayId: training_day_id,
-    set_groups (
+    session_exercises (
       id,
       order,
       session_id,
@@ -350,7 +279,7 @@ export async function getSessionsForCalendar() {
       sets (
         id,
         exercise_id,
-        set_group_id,
+        session_exercise_id,
         order,
         reps,
         rir,
@@ -379,9 +308,9 @@ export async function getSessionsForCalendar() {
 export async function createSession(payload: {
   id?: Session['id']
   name?: Session['name']
+  splitTemplateId?: Session['splitTemplateId']
   splitId?: Session['splitId']
-  trainingDayId?: Session['trainingDayId']
-  istemplate?: Session['isTemplate']
+  order?: Session['order']
   date?: Session['date']
   createdAt?: Session['createdAt']
   updatedAt?: Session['updatedAt']
@@ -419,15 +348,15 @@ export async function deleteSession({ id }: { id: Session['id'] }) {
   console.log({ data, error })
 }
 
-export async function createSetGroup(payload: {
-  id?: SetGroup['id']
-  order?: SetGroup['order']
-  sessionId?: Session['id']
-  exerciseId?: Exercise['id']
+export async function createSessionExercise(payload: {
+  id?: SessionExercise['id']
+  order?: SessionExercise['order']
+  sessionId?: SessionExercise['id']
+  exerciseId?: SessionExercise['id']
 }) {
   // create session in subabase
   const { data, error } = await supabase
-    .from('set_groups')
+    .from('session_exercises')
     .insert(toSnakeCase(payload))
     .eq('id', payload.id)
     .select()
@@ -436,15 +365,15 @@ export async function createSetGroup(payload: {
   return getFirstOrNull({ data })
 }
 
-export async function updateSetGroup(payload: {
+export async function updateSessionExercise(payload: {
   id: Set['id']
   sessionId?: Session['id']
   exerciseId?: Exercise['id']
-  order?: SetGroup['order']
+  order?: SessionExercise['order']
 }) {
   // create session in subabase
   const { data, error } = await supabase
-    .from('set_groups')
+    .from('session_exercises')
     .update(toSnakeCase(payload))
     .eq('id', payload.id)
     .select()
@@ -453,10 +382,14 @@ export async function updateSetGroup(payload: {
   return getFirstOrNull({ data })
 }
 
-export async function deleteSetGroup({ id }: { id: SetGroup['id'] }) {
+export async function deleteSessionExercise({
+  id,
+}: {
+  id: SessionExercise['id']
+}) {
   // deletes all set groups and sets associated with the session
   const { data, error } = await supabase
-    .from('set_groups')
+    .from('session_exercises')
     .delete()
     .eq('id', id)
   console.log({ data, error })
@@ -467,7 +400,7 @@ export async function createSet(payload: {
   order?: Set['order']
   sessionId: Set['sessionId']
   exerciseId?: Set['exerciseId']
-  setGroupId: Set['setGroupId']
+  sessionExerciseId: Set['sessionExerciseId']
 }) {
   console.log('set incoming')
   console.log({ payload })
