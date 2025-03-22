@@ -232,6 +232,13 @@
       "when": 1741319434290,
       "tag": "0032_solid_galactus",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1742679182728,
+      "tag": "0033_cool_living_mummy",
+      "breakpoints": true
     }
   ]
 }
