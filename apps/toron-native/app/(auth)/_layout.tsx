@@ -30,9 +30,9 @@ export default function TabLayout() {
   return (
     <Tabs screenOptions={{ tabBarActiveTintColor: 'blue' }}>
       <Tabs.Screen
-        name='split'
+        name='plan'
         options={{
-          title: 'Split',
+          title: 'Plan',
           tabBarIcon: ({ color }) => (
             <FontAwesome6 size={24} name='table-columns' color={color} />
           ),
@@ -44,9 +44,20 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name='session'
+        name='progress'
         options={{
-          title: 'Session',
+          title: 'Progress',
+          tabBarIcon: ({ color }) => (
+            <FontAwesome6 size={24} name='signal' color={color} />
+          ),
+        }}
+        redirect={isError}
+      />
+
+      <Tabs.Screen
+        name='train'
+        options={{
+          title: 'Train',
           tabBarIcon: ({ color }) => (
             <FontAwesome6 size={24} name='dumbbell' color={color} />
           ),
@@ -55,19 +66,9 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name='index'
+        name='library'
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => (
-            <FontAwesome6 size={24} name='signal' color={color} />
-          ),
-        }}
-        redirect={isError}
-      />
-      <Tabs.Screen
-        name='history'
-        options={{
-          title: 'History',
+          title: 'Library',
           tabBarIcon: ({ color }) => (
             <FontAwesome6 size={24} name='book' color={color} />
           ),
@@ -77,9 +78,9 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name='settings'
+        name='profile'
         options={{
-          title: 'Settings',
+          title: 'Profile',
           tabBarIcon: ({ color }) => (
             <FontAwesome6 size={24} name='gear' color={color} />
           ),

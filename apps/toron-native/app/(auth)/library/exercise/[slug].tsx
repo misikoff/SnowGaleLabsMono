@@ -6,7 +6,7 @@ import { ArrowDownWideNarrow, ArrowUpWideNarrow } from 'lucide-react-native'
 import AddExerciseButton from '@/components/session/addExerciseButton'
 import CompleteSessionButton from '@/components/session/completeSessionButton'
 import SetGroupBlock from '@/components/session/setGroupBlock'
-import { getSession, useSupabaseUser } from '@/lib/dbFunctions'
+import { getSession } from '@/lib/dbFunctions'
 import { useUpdateSetGroupOrderMutation } from '@/lib/mutations/setGroupMutations'
 
 import { SetGroupWithExerciseAndSets } from '../../../../../../packages/toron-db/schema'
@@ -14,18 +14,14 @@ import { SetGroupWithExerciseAndSets } from '../../../../../../packages/toron-db
 export default function Page() {
   const { slug: sessionId } = useLocalSearchParams()
 
-  const { data: user } = useSupabaseUser()
-
   const {
     data: session,
     isLoading,
     isError,
   } = useQuery({
-    enabled: user !== undefined,
     queryKey: ['sessions', sessionId],
     queryFn: () =>
       getSession({
-        userId: user!.data.user?.id,
         sessionId: sessionId as string,
       }),
   })
@@ -44,7 +40,7 @@ export default function Page() {
 
           <View className='gap-4'>
             {/* <Text>Set Groups: {session.setGroups.length}</Text> */}
-            {session.setGroups
+            {/* {session.setGroups
               .sort(
                 (
                   s1: SetGroupWithExerciseAndSets,
@@ -89,7 +85,7 @@ export default function Page() {
                   </Pressable>
                   <SetGroupBlock setGroup={setGroup} />
                 </View>
-              ))}
+              ))} */}
           </View>
         </View>
       )}

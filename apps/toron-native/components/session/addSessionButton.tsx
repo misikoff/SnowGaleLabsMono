@@ -8,10 +8,12 @@ export default function AddSessionButton({
   date = '2-2-2022',
   children,
   onCreate,
+  fromTemplate,
 }: {
   date?: string
   children: React.ReactNode
   onCreate?: (sessionId: string) => void
+  fromTemplate?: string
 }) {
   const createSessionMutation = useCreateSessionMutation()
 
@@ -27,7 +29,6 @@ export default function AddSessionButton({
           date,
           createdAt: new Date(),
           updatedAt: new Date(),
-          date,
         })
         if (onCreate) {
           onCreate(newSessionId)

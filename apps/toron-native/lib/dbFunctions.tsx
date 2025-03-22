@@ -273,38 +273,59 @@ export async function deleteTrainingDay({ id }: { id: TrainingDay['id'] }) {
   console.log({ data, error })
 }
 
-export async function getSessions() {
-  const { data, error } = await supabase.from('sessions').select(
+export async function getSessions(payload: {
+  sessionId?: Session['id']
+  splitId?: Session['splitId']
+  isTemplate?: Session['isTemplate']
+}) {
+  let query = supabase.from('sessions').select(
     `
     id,
     name,
     date,
+    splitId:split_id,
+    isTemplate:is_template,
     set_groups (
       id,
       order,
-      session_id,
+      sessionId:session_id,
       exercise:exercises (
         id,
         name
       ),
       sets (
         id,
-        exercise_id,
-        set_group_id,
+        exerciseId:exercise_id,
+        setGroupId:set_group_id,
         order,
         reps,
         rir,
         weight,
-        session_id
+        sessionId:session_id
       )
     )
   `,
   )
-  // .limit(10)
+
+  // Add filters dynamically based on the provided parameters
+  if (payload.sessionId) {
+    query = query.eq('id', payload.sessionId)
+  }
+  if (payload.splitId) {
+    query = query.eq('split_id', payload.splitId)
+  }
+  if (payload.isTemplate !== undefined) {
+    query = query.eq('is_template', payload.isTemplate)
+  }
+
+  // Execute the query
+  const { data, error } = await query
+
   if (error) {
-    console.error('Error fetching sessions:', error)
+    console.error('Error fetching session:', error)
     return []
   }
+
   return data.map((d) => toCamelCase(d)) as Session[]
 }
 
@@ -339,11 +360,17 @@ export async function getSessionsForCalendar() {
     )
   `,
     )
-    .gte('date', new Date(new Date().setDate(new Date().getDate() - 14)))
+    // only get sessions from the last 14 days based on date (string)
+    .gte(
+      'date',
+      new Date(new Date().setDate(new Date().getDate() - 14)).toISOString(),
+    )
+
+    // .gte('date', new Date(new Date().setDate(new Date().getDate() - 14)))
     .order('date', { ascending: false })
   // .limit(10)
   if (error) {
-    console.error('Error fetching sessions:', error)
+    console.error('Error fetching sessions2:', error)
     return []
   }
   return data.map((d) => toCamelCase(d)) as Session[]

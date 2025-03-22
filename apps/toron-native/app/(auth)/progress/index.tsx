@@ -21,8 +21,9 @@ export default function App() {
     <View className='w-full flex-1'>
       <View className='items-center'>
         <AddSessionButton
+          date={new Date().toISOString()}
           onCreate={(newSessionId) =>
-            router.navigate(`/(auth)/session/${newSessionId}`)
+            router.navigate(`/(auth)/progress/session/${newSessionId}`)
           }
         >
           <View className='rounded-md bg-blue-600 px-3 py-2 text-center'>

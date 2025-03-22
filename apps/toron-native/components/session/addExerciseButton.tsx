@@ -13,14 +13,15 @@ import * as Crypto from 'expo-crypto'
 import { useFocusEffect } from 'expo-router'
 import { useQuery } from '@tanstack/react-query'
 
-import {
-  Exercise,
-  SessionWithSetGroupWithExerciseAndSets,
-} from '../../../../packages/toron-db/schema'
 import CustomSelect from '@/components/customSelect'
 import { getExercises, useSupabaseUser } from '@/lib/dbFunctions'
 import { useCreateSetGroupMutation } from '@/lib/mutations/setGroupMutations'
 import { useCreateSetMutation } from '@/lib/mutations/setMutation'
+
+import {
+  Exercise,
+  SessionWithSetGroupWithExerciseAndSets,
+} from '../../../../packages/toron-db/schema'
 
 export default function AddExerciseButton({
   session,
@@ -36,16 +37,15 @@ export default function AddExerciseButton({
   const [nextOrder, setNextOrder] = useState(0)
 
   useFocusEffect(() => {
-    if (session) {
-      const newMax =
-        session.setGroups.length > 0
-          ? Math.max(
-              ...session.setGroups.map((setGroup) => setGroup.order || 0),
-            ) + 1
-          : 0
-
-      setNextOrder(newMax)
-    }
+    // if (session) {
+    //   const newMax =
+    //     session.setGroups.length > 0
+    //       ? Math.max(
+    //           ...session.setGroups.map((setGroup) => setGroup.order || 0),
+    //         ) + 1
+    //       : 0
+    //   setNextOrder(newMax)
+    // }
   })
 
   // use react query to fetch exercises

@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import {
   getProfile,
+  getSessions,
   getSplit,
   getTrainingDaysForSplit,
 } from '@/lib/dbFunctions'
@@ -44,6 +45,20 @@ export default function Page() {
     queryFn: () => getTrainingDaysForSplit({ splitId: splitId as string }),
     enabled: !!splitId,
   })
+
+  // fetch sessions for training days
+  const {
+    data: sessions,
+    isLoading: sessionsLoading,
+    isError: sessionsError,
+  } = useQuery({
+    queryKey: ['sessions', splitId],
+    queryFn: () =>
+      getSessions({ splitId: splitId as string, isTemplate: true }),
+    enabled: !!splitId,
+  })
+
+  console.log({ sessions })
 
   const handleSelectSplit = () => {
     if (profileLoading || !profile) {
