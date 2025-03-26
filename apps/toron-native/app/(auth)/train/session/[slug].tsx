@@ -1,15 +1,14 @@
 import { Pressable, ScrollView, Text, View } from 'react-native'
-import { Link, useLocalSearchParams } from 'expo-router'
+import { useLocalSearchParams, router, Link } from 'expo-router'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowDownWideNarrow, ArrowUpWideNarrow } from 'lucide-react-native'
 
 import AddExerciseButton from '@/components/session/addExerciseButton'
 import CompleteSessionButton from '@/components/session/completeSessionButton'
+import DeleteSessionButton from '@/components/session/deleteSessionButton'
 import SetGroupBlock from '@/components/session/setGroupBlock'
 import { getSession } from '@/lib/dbFunctions'
 import { useUpdateSetGroupOrderMutation } from '@/lib/mutations/setGroupMutations'
-
-import { SetGroupWithExerciseAndSets } from '../../../../../packages/toron-db/schema'
 
 export default function Page() {
   const { slug: sessionId } = useLocalSearchParams()
@@ -25,7 +24,7 @@ export default function Page() {
         sessionId: sessionId as string,
       }),
   })
-  console.log({ session })
+  console.log({ session123: session })
 
   const updateSetGroupOrderMutation = useUpdateSetGroupOrderMutation()
 
@@ -39,7 +38,17 @@ export default function Page() {
           {/* <Text>Session: {session.id.substring(0, 5)}</Text> */}
 
           <View className='gap-4'>
+            <Text>
+              Session Muscle Groups: {session.sessionExercises.length}
+            </Text>
+            {session.sessionExercises.map((sessionExercise, index) => (
+              <View key={index}>
+                <Text>{sessionExercise.muscleGroup.name}</Text>
+                {/* add exercise button that brings up the select exercise modal with the muscle group's exercises highlighted */}
+              </View>
+            ))}
             {/* <Text>Set Groups: {session.setGroups.length}</Text> */}
+
             {/* {session.setGroups
               .sort(
                 (
@@ -105,6 +114,21 @@ export default function Page() {
           </Text>
         </View>
       </CompleteSessionButton>
+
+      {session?.id && (
+        <DeleteSessionButton
+          sessionId={session.id}
+          onDelete={() => {
+            router.navigate('/(auth)/train')
+          }}
+        >
+          <View className='rounded-md bg-red-600 px-3 py-2 text-center'>
+            <Text className='text-center text-xl font-bold text-white'>
+              <Text>Delete Session</Text>
+            </Text>
+          </View>
+        </DeleteSessionButton>
+      )}
     </ScrollView>
   )
 }

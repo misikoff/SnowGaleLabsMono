@@ -1,13 +1,8 @@
-import { ScrollView, Text, View, Button, Alert } from 'react-native'
+import { ScrollView, Text, View, Button } from 'react-native'
 import { useLocalSearchParams, useNavigation } from 'expo-router'
 import { useQuery } from '@tanstack/react-query'
 
-import {
-  getProfile,
-  getSessions,
-  getSplit,
-  getTrainingDaysForSplit,
-} from '@/lib/dbFunctions'
+import { getProfile, getSessions, getSplit } from '@/lib/dbFunctions'
 import { useUpdateProfileMutation } from '@/lib/mutations/profileMutations'
 
 export default function Page() {
@@ -36,16 +31,6 @@ export default function Page() {
       }),
   })
 
-  const {
-    data: trainingDays,
-    isLoading: trainingDaysLoading,
-    isError: trainingDaysError,
-  } = useQuery({
-    queryKey: ['trainingDays', splitId],
-    queryFn: () => getTrainingDaysForSplit({ splitId: splitId as string }),
-    enabled: !!splitId,
-  })
-
   // fetch sessions for training days
   const {
     data: sessions,
@@ -53,12 +38,14 @@ export default function Page() {
     isError: sessionsError,
   } = useQuery({
     queryKey: ['sessions', splitId],
-    queryFn: () =>
-      getSessions({ splitId: splitId as string, isTemplate: true }),
+    queryFn: () => getSessions({ splitTemplateId: splitId as string }),
     enabled: !!splitId,
   })
 
   console.log({ sessions })
+  console.log({
+    ex: sessions && sessions[0].sessionExercises,
+  })
 
   const handleSelectSplit = () => {
     if (profileLoading || !profile) {
@@ -123,16 +110,24 @@ export default function Page() {
           )}
         </View>
       )}
-      {trainingDaysLoading && <Text>Loading training days...</Text>}
-      {trainingDaysError && <Text>Error loading training days</Text>}
-      {trainingDays && (
+      {sessionsLoading && <Text>Loading training days...</Text>}
+      {sessionsError && <Text>Error loading training days</Text>}
+      {sessions && (
         <View>
           <Text>Training Days:</Text>
-          {trainingDays.map((day) => (
+          {sessions.map((day) => (
             <View key={day.id}>
               <Text>
-                {day.order}: {day.name}
+                day:{day.order}: {day.name}
               </Text>
+              {/* show exercises */}
+              {day.sessionExercises.map((x) => (
+                <View key={x.id}>
+                  <Text>
+                    order:{x.order}: {x.muscleGroup.name}
+                  </Text>
+                </View>
+              ))}
             </View>
           ))}
         </View>

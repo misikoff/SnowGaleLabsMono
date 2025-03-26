@@ -1,3 +1,4 @@
+import { QueryData } from '@supabase/supabase-js'
 import { useQuery } from '@tanstack/react-query'
 
 import { supabase } from '@/utils/supabase'
@@ -10,7 +11,6 @@ import {
   Split,
   Profile,
   MuscleGroup,
-  SessionMuscleGroup,
   SessionExercise,
 } from '../../../packages/toron-db/schema'
 
@@ -56,18 +56,22 @@ function toCamelCase(obj: Record<string, any>) {
 }
 
 export async function getSession(payload: { sessionId: Session['id'] }) {
-  const { data, error } = await supabase
+  const query = supabase
     .from('sessions')
     .select(
       `
     id,
     name,
     date,
-    session_exercises (
+    sessionExercises:session_exercises (
       id,
       order,
       sessionId:session_id,
       exercise:exercises (
+        id,
+        name
+      ),
+      muscleGroup:muscle_groups (
         id,
         name
       ),
@@ -87,13 +91,18 @@ export async function getSession(payload: { sessionId: Session['id'] }) {
     .eq('id', payload.sessionId)
     // order by sessionExercises.order
     .order('order', { ascending: false })
+    .order('order', { referencedTable: 'session_exercises', ascending: true }) // Order sessionExercises
+
+  const { data, error } = await query
 
   if (error) {
     console.error('Error fetching session:', error)
     return []
   }
 
-  return toCamelCase(data[0]) as any
+  return data[0] as QueryData<typeof query>[0]
+
+  //toCamelCase(data[0]) as any
   // console.log({ sessionId: payload.sessionId })
   // const { data, error } = await supabase
   //   .from('sessions')
@@ -122,6 +131,7 @@ export async function updateProfile(payload: {
   id: Profile['id']
   currentSplitId?: Profile['currentSplitId']
   updatedAt?: Profile['updatedAt']
+  activeSessionId?: Profile['activeSessionId']
 }) {
   // update split in supabase
   const { data, error } = await supabase
@@ -209,11 +219,8 @@ export async function getSessions(payload: {
     `
     id,
     name,
-    date,
     order,
-    splitId:split_id,
-    isTemplate:is_template,
-    session_exercises (
+    sessionExercises:session_exercises (
       id,
       order,
       sessionId:session_id,
@@ -221,19 +228,22 @@ export async function getSessions(payload: {
         id,
         name
       ),
-      sets (
+      muscleGroup:muscle_groups (
         id,
-        exerciseId:exercise_id,
-        sessionExerciseId:session_exercise_id,
-        order,
-        reps,
-        rir,
-        weight,
-        sessionId:session_id
+        name
       )
     )
   `,
   )
+
+  // muscleGroup:muscle_groups (
+  //   id,
+  //   name
+  // ),
+  // exercise:exercises (
+  //   id,
+  //   name
+  // )
 
   // Add filters dynamically based on the provided parameters
   if (payload.sessionId) {
@@ -246,7 +256,12 @@ export async function getSessions(payload: {
     query = query.eq('split_template_id', payload.splitTemplateId)
   }
 
-  query = query.order('order', { ascending: true })
+  // Order sessionExercises by their order field
+  query = query.order('order', { ascending: true }) // Order sessions
+  query = query.order('order', {
+    referencedTable: 'session_exercises',
+    ascending: true,
+  }) // Order sessionExercises
 
   // Execute the query
   const { data, error } = await query
@@ -256,7 +271,7 @@ export async function getSessions(payload: {
     return []
   }
 
-  return data.map((d) => toCamelCase(d)) as Session[]
+  return data.map((d) => toCamelCase(d)) as any[]
 }
 
 // get sessions from last 14 days
@@ -310,6 +325,7 @@ export async function createSession(payload: {
   name?: Session['name']
   splitTemplateId?: Session['splitTemplateId']
   splitId?: Session['splitId']
+  clonedFromSessionId?: Session['clonedFromSessionId']
   order?: Session['order']
   date?: Session['date']
   createdAt?: Session['createdAt']
@@ -353,6 +369,7 @@ export async function createSessionExercise(payload: {
   order?: SessionExercise['order']
   sessionId?: SessionExercise['id']
   exerciseId?: SessionExercise['id']
+  muscleGroupId?: SessionExercise['id']
 }) {
   // create session in subabase
   const { data, error } = await supabase
@@ -441,22 +458,6 @@ export async function updateSet(payload: {
     .select()
   console.log({ data, error })
   console.log('done')
-
-  return getFirstOrNull({ data })
-}
-
-export async function createSessionMuscleGroup(payload: {
-  id?: SessionMuscleGroup['id']
-  sessionId: SessionMuscleGroup['sessionId']
-  muscleGroupId: SessionMuscleGroup['muscleGroupId']
-  order?: SessionMuscleGroup['order']
-}) {
-  // create session in subabase
-  const { data, error } = await supabase
-    .from('session_muscle_groups')
-    .insert(toSnakeCase(payload))
-    .select()
-  console.log({ data, error })
 
   return getFirstOrNull({ data })
 }

@@ -1,5 +1,6 @@
-import { relations, sql } from 'drizzle-orm'
+import { sql } from 'drizzle-orm'
 import {
+  AnyPgColumn,
   boolean,
   date,
   index,
@@ -80,10 +81,14 @@ export const profiles = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
     prod: boolean().default(false),
-    currentSplitId: uuid().references(() => splits.id),
+    currentSplitId: uuid().references(() => splits.id, {
+      onDelete: 'set null',
+    }),
+    activeSessionId: uuid().references(() => sessions.id, {
+      onDelete: 'set null',
+    }),
   },
   (table) => [
-    index('usersClerkIdIndex').on(table.id),
     pgPolicy('Only Users can do anything', {
       as: 'permissive',
       to: authenticatedRole,
@@ -119,7 +124,9 @@ export const exercises = pgTable(
   'exercises',
   {
     id,
-    muscleGroupId: uuid().references(() => muscleGroups.id),
+    muscleGroupId: uuid().references(() => muscleGroups.id, {
+      onDelete: 'set null',
+    }),
     name: text(),
     description: text(),
     equipmentType: text({ enum: equipmentEnum }),
@@ -134,10 +141,6 @@ export const exercises = pgTable(
     readOnlyPolicy,
   ],
 )
-
-export const exercisesRelation = relations(exercises, ({ one }) => ({
-  muscleGroups: one(muscleGroups),
-}))
 
 // 🔹 Splits (e.g., "Push/Pull/Legs")
 export const splits = pgTable(
@@ -157,46 +160,25 @@ export const splits = pgTable(
   (table) => [index('splitsUserIdIndex').on(table.userId), usersOnlyPolicy],
 )
 
-export const splitsRelations = relations(splits, ({ one, many }) => ({
-  user: one(users),
-  sessions: many(sessions),
-}))
-
-// 🔹 Ordered Muscle Groups for a Training Day
-export const sessionMuscleGroups = pgTable(
-  'session_muscle_groups',
-  {
-    id,
-    sessionId: uuid()
-      .references(() => sessions.id, {
-        onDelete: 'cascade',
-      })
-      .notNull(),
-    userId,
-    muscleGroupId: uuid().references(() => muscleGroups.id, {
-      onDelete: 'set null',
-    }),
-
-    order: smallint('order').notNull(),
-  },
-  (table) => [usersOnlyPolicy],
-)
-
 // 🔹 Exercises for Each Muscle Group in a Session
 export const sessionExercises = pgTable(
   'session_exercises',
   {
     id,
+    userId,
     sessionId: uuid()
-      .references(() => sessions.id)
-      .notNull(),
-    exerciseId: uuid()
-      .references(() => exercises.id)
+      .references(() => sessions.id, {
+        onDelete: 'cascade',
+      })
       .notNull(),
     muscleGroupId: uuid()
-      .references(() => muscleGroups.id)
+      .references(() => muscleGroups.id, {
+        onDelete: 'set null',
+      })
       .notNull(),
-    userId,
+    exerciseId: uuid().references(() => exercises.id, {
+      onDelete: 'set null',
+    }),
     order: smallint('order').notNull(),
   },
   (table) => [usersOnlyPolicy],
@@ -215,6 +197,9 @@ export const sessions = pgTable(
     // indicates what split this session was created from
     // may delete this if we don't use it
     splitId: uuid().references(() => splits.id, {
+      onDelete: 'set null',
+    }),
+    clonedFromSessionId: uuid().references((): AnyPgColumn => sessions.id, {
       onDelete: 'set null',
     }),
     description: text(),
@@ -238,19 +223,10 @@ export const sessions = pgTable(
   ],
 )
 
-export const sessionsRelations = relations(sessions, ({ one, many }) => ({
-  user: one(users),
-  sets: many(sets),
-  exercises: many(exercises),
-  muscleGroups: many(muscleGroups),
-  split: one(splits),
-}))
-
 export const sets = pgTable(
   'sets',
   {
     id,
-    // relations
     userId,
     sessionExerciseId: uuid()
       .notNull()
@@ -289,14 +265,6 @@ export const sets = pgTable(
   ],
 )
 
-export const setsRelation = relations(sets, ({ one }) => ({
-  user: one(users),
-  sessions: one(sessions),
-  exercises: one(exercises),
-  sessionExercises: one(sessionExercises),
-  exercise: one(exercises),
-}))
-
 export type User = typeof users.$inferSelect
 export type Profile = typeof profiles.$inferSelect
 export type Exercise = typeof exercises.$inferSelect
@@ -306,7 +274,3 @@ export type Quote = typeof quotes.$inferSelect
 export type MuscleGroup = typeof muscleGroups.$inferSelect
 export type Split = typeof splits.$inferSelect
 export type SessionExercise = typeof sessionExercises.$inferSelect
-export type SessionMuscleGroup = typeof sessionMuscleGroups.$inferSelect
-
-// TODO: determine if all relations can be removed because they are redundant for dribble query
-// https://orm.drizzle.team/docs/rqb

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "db:generate:blank": "drizzle-kit generate --config drizzle.config.ts --custom --name=blank-migration",
+    "db:generate:blank": "drizzle-kit generate --config drizzle.config.ts --custom --name=template-fix",
     "db:generate": "drizzle-kit generate --config drizzle.config.ts",
     "db:migrate": "drizzle-kit migrate --config drizzle.config.ts"
   },

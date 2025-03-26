@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 import { View, Text } from 'react-native'
 import { Link, router } from 'expo-router'
 import { useQuery } from '@tanstack/react-query'
 
-import { TrainingDay } from '@repo/toron-db/schema'
 import AddSessionButton from '@/components/session/addSessionButton'
 import {
   useSupabaseUser,
   getProfile,
   getSplit,
-  getTrainingDaysForSplit,
   getSessionsForCalendar,
+  getSessions,
+  updateProfile,
 } from '@/lib/dbFunctions'
 
 export default function Tab() {
@@ -51,8 +51,7 @@ export default function Tab() {
     isError: trainingDaysError,
   } = useQuery({
     queryKey: ['trainingDays', profile?.currentSplitId],
-    queryFn: () =>
-      getTrainingDaysForSplit({ splitId: profile?.currentSplitId }),
+    queryFn: () => getSessions({ splitTemplateId: profile?.currentSplitId }),
     enabled: !!profile?.currentSplitId,
   })
 
@@ -74,23 +73,39 @@ export default function Tab() {
       const lastSession = sessions[sessions.length - 1]
 
       const lastTrainingDay = trainingDays.find(
-        (day) => day.id === lastSession?.trainingDayId,
+        (day) => day.id === lastSession?.clonedFromSessionId,
       )
 
       if (!lastTrainingDay) {
         // set next training day to the first training day
         setNextTrainingDay(trainingDays[0])
-      }
-      const nextTrainingDayOrder =
-        (lastTrainingDay?.order ?? -1 + 1) % trainingDays.length
-      const nextDay = trainingDays.find(
-        (day) => day.order === nextTrainingDayOrder,
-      )
-      if (nextDay) {
-        setNextTrainingDay(nextDay)
+      } else {
+        const nextTrainingDayOrder =
+          (lastTrainingDay?.order ?? -1 + 1) % trainingDays.length
+        const nextDay = trainingDays.find(
+          (day) => day.order === nextTrainingDayOrder,
+        )
+        if (nextDay) {
+          setNextTrainingDay(nextDay)
+        }
       }
     }
   }, [sessions, trainingDays])
+
+  // Shared memoized onCreate function
+  const handleOnCreate = useCallback(
+    async (newSessionId: string) => {
+      if (profile) {
+        await updateProfile({
+          id: profile.id,
+          activeSessionId: newSessionId,
+        }).then(() => {
+          router.navigate(`/(auth)/train/session/${newSessionId}`)
+        })
+      }
+    },
+    [profile],
+  )
 
   return (
     <View className='flex-1 items-center justify-center gap-y-8'>
@@ -116,52 +131,54 @@ export default function Tab() {
           ))}
         </>
       )}
-      {nextTrainingDay && (
-        <Text className='text-center text-lg font-bold'>
-          Next Training Day: {nextTrainingDay.name}
-        </Text>
-      )}
-
-      {/* if split is undefined show link to splits */}
-      {split ? (
-        // <Link href='/session'>
-        <AddSessionButton
-          date={new Date().toISOString()}
-          onCreate={(newSessionId) =>
-            router.navigate(`/(auth)/train/session/${newSessionId}`)
-          }
-          fromTemplate={nextTrainingDay?.id}
-        >
-          <View className='rounded-md bg-blue-600 px-3 py-2 text-center'>
-            <Text className='text-center text-xl font-bold text-white'>
-              Start Next Split Session
-            </Text>
-          </View>
-        </AddSessionButton>
-      ) : (
-        // </Link>
-        <Link href='/(auth)/split'>
-          <View className='rounded-md bg-blue-600 px-3 py-2 text-center'>
-            {/* TODO: if no splits make this go directly to creating a split */}
-            <Text className='text-center text-xl font-bold text-white'>
-              Pick or Create a Split
-            </Text>
-          </View>
+      {profile?.activeSessionId ? (
+        <Link href={`/(auth)/train/session/${profile.activeSessionId}`}>
+          <Text>Resume Active Session</Text>
         </Link>
-      )}
+      ) : (
+        <>
+          {nextTrainingDay && (
+            <Text className='text-center text-lg font-bold'>
+              Next Training Day: {nextTrainingDay.name}
+            </Text>
+          )}
 
-      <AddSessionButton
-        date={new Date().toISOString()}
-        onCreate={(newSessionId) =>
-          router.navigate(`/(auth)/train/session/${newSessionId}`)
-        }
-      >
-        <View className='rounded-md bg-blue-600 px-3 py-2 text-center'>
-          <Text className='text-center text-xl font-bold text-white'>
-            New Session
-          </Text>
-        </View>
-      </AddSessionButton>
+          {/* if split is undefined show link to splits */}
+          {split ? (
+            <AddSessionButton
+              date={new Date().toISOString()}
+              onCreate={handleOnCreate}
+              fromTemplate={nextTrainingDay}
+            >
+              <View className='rounded-md bg-blue-600 px-3 py-2 text-center'>
+                <Text className='text-center text-xl font-bold text-white'>
+                  Start Next Split Session
+                </Text>
+              </View>
+            </AddSessionButton>
+          ) : (
+            <Link href='/(auth)/split'>
+              <View className='rounded-md bg-blue-600 px-3 py-2 text-center'>
+                {/* TODO: if no splits make this go directly to creating a split */}
+                <Text className='text-center text-xl font-bold text-white'>
+                  Pick or Create a Split
+                </Text>
+              </View>
+            </Link>
+          )}
+
+          <AddSessionButton
+            date={new Date().toISOString()}
+            onCreate={handleOnCreate}
+          >
+            <View className='rounded-md bg-blue-600 px-3 py-2 text-center'>
+              <Text className='text-center text-xl font-bold text-white'>
+                New Session
+              </Text>
+            </View>
+          </AddSessionButton>
+        </>
+      )}
     </View>
   )
 }

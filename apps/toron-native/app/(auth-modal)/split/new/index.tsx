@@ -15,7 +15,7 @@ import { FlashList } from '@shopify/flash-list'
 import { useQuery } from '@tanstack/react-query'
 import { PencilIcon } from 'lucide-react-native'
 
-import { createSessionMuscleGroup, getMuscleGroups } from '@/lib/dbFunctions'
+import { createSessionExercise, getMuscleGroups } from '@/lib/dbFunctions'
 import { useCreateSessionMutation } from '@/lib/mutations/sessionMutations'
 import { useCreateSplitMutation } from '@/lib/mutations/splitMutations'
 
@@ -101,56 +101,105 @@ const ModalScreen = () => {
     setTrainingDays(trainingDays.slice(0, -1))
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const splitId = Crypto.randomUUID()
-    const sessionId = Crypto.randomUUID()
-    createSplitMutation.mutate(
-      { id: splitId, name: splitName, rirTarget },
-      {
-        onSuccess: () => {
-          trainingDays.forEach((day, dayIndex) => {
-            console.log('creating training day123', day.name)
-            createSessionMutation.mutate(
-              {
-                id: sessionId,
-                splitTemplateId: splitId,
-                name: day.name,
-                order: dayIndex,
-              },
-              {
-                onError: (error) => {
-                  console.error('Error creating training day', error)
-                },
-                onSettled: () => {
-                  console.log('training day creation settled')
-                },
-                onSuccess: () => {
-                  console.log('training day created')
-                  // create template session and then session muscle groups
-                  day.muscleGroups?.forEach(
-                    async (muscleGroupId, muscleGroupIndex) => {
-                      const x = await createSessionMuscleGroup({
-                        sessionId,
-                        muscleGroupId,
-                        order: muscleGroupIndex,
-                      })
-                      console.log({ result: x })
-                    },
-                  )
-                },
-              },
-            )
-          })
-          navigation.goBack() // Dismiss the route / pop the stack
+
+    await new Promise((resolve, reject) => {
+      createSplitMutation.mutate(
+        { id: splitId, name: splitName, rirTarget },
+        {
+          onSuccess: resolve,
+          onError: reject,
         },
-        onError: (error) => {
-          console.error('Error creating split', error)
-        },
-        onSettled: () => {
-          // console.log('split creation settled')
-        },
-      },
-    )
+      )
+    })
+
+    // TODO: make this all parallel
+    // Create all training days and their associated muscle groups
+    const trainingDayPromises = trainingDays.map(async (day, dayIndex) => {
+      const sessionId = Crypto.randomUUID()
+
+      // Create the session for the training day
+      await createSessionMutation.mutateAsync({
+        id: sessionId,
+        splitTemplateId: splitId,
+        name: day.name,
+        order: dayIndex,
+      })
+
+      // Create muscle groups for the session
+      if (day.muscleGroups) {
+        const muscleGroupPromises = day.muscleGroups.map(
+          (muscleGroupId, muscleGroupIndex) =>
+            createSessionExercise({
+              sessionId,
+              muscleGroupId,
+              order: muscleGroupIndex,
+            }),
+        )
+
+        // Wait for all muscle group creations to complete
+        return muscleGroupPromises
+      }
+    })
+
+    // Wait for all training day promises to complete
+    await Promise.all(trainingDayPromises)
+    console.log('training days created')
+
+    navigation.goBack() // Dismiss the route / pop the stack
+
+    // createSplitMutation.mutate(
+    //   { id: splitId, name: splitName, rirTarget },
+    //   {
+    //     onSuccess: () => {
+    //       trainingDays.forEach((day, dayIndex) => {
+    //         console.log('creating training day123', day.name)
+    //         createSessionMutation.mutate(
+    //           {
+    //             id: sessionId,
+    //             splitTemplateId: splitId,
+    //             name: day.name,
+    //             order: dayIndex,
+    //           },
+    //           {
+    //             onError: (error) => {
+    //               console.error('Error creating training day', error)
+    //             },
+    //             onSettled: () => {
+    //               console.log('training day creation settled')
+    //             },
+    //             onSuccess: async () => {
+    //               console.log('training day created')
+    //               // create template session and then session muscle groups
+    //               // Create muscle groups for the session
+    //               if (day.muscleGroups) {
+    //                 const muscleGroupPromises = day.muscleGroups.map(
+    //                   (muscleGroupId, muscleGroupIndex) =>
+    //                     createSessionMuscleGroup({
+    //                       sessionId,
+    //                       muscleGroupId,
+    //                       order: muscleGroupIndex,
+    //                     }),
+    //                 )
+
+    //                 // Wait for all muscle group creations to complete
+    //                 await Promise.all(muscleGroupPromises)
+    //               }
+    //             },
+    //           },
+    //         )
+    //       })
+    //       navigation.goBack() // Dismiss the route / pop the stack
+    //     },
+    //     onError: (error) => {
+    //       console.error('Error creating split', error)
+    //     },
+    //     onSettled: () => {
+    //       // console.log('split creation settled')
+    //     },
+    //   },
+    // )
   }
 
   useEffect(() => {
