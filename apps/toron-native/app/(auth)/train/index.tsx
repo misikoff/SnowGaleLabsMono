@@ -133,7 +133,11 @@ export default function Tab() {
       )}
       {profile?.activeSessionId ? (
         <Link href={`/(auth)/train/session/${profile.activeSessionId}`}>
-          <Text>Resume Active Session</Text>
+          <View className='rounded-md bg-blue-600 px-3 py-2 text-center'>
+            <Text className='text-center text-xl font-bold text-white'>
+              Resume Active Session
+            </Text>
+          </View>
         </Link>
       ) : (
         <>

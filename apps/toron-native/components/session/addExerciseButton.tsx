@@ -15,7 +15,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import CustomSelect from '@/components/customSelect'
 import { getExercises, useSupabaseUser } from '@/lib/dbFunctions'
-import { useCreateSetGroupMutation } from '@/lib/mutations/setGroupMutations'
+import { useCreateSetGroupMutation } from '@/lib/mutations/sessionExerciseMutations'
 import { useCreateSetMutation } from '@/lib/mutations/setMutation'
 
 import {
@@ -57,6 +57,8 @@ export default function AddExerciseButton({
     queryKey: ['exercises'],
     queryFn: async () => getExercises(),
   })
+
+  console.log({ exercises })
 
   const exercisesOptions = exercises?.map((exercise) => ({
     label: exercise.name,

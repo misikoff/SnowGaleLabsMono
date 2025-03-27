@@ -7,7 +7,7 @@ import AddExerciseButton from '@/components/session/addExerciseButton'
 import CompleteSessionButton from '@/components/session/completeSessionButton'
 import SetGroupBlock from '@/components/session/setGroupBlock'
 import { getSession } from '@/lib/dbFunctions'
-import { useUpdateSetGroupOrderMutation } from '@/lib/mutations/setGroupMutations'
+import { useUpdateSetGroupOrderMutation } from '@/lib/mutations/sessionExerciseMutations'
 
 import { SetGroupWithExerciseAndSets } from '../../../../../../packages/toron-db/schema'
 

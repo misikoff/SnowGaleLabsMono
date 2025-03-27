@@ -1,14 +1,24 @@
-import { Pressable, ScrollView, Text, View } from 'react-native'
+import {
+  Alert,
+  Button,
+  //  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native'
 import { useLocalSearchParams, router, Link } from 'expo-router'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowDownWideNarrow, ArrowUpWideNarrow } from 'lucide-react-native'
+// import { ArrowDownWideNarrow, ArrowUpWideNarrow } from 'lucide-react-native'
 
-import AddExerciseButton from '@/components/session/addExerciseButton'
+// import AddExerciseButton from '@/components/session/addExerciseButton'
 import CompleteSessionButton from '@/components/session/completeSessionButton'
 import DeleteSessionButton from '@/components/session/deleteSessionButton'
-import SetGroupBlock from '@/components/session/setGroupBlock'
+// import SetGroupBlock from '@/components/session/setGroupBlock'
 import { getSession } from '@/lib/dbFunctions'
-import { useUpdateSetGroupOrderMutation } from '@/lib/mutations/setGroupMutations'
+import {
+  useDeleteSessionExerciseMutation,
+  useUpdateSessionExerciseMutation,
+} from '@/lib/mutations/sessionExerciseMutations'
 
 export default function Page() {
   const { slug: sessionId } = useLocalSearchParams()
@@ -26,7 +36,8 @@ export default function Page() {
   })
   console.log({ session123: session })
 
-  const updateSetGroupOrderMutation = useUpdateSetGroupOrderMutation()
+  const deleteSessionExerciseMutation = useDeleteSessionExerciseMutation()
+  const updateSessionExerciseMutation = useUpdateSessionExerciseMutation()
 
   return (
     <ScrollView>
@@ -43,10 +54,94 @@ export default function Page() {
             </Text>
             {session.sessionExercises.map((sessionExercise, index) => (
               <View key={index}>
-                <Text>{sessionExercise.muscleGroup.name}</Text>
+                <Text>
+                  {sessionExercise.muscleGroup.name}: {sessionExercise.order}
+                </Text>
                 {/* add exercise button that brings up the select exercise modal with the muscle group's exercises highlighted */}
+                {sessionExercise.exercise ? (
+                  <>
+                    <Text>{sessionExercise.exercise.name}</Text>
+                    {session.id && (
+                      <Button
+                        title='Swap Exercise'
+                        onPress={() =>
+                          router.push(
+                            `/(auth-modal)/add-exercise?sessionId=${session.id}&sessionExerciseId=${sessionExercise.id}&muscleGroupId=${sessionExercise.muscleGroup.id}`,
+                          )
+                        }
+                      />
+                    )}
+                    <Button
+                      title='Delete'
+                      color='red'
+                      onPress={() => {
+                        Alert.alert(
+                          'Delete Exercise',
+                          'Are you sure you want to delete this exercise? All sets will be deleted.',
+                          [
+                            {
+                              text: 'Cancel',
+                              style: 'cancel',
+                            },
+                            {
+                              text: 'OK',
+                              onPress: async () => {
+                                // TODO: delete session exercise and update other session exercise orders
+                                await deleteSessionExerciseMutation
+                                  .mutateAsync({
+                                    sessionId: session.id,
+                                    id: sessionExercise.id,
+                                  })
+                                  .then(async () => {
+                                    // iterate over sessionExercises and update the order
+                                    await session.sessionExercises.forEach(
+                                      async (se, index1) => {
+                                        if (se.order > sessionExercise.order) {
+                                          // se.order = se.order - 1
+                                          await updateSessionExerciseMutation.mutateAsync(
+                                            {
+                                              id: se.id,
+                                              order: index1 - 1,
+                                            },
+                                          )
+                                        }
+                                      },
+                                    )
+                                  })
+                              },
+                            },
+                          ],
+                          // { cancelable: true },
+                        )
+                      }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    {session.id && (
+                      <Button
+                        title='Pick Exercise'
+                        onPress={() =>
+                          router.push(
+                            `/(auth-modal)/add-exercise?sessionId=${session.id}&sessionExerciseId=${sessionExercise.id}&muscleGroupId=${sessionExercise.muscleGroup.id}`,
+                          )
+                        }
+                      />
+                    )}
+                  </>
+                )}
               </View>
             ))}
+
+            <Button
+              title='Add Another Exercise'
+              onPress={() =>
+                router.push(
+                  `/(auth-modal)/add-exercise?sessionId=${session.id}&order=${session.sessionExercises.length}`,
+                )
+              }
+            />
+
             {/* <Text>Set Groups: {session.setGroups.length}</Text> */}
 
             {/* {session.setGroups
@@ -98,14 +193,6 @@ export default function Page() {
           </View>
         </View>
       )}
-
-      <AddExerciseButton session={session}>
-        <View className='rounded-md bg-teal-600 px-3 py-2 text-center'>
-          <Text className='text-center text-xl font-bold text-white'>
-            <Text>Add Exercise</Text>
-          </Text>
-        </View>
-      </AddExerciseButton>
 
       <CompleteSessionButton session={session}>
         <View className='rounded-md bg-green-600 px-3 py-2 text-center'>

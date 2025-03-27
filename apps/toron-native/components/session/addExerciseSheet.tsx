@@ -18,7 +18,7 @@ import { ScrollView, TextInput } from 'react-native-gesture-handler'
 
 import { SessionWithSetGroupWithExerciseAndSets } from '../../../../packages/toron-db/schema'
 import { getExercises, useSupabaseUser } from '@/lib/dbFunctions'
-import { useCreateSetGroupMutation } from '@/lib/mutations/setGroupMutations'
+import { useCreateSetGroupMutation } from '@/lib/mutations/sessionExerciseMutations'
 import { useCreateSetMutation } from '@/lib/mutations/setMutation'
 
 export default function AddExerciseSheet({

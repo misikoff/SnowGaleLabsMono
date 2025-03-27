@@ -2,7 +2,7 @@ import { Alert, Pressable } from 'react-native'
 import * as Haptics from 'expo-haptics'
 
 import { SetGroupWithExerciseAndSets } from '../../../../packages/toron-db/schema'
-import { useDeleteSetGroupMutation } from '@/lib/mutations/setGroupMutations'
+import { useDeleteSetGroupMutation } from '@/lib/mutations/sessionExerciseMutations'
 export default function DeleteSetGroupButton({
   setGroup,
   children = false,

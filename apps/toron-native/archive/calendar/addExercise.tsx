@@ -16,7 +16,7 @@ import { clsx } from 'clsx'
 import { GlassesIcon, InfoIcon, XIcon } from 'lucide-react-native'
 
 import { getExercises, getSession, useSupabaseUser } from '@/lib/dbFunctions'
-import { useCreateSetGroupMutation } from '@/lib/mutations/setGroupMutations'
+import { useCreateSetGroupMutation } from '@/lib/mutations/sessionExerciseMutations'
 import { useCreateSetMutation } from '@/lib/mutations/setMutation'
 export default function App() {
   const { sessionId } = useLocalSearchParams()

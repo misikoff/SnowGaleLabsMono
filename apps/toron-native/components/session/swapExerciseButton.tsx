@@ -15,7 +15,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Exercise, SetGroupWithExerciseAndSets } from '../../../../packages/toron-db/schema'
 import CustomSelect from '@/components/customSelect'
 import { getExercises } from '@/lib/dbFunctions'
-import { useSwapSetGroupMutation } from '@/lib/mutations/setGroupMutations'
+import { useSwapSetGroupMutation } from '@/lib/mutations/sessionExerciseMutations'
 
 export default function SwapExerciseButton({
   setGroup,
