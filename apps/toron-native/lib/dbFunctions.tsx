@@ -60,38 +60,41 @@ export async function getSession(payload: { sessionId: Session['id'] }) {
     .from('sessions')
     .select(
       `
-    id,
-    name,
-    date,
-    sessionExercises:session_exercises (
       id,
-      order,
-      sessionId:session_id,
-      exercise:exercises (
+      name,
+      date,
+      sessionExercises:session_exercises (
         id,
-        name
-      ),
-      muscleGroup:muscle_groups (
-        id,
-        name
-      ),
-      sets (
-        id,
-        exerciseId:exercise_id,
-        sessionExerciseId:session_exercise_id,
         order,
-        reps,
-        rir,
-        weight,
-        sessionId:session_id
+        sessionId:session_id,
+        exercise:exercises (
+          id,
+          name
+        ),
+        muscleGroup:muscle_groups (
+          id,
+          name
+        ),
+        sets (
+          id,
+          exerciseId:exercise_id,
+          sessionExerciseId:session_exercise_id,
+          order,
+          reps,
+          rir,
+          weight,
+          sessionId:session_id
+        )
       )
-    )
-  `,
+    `,
     )
     .eq('id', payload.sessionId)
-    // order by sessionExercises.order
     .order('order', { ascending: false })
     .order('order', { referencedTable: 'session_exercises', ascending: true }) // Order sessionExercises
+    .order('order', {
+      referencedTable: 'session_exercises.sets',
+      ascending: true,
+    })
 
   const { data, error } = await query
 
@@ -106,19 +109,6 @@ export async function getSession(payload: { sessionId: Session['id'] }) {
   }
 
   return data[0] as QueryData<typeof query>[0]
-
-  //toCamelCase(data[0]) as any
-  // console.log({ sessionId: payload.sessionId })
-  // const { data, error } = await supabase
-  //   .from('sessions')
-  //   .select('*')
-  //   .eq('id', payload.sessionId)
-  // // .limit(10)
-  // if (error) {
-  //   console.error('Error fetching session:', error)
-  //   return []
-  // }
-  // return getFirstOrNull({ data }) as Session
 }
 
 export async function getProfile() {

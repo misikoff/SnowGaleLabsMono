@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
   Alert,
@@ -11,25 +11,37 @@ import {
 } from 'react-native'
 import { Picker as SelectPicker } from '@react-native-picker/picker'
 
-import { Set } from '../../../../packages/toron-db/schema'
 import { useUpdateSetMutation } from '@/lib/mutations/setMutation'
+
+import { Set } from '../../../../packages/toron-db/schema'
 
 export default function PerformanceButton({
   set,
+  defaultWeight = 0,
+  defaultReps = 0,
+  targetRir = 0,
   disabled = false,
   children,
 }: {
   set: Set
+  defaultWeight?: number
+  defaultReps?: number
+  targetRir?: number
   disabled?: boolean
   children: React.ReactNode
 }) {
   const [showMoveModal, setShowMoveModal] = useState(false)
 
-  const [curWeight, setCurWeight] = useState(set.weight)
-  const [curReps, setCurReps] = useState(set.reps)
-  const [curRpe, setCurRpe] = useState(set.rpe)
+  const [curWeight, setCurWeight] = useState(set.weight || defaultWeight)
+  const [curReps, setCurReps] = useState(set.reps || defaultReps)
+  const [curRir, setCurRir] = useState(set.rir || targetRir)
 
   const updateSetMutation = useUpdateSetMutation()
+  useEffect(() => {
+    setCurWeight(set.weight || defaultWeight)
+    setCurReps(set.reps || defaultReps)
+    setCurRir(set.rir || targetRir)
+  }, [set, defaultWeight, defaultReps, targetRir])
 
   return (
     <>
@@ -65,7 +77,7 @@ export default function PerformanceButton({
                   id: set.id,
                   weight: Number(curWeight),
                   reps: Number(curReps),
-                  rpe: Number(curRpe),
+                  rir: Number(curRir),
                   sessionId: set.sessionId,
                 })
                 setShowMoveModal(false)
@@ -127,10 +139,10 @@ export default function PerformanceButton({
               <SelectPicker
                 itemStyle={pickerSelectStyles.pickerItem}
                 style={pickerSelectStyles.picker}
-                selectedValue={curRpe}
-                onValueChange={(itemValue, itemIndex) => setCurRpe(itemValue)}
+                selectedValue={curRir}
+                onValueChange={(itemValue, itemIndex) => setCurRir(itemValue)}
               >
-                {[0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5].map((week, i) => (
+                {[0, 1, 2, 3, 4, 5].map((week, i) => (
                   <SelectPicker.Item
                     key={i}
                     label={week.toString()}

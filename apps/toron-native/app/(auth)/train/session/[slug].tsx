@@ -1,21 +1,11 @@
-import {
-  Alert,
-  Button,
-  //  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native'
+import { Alert, Button, ScrollView, Text, View } from 'react-native'
 import * as Crypto from 'expo-crypto'
 import { useLocalSearchParams, router, Link } from 'expo-router'
 import { useQuery } from '@tanstack/react-query'
-// import { ArrowDownWideNarrow, ArrowUpWideNarrow } from 'lucide-react-native'
 
-// import AddExerciseButton from '@/components/session/addExerciseButton'
 import CompleteSessionButton from '@/components/session/completeSessionButton'
-import DeleteSessionButton from '@/components/session/deleteSessionButton'
-// import SetGroupBlock from '@/components/session/setGroupBlock'
-import { getSession } from '@/lib/dbFunctions'
+import PerformanceButton from '@/components/session/performanceButton'
+import { getProfile, getSession, getSplit } from '@/lib/dbFunctions'
 import {
   useDeleteSessionExerciseMutation,
   useUpdateSessionExerciseMutation,
@@ -39,6 +29,26 @@ export default function Page() {
       getSession({
         sessionId: sessionId as string,
       }),
+  })
+
+  const {
+    data: profile,
+    isLoading: profileLoading,
+    isError: profileError,
+    refetch: profileRefetch,
+  } = useQuery({
+    queryKey: ['profile'],
+    queryFn: async () => getProfile(),
+  })
+
+  const {
+    data: split,
+    isLoading: splitLoading,
+    isError: splitError,
+  } = useQuery({
+    queryKey: ['splits', profile?.currentSplitId],
+    queryFn: () => getSplit({ id: profile?.currentSplitId }),
+    enabled: !!profile?.currentSplitId,
   })
 
   const deleteSessionExerciseMutation = useDeleteSessionExerciseMutation()
@@ -159,38 +169,55 @@ export default function Page() {
                           key={index}
                           className='rounded-md bg-gray-300 p-2'
                         >
-                          <Text>
-                            Set: {set.order}: {set.reps}x{set.weight}
-                          </Text>
-                          <Button
-                            title='Delete Set'
-                            color='red'
-                            onPress={async () => {
-                              console.log({
-                                exerciseId: sessionExercise.exercise.id,
-                              })
-                              await deleteSetMutation
-                                .mutateAsync({
-                                  id: set.id,
-                                  sessionExerciseId: sessionExercise.id,
-                                  sessionId: session.id,
+                          <View className='flex-row items-center justify-between'>
+                            <Text>
+                              Set: {set.order}: {set.weight}
+                              lbs x {set.reps}reps @ {set.rir}RIR
+                            </Text>
+                            <PerformanceButton
+                              set={set}
+                              // set default weight to previous set weight if available
+                              // TODO: set default weight and reps to last first set of the exercise if it's the first set
+                              defaultWeight={
+                                sessionExercise.sets[index - 1]?.weight
+                              }
+                              defaultReps={
+                                sessionExercise.sets[index - 1]?.reps
+                              }
+                              targetRir={split?.rirTarget}
+                            >
+                              <Text>Performance</Text>
+                            </PerformanceButton>
+                            <Button
+                              title='-'
+                              color='red'
+                              onPress={async () => {
+                                console.log({
+                                  exerciseId: sessionExercise.exercise.id,
                                 })
-                                .then(async () => {
-                                  // iterate over sessionExercises and update the order
-                                  await sessionExercise.sets.forEach(
-                                    async (s, index2) => {
-                                      if (s.order > set.order) {
-                                        // se.order = se.order - 1
-                                        await updateSetMutation.mutateAsync({
-                                          id: s.id,
-                                          order: index2 - 1,
-                                        })
-                                      }
-                                    },
-                                  )
-                                })
-                            }}
-                          />
+                                await deleteSetMutation
+                                  .mutateAsync({
+                                    id: set.id,
+                                    sessionExerciseId: sessionExercise.id,
+                                    sessionId: session.id,
+                                  })
+                                  .then(async () => {
+                                    // iterate over sessionExercises and update the order
+                                    await sessionExercise.sets.forEach(
+                                      async (s, index2) => {
+                                        if (s.order > set.order) {
+                                          // se.order = se.order - 1
+                                          await updateSetMutation.mutateAsync({
+                                            id: s.id,
+                                            order: index2 - 1,
+                                          })
+                                        }
+                                      },
+                                    )
+                                  })
+                              }}
+                            />
+                          </View>
                         </View>
                       ))}
                     </View>
@@ -297,21 +324,6 @@ export default function Page() {
           </Text>
         </View>
       </CompleteSessionButton>
-
-      {session?.id && (
-        <DeleteSessionButton
-          sessionId={session.id}
-          onDelete={() => {
-            router.back()
-          }}
-        >
-          <View className='rounded-md bg-red-600 px-3 py-2 text-center'>
-            <Text className='text-center text-xl font-bold text-white'>
-              Delete Session
-            </Text>
-          </View>
-        </DeleteSessionButton>
-      )}
     </ScrollView>
   )
 }
