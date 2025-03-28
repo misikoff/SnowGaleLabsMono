@@ -6,6 +6,7 @@ import {
   Text,
   View,
 } from 'react-native'
+import * as Crypto from 'expo-crypto'
 import { useLocalSearchParams, router, Link } from 'expo-router'
 import { useQuery } from '@tanstack/react-query'
 // import { ArrowDownWideNarrow, ArrowUpWideNarrow } from 'lucide-react-native'
@@ -19,6 +20,11 @@ import {
   useDeleteSessionExerciseMutation,
   useUpdateSessionExerciseMutation,
 } from '@/lib/mutations/sessionExerciseMutations'
+import {
+  useCreateSetMutation,
+  useDeleteSetMutation,
+  useUpdateSetMutation,
+} from '@/lib/mutations/setMutation'
 
 export default function Page() {
   const { slug: sessionId } = useLocalSearchParams()
@@ -34,10 +40,13 @@ export default function Page() {
         sessionId: sessionId as string,
       }),
   })
-  console.log({ session123: session })
 
   const deleteSessionExerciseMutation = useDeleteSessionExerciseMutation()
   const updateSessionExerciseMutation = useUpdateSessionExerciseMutation()
+
+  const updateSetMutation = useUpdateSetMutation()
+  const createSetMutation = useCreateSetMutation()
+  const deleteSetMutation = useDeleteSetMutation()
 
   return (
     <ScrollView>
@@ -49,73 +58,161 @@ export default function Page() {
           {/* <Text>Session: {session.id.substring(0, 5)}</Text> */}
 
           <View className='gap-4'>
-            <Text>
+            {/* <Text>
               Session Muscle Groups: {session.sessionExercises.length}
-            </Text>
+            </Text> */}
             {session.sessionExercises.map((sessionExercise, index) => (
-              <View key={index}>
+              <View key={index} className='rounded-md bg-gray-200 p-2'>
                 <Text>
                   {sessionExercise.muscleGroup.name}: {sessionExercise.order}
                 </Text>
                 {/* add exercise button that brings up the select exercise modal with the muscle group's exercises highlighted */}
                 {sessionExercise.exercise ? (
-                  <>
-                    <Text>{sessionExercise.exercise.name}</Text>
-                    {session.id && (
-                      <Button
-                        title='Swap Exercise'
-                        onPress={() =>
-                          router.push(
-                            `/(auth-modal)/add-exercise?sessionId=${session.id}&sessionExerciseId=${sessionExercise.id}&muscleGroupId=${sessionExercise.muscleGroup.id}`,
-                          )
-                        }
-                      />
-                    )}
-                    <Button
-                      title='Delete'
-                      color='red'
-                      onPress={() => {
-                        Alert.alert(
-                          'Delete Exercise',
-                          'Are you sure you want to delete this exercise? All sets will be deleted.',
-                          [
-                            {
-                              text: 'Cancel',
-                              style: 'cancel',
-                            },
-                            {
-                              text: 'OK',
-                              onPress: async () => {
-                                // TODO: delete session exercise and update other session exercise orders
-                                await deleteSessionExerciseMutation
-                                  .mutateAsync({
-                                    sessionId: session.id,
-                                    id: sessionExercise.id,
-                                  })
-                                  .then(async () => {
-                                    // iterate over sessionExercises and update the order
-                                    await session.sessionExercises.forEach(
-                                      async (se, index1) => {
-                                        if (se.order > sessionExercise.order) {
-                                          // se.order = se.order - 1
-                                          await updateSessionExerciseMutation.mutateAsync(
-                                            {
-                                              id: se.id,
-                                              order: index1 - 1,
-                                            },
-                                          )
-                                        }
+                  <View>
+                    <View className='flex-row items-center justify-between'>
+                      <Text>{sessionExercise.exercise.name}</Text>
+                      <View className='flex-row gap-2'>
+                        {session.id && (
+                          <Button
+                            title='Swap'
+                            onPress={() => {
+                              if (sessionExercise.sets.length > 0) {
+                                Alert.alert(
+                                  'Delete Sets',
+                                  'Swapping exercises will delete all sets for this exercise. Are you sure you want to continue?',
+                                  [
+                                    {
+                                      text: 'Cancel',
+                                      style: 'cancel',
+                                    },
+                                    {
+                                      text: 'Continue',
+                                      onPress: () => {
+                                        router.push(
+                                          `/(auth-modal)/add-exercise?sessionId=${session.id}&sessionExerciseId=${sessionExercise.id}&muscleGroupId=${sessionExercise.muscleGroup.id}`,
+                                        )
                                       },
-                                    )
-                                  })
-                              },
-                            },
-                          ],
-                          // { cancelable: true },
-                        )
+                                    },
+                                  ],
+                                  // { cancelable: true },
+                                )
+                              } else {
+                                router.push(
+                                  `/(auth-modal)/add-exercise?sessionId=${session.id}&sessionExerciseId=${sessionExercise.id}&muscleGroupId=${sessionExercise.muscleGroup.id}`,
+                                )
+                              }
+                            }}
+                          />
+                        )}
+                        <Button
+                          title='Delete'
+                          color='red'
+                          onPress={() => {
+                            Alert.alert(
+                              'Delete Exercise',
+                              'Are you sure you want to delete this exercise? All sets will be deleted.',
+                              [
+                                {
+                                  text: 'Cancel',
+                                  style: 'cancel',
+                                },
+                                {
+                                  text: 'OK',
+                                  onPress: async () => {
+                                    // TODO: delete session exercise and update other session exercise orders
+                                    await deleteSessionExerciseMutation
+                                      .mutateAsync({
+                                        sessionId: session.id,
+                                        id: sessionExercise.id,
+                                      })
+                                      .then(async () => {
+                                        // iterate over sessionExercises and update the order
+                                        await session.sessionExercises.forEach(
+                                          async (se, index1) => {
+                                            if (
+                                              se.order > sessionExercise.order
+                                            ) {
+                                              // se.order = se.order - 1
+                                              await updateSessionExerciseMutation.mutateAsync(
+                                                {
+                                                  id: se.id,
+                                                  order: index1 - 1,
+                                                },
+                                              )
+                                            }
+                                          },
+                                        )
+                                      })
+                                  },
+                                },
+                              ],
+                              // { cancelable: true },
+                            )
+                          }}
+                        />
+                      </View>
+                    </View>
+
+                    {/* for each set list the sets */}
+                    <View className='gap-2'>
+                      {sessionExercise.sets.map((set, index) => (
+                        <View
+                          key={index}
+                          className='rounded-md bg-gray-300 p-2'
+                        >
+                          <Text>
+                            Set: {set.order}: {set.reps}x{set.weight}
+                          </Text>
+                          <Button
+                            title='Delete Set'
+                            color='red'
+                            onPress={async () => {
+                              console.log({
+                                exerciseId: sessionExercise.exercise.id,
+                              })
+                              await deleteSetMutation
+                                .mutateAsync({
+                                  id: set.id,
+                                  sessionExerciseId: sessionExercise.id,
+                                  sessionId: session.id,
+                                })
+                                .then(async () => {
+                                  // iterate over sessionExercises and update the order
+                                  await sessionExercise.sets.forEach(
+                                    async (s, index2) => {
+                                      if (s.order > set.order) {
+                                        // se.order = se.order - 1
+                                        await updateSetMutation.mutateAsync({
+                                          id: s.id,
+                                          order: index2 - 1,
+                                        })
+                                      }
+                                    },
+                                  )
+                                })
+                            }}
+                          />
+                        </View>
+                      ))}
+                    </View>
+
+                    {/* add set button */}
+                    <Button
+                      title='Add Set'
+                      onPress={async () => {
+                        console.log({
+                          exerciseId: sessionExercise.exercise.id,
+                        })
+                        await createSetMutation.mutateAsync({
+                          id: Crypto.randomUUID(),
+                          sessionExerciseId: sessionExercise.id,
+                          exerciseId: sessionExercise.exercise.id,
+                          order: sessionExercise.sets.length,
+                          sessionId: session.id,
+                        })
                       }}
                     />
-                  </>
+                  </View>
                 ) : (
                   <>
                     {session.id && (

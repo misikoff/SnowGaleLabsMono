@@ -1,18 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native'
+import { View, Text, Button, TouchableOpacity } from 'react-native'
 import * as Crypto from 'expo-crypto'
 import { useLocalSearchParams, useNavigation } from 'expo-router'
 import { FlashList } from '@shopify/flash-list'
 import { useQuery } from '@tanstack/react-query'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 
 import { getExercises, getMuscleGroups } from '@/lib/dbFunctions'
 import {
@@ -78,9 +71,11 @@ const ModalScreen = () => {
         .mutateAsync({
           id: sessionExerciseId,
           exerciseId: selectedExercise?.id,
+          muscleGroupId: selectedExercise?.muscleGroupId,
         })
         .then(() => {
           console.log('Exercise updated')
+          // TODO: delete all this session exercise's
           navigation.goBack() // Dismiss the route / pop the stack
         })
     }
@@ -164,8 +159,6 @@ const ModalScreen = () => {
           estimatedItemSize={50}
         />
       </View>
-
-      <Text>order: {order}</Text>
 
       {/* Submit Button */}
       <View className='mt-4 w-full'>

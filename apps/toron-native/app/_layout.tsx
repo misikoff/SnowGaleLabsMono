@@ -65,7 +65,6 @@ export default function HomeLayout() {
             options={{
               presentation: 'modal',
               headerShown: false,
-              // headerBackTitle: 'Back',
             }}
           />
         </Stack>

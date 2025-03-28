@@ -421,11 +421,7 @@ export async function createSet(payload: {
 }) {
   console.log('set incoming')
   console.log({ payload })
-  // remove id from payload if it is null
-  if (payload.exerciseId) {
-    delete payload.exerciseId
-  }
-  payload.exerciseId = '8270f873-2b90-43cc-a7e6-5ce01d2bb504'
+
   // create session in subabase
   const { data, error } = await supabase
     .from('sets')
@@ -449,6 +445,9 @@ export async function updateSet(payload: {
   rir?: Set['rir']
   weight?: Set['weight']
   exerciseId?: Set['exerciseId']
+  order?: Set['order']
+  sessionId?: Set['sessionId']
+  sessionExerciseId?: Set['sessionExerciseId']
 }) {
   // create session in subabase
   const { data, error } = await supabase
