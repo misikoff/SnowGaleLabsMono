@@ -10,9 +10,6 @@ export function invalidateSessionQueries(
   queryClient.invalidateQueries({
     queryKey: ['sessions'],
   })
-  queryClient.invalidateQueries({
-    queryKey: ['sessions'],
-  })
 }
 
 export function sessionRefetcher(
@@ -29,7 +26,7 @@ export function sessionRefetcher(
   }
 
   if (refetchOptions.single) {
-    queryClient.setQueryData(['session', sessionId], updatedSession)
+    // queryClient.setQueryData(['session', sessionId], updatedSession)
   }
 
   if (refetchOptions.multiple) {
@@ -47,7 +44,7 @@ export function sessionRefetcher(
       }
     })
 
-    queryClient.setQueryData(['sessions'], nextSessions)
+    // queryClient.setQueryData(['sessions'], nextSessions)
   }
 }
 

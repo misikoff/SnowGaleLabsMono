@@ -97,7 +97,12 @@ export async function getSession(payload: { sessionId: Session['id'] }) {
 
   if (error) {
     console.error('Error fetching session:', error)
-    return []
+    return null
+  }
+
+  if (!data || data.length === 0) {
+    console.log('No session found')
+    return null
   }
 
   return data[0] as QueryData<typeof query>[0]

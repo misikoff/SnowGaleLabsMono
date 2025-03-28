@@ -1,10 +1,16 @@
-import { View } from 'react-native'
-import { Slot } from 'expo-router'
+import { Stack } from 'expo-router'
 
-export default function SessionLayout() {
+export default function TrainLayout() {
   return (
-    <View className='h-full px-4 py-2'>
-      <Slot />
-    </View>
+    <Stack
+      screenOptions={{
+        title: 'Train',
+        headerShown: true,
+        headerStyle: { backgroundColor: '#f8f9fa' },
+        headerTintColor: '#333',
+        headerTitleStyle: { fontWeight: 'bold' },
+        headerBackButtonDisplayMode: 'minimal',
+      }}
+    />
   )
 }

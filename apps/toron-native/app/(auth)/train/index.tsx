@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 
 import { View, Text } from 'react-native'
-import { Link, router } from 'expo-router'
+import { Link, router, useFocusEffect } from 'expo-router'
 import { useQuery } from '@tanstack/react-query'
 
 import AddSessionButton from '@/components/session/addSessionButton'
@@ -29,6 +29,7 @@ export default function Tab() {
     data: profile,
     isLoading: profileLoading,
     isError: profileError,
+    refetch: profileRefetch,
   } = useQuery({
     queryKey: ['profile'],
     queryFn: async () => getProfile(),
@@ -59,10 +60,19 @@ export default function Tab() {
     data: sessions,
     isLoading: sessionsLoading,
     isError: sessionsError,
+    refetch: sessionsRefetch,
   } = useQuery({
     queryKey: ['sessions'],
     queryFn: () => getSessionsForCalendar(),
   })
+
+  useFocusEffect(
+    useCallback(() => {
+      // Refetch sessions when the screen comes into focus
+      sessionsRefetch()
+      profileRefetch()
+    }, [profileRefetch, sessionsRefetch]),
+  )
 
   useEffect(() => {
     if (sessions && trainingDays) {

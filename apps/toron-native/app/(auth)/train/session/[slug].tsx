@@ -50,7 +50,6 @@ export default function Page() {
 
   return (
     <ScrollView>
-      <Link href='/(auth)/train'>Back</Link>
       {isLoading && <Text>Loading...</Text>}
       {isError && <Text>Error</Text>}
       {session && (
@@ -303,12 +302,12 @@ export default function Page() {
         <DeleteSessionButton
           sessionId={session.id}
           onDelete={() => {
-            router.navigate('/(auth)/train')
+            router.back()
           }}
         >
           <View className='rounded-md bg-red-600 px-3 py-2 text-center'>
             <Text className='text-center text-xl font-bold text-white'>
-              <Text>Delete Session</Text>
+              Delete Session
             </Text>
           </View>
         </DeleteSessionButton>

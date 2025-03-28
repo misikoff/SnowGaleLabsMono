@@ -57,6 +57,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name='train'
         options={{
+          headerShown: false,
           title: 'Train',
           tabBarIcon: ({ color }) => (
             <FontAwesome6 size={24} name='dumbbell' color={color} />

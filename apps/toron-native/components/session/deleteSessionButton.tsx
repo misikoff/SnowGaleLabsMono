@@ -15,10 +15,11 @@ export default function DeleteSessionButton({
 
   const handleDelete = async () => {
     console.log('delete session')
-    await deleteSessionMutation.mutateAsync({ id: sessionId })
-    if (onDelete) {
-      onDelete()
-    }
+    await deleteSessionMutation.mutateAsync({ id: sessionId }).then(() => {
+      if (onDelete) {
+        onDelete()
+      }
+    })
   }
 
   const confirmDelete = () => {
