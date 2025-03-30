@@ -265,6 +265,24 @@ export const sets = pgTable(
   ],
 )
 
+export const feedback = pgTable(
+  'feedback',
+  {
+    id: uuid('id').default(primaryKeyDef).primaryKey(),
+    userId,
+    content: text('content').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at')
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => [
+    index('feedbackUserIdIndex').on(table.userId),
+    usersOnlyPolicy, // Apply the "Only Users can do anything" policy
+  ],
+)
+
 export type User = typeof users.$inferSelect
 export type Profile = typeof profiles.$inferSelect
 export type Exercise = typeof exercises.$inferSelect
@@ -274,3 +292,4 @@ export type Quote = typeof quotes.$inferSelect
 export type MuscleGroup = typeof muscleGroups.$inferSelect
 export type Split = typeof splits.$inferSelect
 export type SessionExercise = typeof sessionExercises.$inferSelect
+export type Feedback = typeof feedback.$inferSelect

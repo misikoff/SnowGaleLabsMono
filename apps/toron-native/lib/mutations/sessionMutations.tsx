@@ -186,7 +186,7 @@ export const useCompleteSessionMutation = () => {
       })
 
       // Snapshot the previous value
-      const previousSession = queryClient.getQueryData(['session', vars.id])
+      const previousSession = queryClient.getQueryData(['sessions', vars.id])
       const nextSession = produce(previousSession, (draft: any) => {
         draft.completed = true
       }) as Session

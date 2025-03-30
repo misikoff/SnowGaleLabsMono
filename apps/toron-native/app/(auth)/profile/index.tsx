@@ -1,5 +1,15 @@
-import { Alert, Pressable, Text, View } from 'react-native'
+import React, { useState } from 'react'
 // import Modal3D from '@/components/modal3d'
+
+import {
+  Alert,
+  Linking,
+  Modal,
+  Pressable,
+  Text,
+  TextInput,
+  View,
+} from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useQuery } from '@tanstack/react-query'
 
@@ -33,7 +43,6 @@ const DeleteAccountButton = () => {
             {
               text: 'Delete',
               onPress: async () => {
-                // fetch from localhost
                 console.log('delete account')
 
                 const {
@@ -91,7 +100,98 @@ const DeleteAccountButton = () => {
   )
 }
 
-export default function App() {
+const FeedbackButton = () => {
+  const [modalVisible, setModalVisible] = useState(false)
+  const [feedback, setFeedback] = useState('')
+
+  const submitFeedback = async () => {
+    if (!feedback.trim()) {
+      Alert.alert('Error', 'Feedback cannot be empty.')
+      return
+    }
+
+    // Get the current user's ID
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser()
+
+    if (userError || !user) {
+      Alert.alert('Error', 'Failed to retrieve user information.')
+      console.error('Error retrieving user:', userError?.message)
+      return
+    }
+
+    const { error } = await supabase.from('feedback').insert({
+      user_id: user.id,
+      content: feedback,
+    })
+
+    if (error) {
+      Alert.alert('Error', 'Failed to submit feedback.')
+      console.error('Error submitting feedback:', error.message)
+      return
+    }
+
+    Alert.alert('Success', 'Thank you for your feedback!')
+    setFeedback('')
+    setModalVisible(false)
+  }
+
+  return (
+    <>
+      <Pressable
+        onPress={() => setModalVisible(true)}
+        className='flex-row items-center gap-3 rounded-md bg-blue-200 px-4 py-2'
+      >
+        <Ionicons name='mail' size={24} color={'#444'} />
+        <Text className='text-lg font-bold'>Send Feedback</Text>
+      </Pressable>
+
+      <Modal
+        animationType='slide'
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(false)
+          setFeedback('')
+        }}
+      >
+        <View className='flex-1 items-center justify-center bg-black/50'>
+          <View className='w-4/5 rounded-lg bg-white p-6'>
+            <Text className='mb-4 text-lg font-bold'>Send Feedback</Text>
+            <TextInput
+              className='mb-4 h-24 w-full rounded-md border border-gray-300 p-2 text-sm'
+              placeholder='Write your feedback here...'
+              value={feedback}
+              onChangeText={setFeedback}
+              multiline
+            />
+            <View className='flex-row justify-between'>
+              <Pressable
+                className='flex-1 items-center justify-center rounded-md bg-gray-300 py-2'
+                onPress={() => {
+                  setModalVisible(false)
+                  setFeedback('')
+                }}
+              >
+                <Text className='font-bold text-gray-700'>Cancel</Text>
+              </Pressable>
+              <Pressable
+                className='ml-2 flex-1 items-center justify-center rounded-md bg-blue-500 py-2'
+                onPress={submitFeedback}
+              >
+                <Text className='font-bold text-white'>Submit</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </>
+  )
+}
+
+export default function Profile() {
   const {
     data: user,
     isLoading,
@@ -104,6 +204,10 @@ export default function App() {
   return (
     // <Modal3D modalContent={modalContent}>
     <View className='mt-12 flex-1 items-start gap-5 p-5'>
+      {/* Account Management Section */}
+      <Text className='text-center text-lg font-bold text-gray-700'>
+        Account Information
+      </Text>
       <View className='items-start gap-2 rounded-md bg-gray-300 p-4'>
         <Text className='text-center text-sm font-extrabold'>
           ID: {user && user.data.user?.id}
@@ -113,6 +217,10 @@ export default function App() {
         </Text>
       </View>
 
+      {/* Account Management Section */}
+      <Text className='mt-8 text-lg font-bold text-gray-700'>
+        Account Management
+      </Text>
       <View className='flex-row items-center gap-3 rounded-md bg-red-200 px-4 py-2'>
         <Text className='text-lg font-bold'>Log Out</Text>
         <LogoutButton />
@@ -121,6 +229,18 @@ export default function App() {
         <Text className='text-lg font-bold'>Delete Account</Text>
         <DeleteAccountButton />
       </View>
+
+      {/* Feedback & Community Section */}
+      <Text className='mt-8 text-lg font-bold text-gray-700'>
+        Help Improve Toron
+      </Text>
+      <Text className='mb-4 text-sm text-gray-500'>
+        Share your feedback or join our community to help us improve Toron.
+      </Text>
+
+      <FeedbackButton />
+      {/* TODO: add discord invite button */}
+      {/* <DiscordButton /> */}
     </View>
     // </Modal3D>
   )

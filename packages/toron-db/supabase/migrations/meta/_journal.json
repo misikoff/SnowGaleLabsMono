@@ -281,6 +281,13 @@
       "when": 1742931910074,
       "tag": "0039_template-fix",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1743335430519,
+      "tag": "0040_thick_terrax",
+      "breakpoints": true
     }
   ]
 }

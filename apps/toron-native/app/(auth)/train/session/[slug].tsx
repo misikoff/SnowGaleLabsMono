@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import CompleteSessionButton from '@/components/session/completeSessionButton'
 import PerformanceButton from '@/components/session/performanceButton'
 import { getProfile, getSession, getSplit } from '@/lib/dbFunctions'
+import { useUpdateProfileMutation } from '@/lib/mutations/profileMutations'
 import {
   useDeleteSessionExerciseMutation,
   useUpdateSessionExerciseMutation,
@@ -53,6 +54,8 @@ export default function Page() {
 
   const deleteSessionExerciseMutation = useDeleteSessionExerciseMutation()
   const updateSessionExerciseMutation = useUpdateSessionExerciseMutation()
+
+  const updateProfileMutation = useUpdateProfileMutation()
 
   const updateSetMutation = useUpdateSetMutation()
   const createSetMutation = useCreateSetMutation()
@@ -210,6 +213,7 @@ export default function Page() {
                                           await updateSetMutation.mutateAsync({
                                             id: s.id,
                                             order: index2 - 1,
+                                            sessionId: session.id,
                                           })
                                         }
                                       },
@@ -264,60 +268,24 @@ export default function Page() {
                 )
               }
             />
-
-            {/* <Text>Set Groups: {session.setGroups.length}</Text> */}
-
-            {/* {session.setGroups
-              .sort(
-                (
-                  s1: SetGroupWithExerciseAndSets,
-                  s2: SetGroupWithExerciseAndSets,
-                ) => {
-                  if (s1.order && s2.order) {
-                    return s1.order - s2.order
-                  } else if (s1.order) {
-                    return -1
-                  } else {
-                    return 1
-                  }
-                },
-              )
-              .map((setGroup: SetGroupWithExerciseAndSets, index: number) => (
-                <View key={index}>
-                  <Pressable
-                    disabled={index === 0}
-                    onPress={async () => {
-                      await updateSetGroupOrderMutation.mutateAsync({
-                        index1: index,
-                        index2: index - 1,
-                        session,
-                        sessionId: setGroup.sessionId,
-                      })
-                    }}
-                  >
-                    <ArrowUpWideNarrow />
-                  </Pressable>
-                  <Pressable
-                    disabled={index === session.setGroups.length - 1}
-                    onPress={async () => {
-                      await updateSetGroupOrderMutation.mutateAsync({
-                        index1: index,
-                        index2: index + 1,
-                        session,
-                        sessionId: setGroup.sessionId,
-                      })
-                    }}
-                  >
-                    <ArrowDownWideNarrow />
-                  </Pressable>
-                  <SetGroupBlock setGroup={setGroup} />
-                </View>
-              ))} */}
           </View>
         </View>
       )}
 
-      <CompleteSessionButton session={session}>
+      <CompleteSessionButton
+        sessionId={session?.id}
+        className='mt-8'
+        onComplete={async () => {
+          if (profile?.activeSessionId) {
+            await updateProfileMutation.mutateAsync({
+              id: profile?.id,
+              activeSessionId: null,
+            })
+          }
+
+          router.back()
+        }}
+      >
         <View className='rounded-md bg-green-600 px-3 py-2 text-center'>
           <Text className='text-center text-xl font-bold text-white'>
             <Text>Complete Session</Text>
