@@ -171,7 +171,7 @@ export default function Tab() {
               </View>
             </AddSessionButton>
           ) : (
-            <Link href='/(auth)/split'>
+            <Link href='/(auth)/plan'>
               <View className='rounded-md bg-blue-600 px-3 py-2 text-center'>
                 {/* TODO: if no splits make this go directly to creating a split */}
                 <Text className='text-center text-xl font-bold text-white'>

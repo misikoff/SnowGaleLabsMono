@@ -11,8 +11,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "prebuild": "expo prebuild",
-    "run1": "expo run:ios"
+    "prebuild": "expo prebuild"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.23.1",
@@ -29,11 +28,11 @@
     "expo-auth-session": "~6.0.3",
     "expo-constants": "~17.0.7",
     "expo-crypto": "~14.0.2",
-    "expo-dev-client": "~5.0.12",
+    "expo-dev-client": "~5.0.18",
     "expo-font": "~13.0.4",
     "expo-haptics": "^14.0.1",
     "expo-linking": "~7.0.5",
-    "expo-router": "~4.0.16",
+    "expo-router": "~4.0.20",
     "expo-secure-store": "^14.0.1",
     "expo-status-bar": "~2.0.1",
     "expo-web-browser": "^14.0.2",
@@ -43,7 +42,7 @@
     "nativewind": "^4.1.21",
     "react": "~18.3.1",
     "react-dom": "~18.3.1",
-    "react-native": "0.76.7",
+    "react-native": "0.77.2",
     "react-native-gesture-handler": "~2.20.2",
     "react-native-modal": "^13.0.1",
     "react-native-reanimated": "~3.16.5",

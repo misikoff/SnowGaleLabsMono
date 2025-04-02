@@ -1,3 +1,5 @@
+import { useCallback } from 'react'
+
 import { Alert, Button, ScrollView, Text, View } from 'react-native'
 import * as Crypto from 'expo-crypto'
 import { useLocalSearchParams, router, Link } from 'expo-router'
@@ -16,6 +18,20 @@ import {
   useDeleteSetMutation,
   useUpdateSetMutation,
 } from '@/lib/mutations/setMutation'
+
+function exerciseCounter(sessionExercises, curExercise, curIndex) {
+  const count =
+    sessionExercises
+      .slice(0, curIndex)
+      .filter((se) => se.muscleGroup.id === curExercise.muscleGroup.id).length +
+    1
+
+  if (count > 1) {
+    return <Text>#{count} for this muscle group</Text>
+  } else {
+    return <></>
+  }
+}
 
 export default function Page() {
   const { slug: sessionId } = useLocalSearchParams()
@@ -61,6 +77,32 @@ export default function Page() {
   const createSetMutation = useCreateSetMutation()
   const deleteSetMutation = useDeleteSetMutation()
 
+  const deleteSet = useCallback(
+    async (set, sessionExercise) => {
+      await deleteSetMutation
+        .mutateAsync({
+          id: set.id,
+          sessionExerciseId: sessionExercise.id,
+          sessionId: session?.id,
+        })
+        .then(async () => {
+          // Iterate over sessionExercise sets and update the order
+          await Promise.all(
+            sessionExercise.sets.map(async (s) => {
+              if (s.order > set.order) {
+                await updateSetMutation.mutateAsync({
+                  id: s.id,
+                  order: s.order - 1,
+                  sessionId: session?.id,
+                })
+              }
+            }),
+          )
+        })
+    },
+    [deleteSetMutation, updateSetMutation, session?.id],
+  )
+
   return (
     <ScrollView>
       {isLoading && <Text>Loading...</Text>}
@@ -78,6 +120,13 @@ export default function Page() {
                 <Text>
                   {sessionExercise.muscleGroup.name}: {sessionExercise.order}
                 </Text>
+                {/* count how many exercises before this one also had the same muscle group */}
+                {exerciseCounter(
+                  session.sessionExercises,
+                  sessionExercise,
+                  index,
+                )}
+
                 {/* add exercise button that brings up the select exercise modal with the muscle group's exercises highlighted */}
                 {sessionExercise.exercise ? (
                   <View>
@@ -198,27 +247,30 @@ export default function Page() {
                                 console.log({
                                   exerciseId: sessionExercise.exercise.id,
                                 })
-                                await deleteSetMutation
-                                  .mutateAsync({
-                                    id: set.id,
-                                    sessionExerciseId: sessionExercise.id,
-                                    sessionId: session.id,
-                                  })
-                                  .then(async () => {
-                                    // iterate over sessionExercises and update the order
-                                    await sessionExercise.sets.forEach(
-                                      async (s, index2) => {
-                                        if (s.order > set.order) {
-                                          // se.order = se.order - 1
-                                          await updateSetMutation.mutateAsync({
-                                            id: s.id,
-                                            order: index2 - 1,
-                                            sessionId: session.id,
-                                          })
-                                        }
+                                if (
+                                  set.rir !== null ||
+                                  set.weight !== null ||
+                                  set.reps !== null
+                                ) {
+                                  Alert.alert(
+                                    'Delete Set',
+                                    'Are you sure you want to delete this set?',
+                                    [
+                                      {
+                                        text: 'Cancel',
+                                        style: 'cancel',
                                       },
-                                    )
-                                  })
+                                      {
+                                        text: 'OK',
+                                        onPress: async () => {
+                                          await deleteSet(set, sessionExercise)
+                                        },
+                                      },
+                                    ],
+                                  )
+                                } else {
+                                  await deleteSet(set, sessionExercise)
+                                }
                               }}
                             />
                           </View>
