@@ -22,16 +22,22 @@ export default function Auth() {
   const [loading, setLoading] = useState(false)
 
   async function signInWithEmail() {
-    setLoading(true)
+    // setLoading(true)
+    console.log('signInWithEmail', { email, password })
+    // const session = (await supabase.auth.getSession()) || { blah: 'blah' }
+    // console.log('session', session)
     const { error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
+      email: 'tmisikoff+blue1@gmail.com', // email,
+      password: '123123', //password,
     })
 
+    console.log('done')
+
     if (error) {
+      console.log({ error })
       Alert.alert(error.message)
     }
-    setLoading(false)
+    // setLoading(false)
   }
 
   async function signUpWithEmail() {
@@ -57,18 +63,18 @@ export default function Auth() {
     <View className='mt-10 p-3'>
       <View className='mt-20 self-stretch py-1'>
         <Text>Email</Text>
-        <TextInput
+        {/* <TextInput
           // label='Email'
           // leftIcon={{ type: 'font-awesome', name: 'envelope' }}
           onChangeText={(text) => setEmail(text)}
           value={email}
           placeholder='email@address.com'
           autoCapitalize={'none'}
-        />
+        /> */}
       </View>
       <View className='self-stretch py-1'>
         <Text>Password</Text>
-        <TextInput
+        {/* <TextInput
           // label='Password'
           // leftIcon={{ type: 'font-awesome', name: 'lock' }}
           onChangeText={(text) => setPassword(text)}
@@ -76,11 +82,11 @@ export default function Auth() {
           secureTextEntry={true}
           placeholder='Password'
           autoCapitalize={'none'}
-        />
+        /> */}
       </View>
       <View className='mt-20 self-stretch py-1'>
         <Button
-          title='Sign in'
+          title='Sign in as tmisikoff+blue1@gmail.com'
           disabled={loading}
           onPress={() => signInWithEmail()}
         />

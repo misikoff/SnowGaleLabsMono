@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import {
   View,
@@ -13,8 +13,12 @@ import { useNavigation } from 'expo-router'
 import { Picker } from '@react-native-picker/picker'
 import { FlashList } from '@shopify/flash-list'
 import { useQuery } from '@tanstack/react-query'
+import { clsx } from 'clsx'
 import { PencilIcon } from 'lucide-react-native'
+import { useSharedValue } from 'react-native-reanimated'
 
+import DropZone from '@/components/dropZone'
+import MuscleGroupDragButton from '@/components/muscleGroupDragButton'
 import { createSessionExercise, getMuscleGroups } from '@/lib/dbFunctions'
 import { useCreateSessionMutation } from '@/lib/mutations/sessionMutations'
 import { useCreateSplitMutation } from '@/lib/mutations/splitMutations'
@@ -34,6 +38,11 @@ const ModalScreen = () => {
   const [selectedMuscleGroupId, setSelectedMuscleGroupId] = useState<
     string | null
   >(null)
+
+  const [dragging, setDragging] = useState(false)
+  const dragPos = useSharedValue({ x: -999, y: -999 })
+  const activeDropZoneId = useSharedValue<string | null>(null)
+
   const createSplitMutation = useCreateSplitMutation()
   const createSessionMutation = useCreateSessionMutation()
   const navigation = useNavigation()
@@ -258,21 +267,43 @@ const ModalScreen = () => {
 
       {muscleGroups && (
         <View className='flex flex-row flex-wrap gap-2 p-2'>
+          {/* <Text>{dragPos.value.x}</Text>
+          <Text>{dragPos.value.y}</Text> */}
           {muscleGroups.map((group) => (
-            <TouchableOpacity
+            <MuscleGroupDragButton
               key={group.id}
-              onPress={() =>
-                // setFilteredMuscleGroupId(
-                //   filteredMuscleGroupId === group.id ? null : group.id,
-                // )
-                console.log('muscle group pressed')
-              }
-              className={'rounded-full bg-gray-300 px-4 py-2'}
-            >
-              <Text className={'text-sm font-bold text-black'}>
-                {group.name}
-              </Text>
-            </TouchableOpacity>
+              dragPos={dragPos}
+              group={group}
+              onDrag={() => {
+                console.log('dragging')
+                setDragging(true)
+              }}
+              onDrop={(group, x, y) => {
+                setDragging(false)
+                console.log('dropped', group, x, y)
+                // handleDrop(group, x, y)
+              }}
+
+              // onPress={() => {
+              //   if (selectedTrainingDayId) {
+              //     handleMuscleGroupChange(selectedTrainingDayId, group.id)
+              //   }
+              // }}
+            />
+            // <TouchableOpacity
+            //   key={group.id}
+            //   onPress={() =>
+            //     // setFilteredMuscleGroupId(
+            //     //   filteredMuscleGroupId === group.id ? null : group.id,
+            //     // )
+            //     console.log('muscle group pressed')
+            //   }
+            //   className={'rounded-full bg-gray-300 px-4 py-2'}
+            // >
+            //   <Text className={'text-sm font-bold text-black'}>
+            //     {group.name}
+            //   </Text>
+            // </TouchableOpacity>
           ))}
         </View>
       )}
@@ -300,45 +331,85 @@ const ModalScreen = () => {
         <FlashList
           data={trainingDays}
           keyExtractor={(item) => item.id}
-          extraData={{ editingDayName, editingDayId, selectedTrainingDayId }}
+          extraData={{
+            editingDayName,
+            editingDayId,
+            selectedTrainingDayId,
+            activeDropZoneId,
+          }}
           renderItem={({ item, index }) => (
-            <View key={item.id} className='flex justify-between'>
-              <View className='flex flex-row items-center justify-between'>
-                {editingDayId === item.id ? (
-                  <>
-                    <TextInput
-                      placeholder='Name'
-                      value={editingDayName || ''}
-                      onChangeText={(text) => setEditingDayName(text)}
-                      style={{ borderWidth: 1, padding: 5, marginVertical: 5 }}
-                    />
-                    <Button
-                      title='Save'
-                      onPress={() => handleSaveTrainingDayName(item.id)}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <Text>{item.name ? item.name : 'Day ' + (index + 1)}</Text>
+            <View
+              key={item.id}
+              className='flex justify-between'
+              // onLayout={(event) => handleLayout(event, item.id)} // Capture layout
+            >
+              <DropZone
+                zoneId={item.id}
+                activeDropZoneId={activeDropZoneId}
+                dragPos={dragPos}
+              >
+                <View
+                  className={clsx(
+                    'flex flex-row items-center justify-between',
+                    // item.id === activeDropZoneId
+                    //     ? 'bg-sky-600'
+                    //     : 'bg-green-400',
+                  )}
+                >
+                  {editingDayId === item.id ? (
+                    <>
+                      <TextInput
+                        placeholder='Name'
+                        value={editingDayName || ''}
+                        onChangeText={(text) => setEditingDayName(text)}
+                        style={{
+                          borderWidth: 1,
+                          padding: 5,
+                          marginVertical: 5,
+                        }}
+                      />
+                      <Button
+                        title='Save'
+                        onPress={() => handleSaveTrainingDayName(item.id)}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <View>
+                        {/* {dragging ? (
+                          <>
+                            <Text>woww</Text>
+                          </>
+                        ) : (
+                          <></>
+                        )} */}
+                        <Text>
+                          {item.name ? item.name : 'Day ' + (index + 1)}:
+                          {item.id.slice(0, 5)}
+                        </Text>
 
-                    <TouchableOpacity
-                      // title='Edit'
-                      onPress={() => handleEditTrainingDay(item.id, item.name)}
-                    >
-                      <PencilIcon size={16} />
-                    </TouchableOpacity>
-                  </>
-                )}
+                        <TouchableOpacity
+                          // title='Edit'
+                          onPress={() =>
+                            handleEditTrainingDay(item.id, item.name)
+                          }
+                        >
+                          <PencilIcon size={16} />
+                        </TouchableOpacity>
+                      </View>
+                    </>
+                  )}
 
-                <Button
-                  title='-'
-                  onPress={() => {
-                    setTrainingDays(
-                      trainingDays.filter((day) => day.id !== item.id),
-                    )
-                  }}
-                />
-              </View>
+                  <Button
+                    title='-'
+                    onPress={() => {
+                      setTrainingDays(
+                        trainingDays.filter((day) => day.id !== item.id),
+                      )
+                    }}
+                  />
+                </View>
+              </DropZone>
               <View className=''>
                 {/* show all muscle groups */}
                 <View className='flex gap-2'>
