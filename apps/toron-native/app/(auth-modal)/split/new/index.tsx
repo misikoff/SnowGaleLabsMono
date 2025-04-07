@@ -255,6 +255,28 @@ const ModalScreen = () => {
           />
         </View>
       </View>
+
+      {muscleGroups && (
+        <View className='flex flex-row flex-wrap gap-2 p-2'>
+          {muscleGroups.map((group) => (
+            <TouchableOpacity
+              key={group.id}
+              onPress={() =>
+                // setFilteredMuscleGroupId(
+                //   filteredMuscleGroupId === group.id ? null : group.id,
+                // )
+                console.log('muscle group pressed')
+              }
+              className={'rounded-full bg-gray-300 px-4 py-2'}
+            >
+              <Text className={'text-sm font-bold text-black'}>
+                {group.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+
       <View className='h-10 w-full flex-row items-center justify-between'>
         <Text className='text-lg font-bold'>Training Days:</Text>
         <View className='flex-row items-center gap-2'>

@@ -6,6 +6,7 @@ import {
   Linking,
   Modal,
   Pressable,
+  ScrollView,
   Text,
   TextInput,
   View,
@@ -203,7 +204,8 @@ export default function Profile() {
 
   return (
     // <Modal3D modalContent={modalContent}>
-    <View className='mt-12 flex-1 items-start gap-5 p-5'>
+    // <ScrollView>
+    <View className='flex-1 items-start gap-2 p-5'>
       {/* Account Management Section */}
       <Text className='text-center text-lg font-bold text-gray-700'>
         Account Information
@@ -230,6 +232,16 @@ export default function Profile() {
         <DeleteAccountButton />
       </View>
 
+      {/* Data Management Section */}
+      <Text className='mt-8 text-lg font-bold text-gray-700'>
+        Data Management
+      </Text>
+
+      {/* TODO: implement complete data export */}
+      <View className='flex-row items-center gap-3 rounded-md bg-blue-200 px-4 py-2'>
+        <Text className='text-lg font-bold'>Export Data</Text>
+      </View>
+
       {/* Feedback & Community Section */}
       <Text className='mt-8 text-lg font-bold text-gray-700'>
         Help Improve Toron
@@ -242,6 +254,7 @@ export default function Profile() {
       {/* TODO: add discord invite button */}
       {/* <DiscordButton /> */}
     </View>
+    // </ScrollView>
     // </Modal3D>
   )
 }

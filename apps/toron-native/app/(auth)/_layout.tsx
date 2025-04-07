@@ -9,6 +9,7 @@ import { supabase } from '@/utils/supabase'
 export const LogoutButton = () => {
   const doLogout = async () => {
     const { error } = await supabase.auth.signOut()
+    console.log('Logging out...')
     // TODO: clear query cache
     if (error) {
       alert('Error logging out: ' + error.message)
