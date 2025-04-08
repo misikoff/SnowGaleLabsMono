@@ -151,6 +151,7 @@ export const splits = pgTable(
     name: text(),
     description: text(),
     rirTarget: smallint().default(0),
+    plannedRestDays: boolean().default(true),
     createdAt: timestamp().notNull().defaultNow(),
     updatedAt: timestamp()
       .notNull()
@@ -194,6 +195,7 @@ export const sessions = pgTable(
     splitTemplateId: uuid().references(() => splits.id, {
       onDelete: 'cascade',
     }),
+    isRestDay: boolean().default(false),
     // indicates what split this session was created from
     // may delete this if we don't use it
     splitId: uuid().references(() => splits.id, {

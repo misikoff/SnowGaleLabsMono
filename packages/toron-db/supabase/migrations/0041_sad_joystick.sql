@@ -1,0 +1,1 @@
+ALTER TABLE "splits" ADD COLUMN "planned_rest_days" boolean DEFAULT true;

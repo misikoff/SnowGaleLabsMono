@@ -19,6 +19,9 @@ import { useCreateSplitMutation } from '@/lib/mutations/splitMutations'
 const ModalScreen = () => {
   const [splitName, setSplitName] = useState('')
   const [rirTarget, setRirTarget] = useState(1)
+  const [restDayType, setRestDayType] = useState<'Planned' | 'Dynamic'>(
+    'Planned',
+  )
   const [trainingDays, setTrainingDays] = useState<
     { id: string; name: string; order: number; muscleGroups?: string[] }[]
   >([])
@@ -315,6 +318,22 @@ const ModalScreen = () => {
         </View>
       </View>
 
+      <View className='h-10 w-full flex-row items-center justify-between'>
+        <Text className='text-lg font-bold'>Rest Days:</Text>
+        <View className='flex-row items-center gap-2'>
+          <Button
+            title='Planned'
+            onPress={() => setRestDayType('Planned')}
+            disabled={restDayType === 'Planned'}
+          />
+          <Button
+            title='Dynamic'
+            onPress={() => setRestDayType('Dynamic')}
+            disabled={restDayType === 'Dynamic'}
+          />
+        </View>
+      </View>
+
       {muscleGroups && (
         <View className='flex flex-row flex-wrap justify-center gap-2 p-2'>
           {muscleGroups.map((group) => (
@@ -340,7 +359,9 @@ const ModalScreen = () => {
       )}
 
       <View className='h-10 w-full flex-row items-center justify-between'>
-        <Text className='text-lg font-bold'>Training Days:</Text>
+        <Text className='text-lg font-bold'>
+          {restDayType === 'Planned' ? 'Cycle Length' : 'Training Days'}
+        </Text>
         <View className='flex-row items-center gap-2'>
           <Button
             title='-'
@@ -400,7 +421,12 @@ const ModalScreen = () => {
                         <Text className='text-lg font-bold'>
                           {item.name ? item.name : 'Day ' + (index + 1)}:{' '}
                         </Text>
-
+                        {restDayType === 'Planned' &&
+                          (item.muscleGroups?.length || 0) === 0 && (
+                            <Text className='text-lg font-bold text-gray-500'>
+                              Rest Day
+                            </Text>
+                          )}
                         <TouchableOpacity
                           // title='Edit'
                           onPress={() =>
@@ -425,6 +451,7 @@ const ModalScreen = () => {
                     {/* show all muscle groups */}
                     <View className='flex gap-2'>
                       {item.muscleGroups?.map((groupId, i) => (
+                        // TODO: fix z-index issues with other buttons and scroll container
                         <MuscleGroupDragButton
                           key={'day' + groupId}
                           dragPos={dragPos}
