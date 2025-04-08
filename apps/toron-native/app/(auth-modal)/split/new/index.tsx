@@ -185,6 +185,8 @@ const ModalScreen = () => {
       await createSessionMutation.mutateAsync({
         id: sessionId,
         splitTemplateId: splitId,
+        isRestDay:
+          restDayType === 'Planned' && (day.muscleGroups?.length || 0) === 0,
         name: day.name,
         order: dayIndex,
       })
