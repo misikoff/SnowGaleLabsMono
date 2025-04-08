@@ -9,15 +9,17 @@ import Animated, {
 } from 'react-native-reanimated'
 
 export default function DropZone({
+  className,
+  children,
   zoneId,
   dragPos,
   activeDropZoneId,
-  children,
 }: {
+  className?: string
+  children: React.ReactNode
   zoneId: string
   dragPos: SharedValue<{ x: number; y: number }>
   activeDropZoneId: SharedValue<string | null>
-  children: React.ReactNode
 }) {
   const layout = useSharedValue({ x: 0, y: 0, width: 0, height: 0 })
   const viewRef = useRef<View>(null)
@@ -76,7 +78,7 @@ export default function DropZone({
   })
 
   return (
-    <Animated.View ref={viewRef} style={animatedStyle}>
+    <Animated.View ref={viewRef} style={animatedStyle} className={className}>
       {children}
     </Animated.View>
   )

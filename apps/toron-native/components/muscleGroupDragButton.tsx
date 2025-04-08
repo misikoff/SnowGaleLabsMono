@@ -27,12 +27,14 @@ export default function MuscleGroupDragButton({
   activeDropZoneId,
   // onDrag,
   onDrop,
+  showPhantom = false,
 }: {
   group: MuscleGroup
   dragPos: SharedValue<{ x: number; y: number }>
   activeDropZoneId: SharedValue<string | null>
   // onDrag: () => void
   onDrop: (group: MuscleGroup, x: number, y: number) => void
+  showPhantom?: boolean
 }) {
   const pressed = useSharedValue<boolean>(false)
   const offsetX = useSharedValue<number>(0)
@@ -119,12 +121,14 @@ export default function MuscleGroupDragButton({
   return (
     <View className='relative flex-row items-center justify-center'>
       {/* Phantom Button */}
-      <Animated.View
-        style={phantomStyles}
-        className='absolute items-center justify-center'
-      >
-        {getButton(group)}
-      </Animated.View>
+      {showPhantom && (
+        <Animated.View
+          style={phantomStyles}
+          className='absolute items-center justify-center'
+        >
+          {getButton(group)}
+        </Animated.View>
+      )}
 
       {/* Draggable Button */}
       <GestureDetector key={group.id} gesture={pan}>

@@ -1,22 +1,15 @@
 import { useEffect, useState } from 'react'
 
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  TouchableOpacity,
-  // Modal,
-} from 'react-native'
+import { View, Text, TextInput, Button, TouchableOpacity } from 'react-native'
 import * as Crypto from 'expo-crypto'
 import { useNavigation } from 'expo-router'
-// import { Picker } from '@react-native-picker/picker'
 import { FlashList } from '@shopify/flash-list'
 import { useQuery } from '@tanstack/react-query'
 import { clsx } from 'clsx'
 import { PencilIcon } from 'lucide-react-native'
 import { useSharedValue } from 'react-native-reanimated'
 
+import { MuscleGroup, Session } from '@repo/toron-db/schema'
 import DropZone from '@/components/dropZone'
 import MuscleGroupDragButton from '@/components/muscleGroupDragButton'
 import { createSessionExercise, getMuscleGroups } from '@/lib/dbFunctions'
@@ -32,14 +25,7 @@ const ModalScreen = () => {
   const [numTrainingDays, setNumTrainingDays] = useState(0)
   const [editingDayId, setEditingDayId] = useState<string | null>(null)
   const [editingDayName, setEditingDayName] = useState<string>('')
-  const [selectedTrainingDayId, setSelectedTrainingDayId] = useState<
-    string | null
-  >(null)
-  // const [selectedMuscleGroupId, setSelectedMuscleGroupId] = useState<
-  // string | null
-  // >(null)
 
-  // const [dragging, setDragging] = useState(false)
   const dragPos = useSharedValue({ x: -999, y: -999 })
   const activeDropZoneId = useSharedValue<string | null>(null)
 
@@ -56,13 +42,16 @@ const ModalScreen = () => {
     queryFn: async () => getMuscleGroups(),
   })
 
-  const handleTrainingDayNameChange = (id: string, name: string) => {
+  const handleTrainingDayNameChange = (id: Session['id'], name: string) => {
     setTrainingDays(
       trainingDays.map((day) => (day.id === id ? { ...day, name } : day)),
     )
   }
 
-  const handleMuscleGroupChange = (id: string, muscleGroupId: string) => {
+  const handleMuscleGroupChange = (
+    id: Session['id'],
+    muscleGroupId: string,
+  ) => {
     setTrainingDays(
       trainingDays.map((day) =>
         day.id === id
@@ -76,8 +65,69 @@ const ModalScreen = () => {
       ),
     )
     console.log('muscle group added to training day')
-    // setSelectedTrainingDayId(null)
-    // setSelectedMuscleGroupId(null)
+  }
+
+  // TODO handle index instead of muscle group
+  const handleRemovingMuscleGroup = (
+    id: Session['id'],
+    muscleGroupId: string,
+  ) => {
+    setTrainingDays(
+      trainingDays.map((day) =>
+        day.id === id
+          ? {
+              ...day,
+              muscleGroups: day.muscleGroups?.filter(
+                (groupId) => groupId !== muscleGroupId,
+              ),
+            }
+          : day,
+      ),
+    )
+    console.log('muscle group removed from training day')
+  }
+
+  const handleSwapMuscleGroupFromDayToDay = (
+    dayToRemoveId: Session['id'],
+    dayToAddId: Session['id'],
+    muscleGroupId: MuscleGroup['id'],
+    muscleGroupIndex: number,
+  ) => {
+    const dayToRemove = trainingDays.find((day) => day.id === dayToRemoveId)
+    const dayToAdd = trainingDays.find((day) => day.id === dayToAddId)
+    console.log('swapping muscle group', {
+      dayToRemoveId,
+      dayToAddId,
+      muscleGroupId,
+      muscleGroupIndex,
+    })
+    if (dayToRemove && dayToAdd) {
+      const newTrainingDays = trainingDays.map((day) =>
+        day.id === dayToRemoveId
+          ? {
+              ...day,
+              muscleGroups: day.muscleGroups?.filter(
+                (groupId, index) =>
+                  !(groupId === muscleGroupId && index === muscleGroupIndex),
+              ),
+            }
+          : day.id === dayToAddId
+            ? {
+                ...day,
+                muscleGroups: day.muscleGroups
+                  ? [...day.muscleGroups, muscleGroupId]
+                  : [muscleGroupId],
+              }
+            : day,
+      )
+      console.log(
+        'new training days',
+        newTrainingDays.map((day) => {
+          return { dayId: day.id, muscleGroups: day.muscleGroups?.length }
+        }),
+      )
+      setTrainingDays(newTrainingDays)
+    }
   }
 
   const handleEditTrainingDay = (id: string, name: string) => {
@@ -266,21 +316,14 @@ const ModalScreen = () => {
       </View>
 
       {muscleGroups && (
-        <View className='flex flex-row flex-wrap gap-2 p-2'>
-          {/* <Text>{dragPos.value.x}</Text>
-          <Text>{dragPos.value.y}</Text> */}
+        <View className='flex flex-row flex-wrap justify-center gap-2 p-2'>
           {muscleGroups.map((group) => (
             <MuscleGroupDragButton
               key={group.id}
               dragPos={dragPos}
               activeDropZoneId={activeDropZoneId}
               group={group}
-              // onDrag={() => {
-              //   console.log('dragging')
-              //   setDragging(true)
-              // }}
               onDrop={(group, x, y) => {
-                // setDragging(false)
                 console.log('dropped', group, x, y)
                 if (activeDropZoneId.value) {
                   handleMuscleGroupChange(activeDropZoneId.value, group.id)
@@ -289,29 +332,9 @@ const ModalScreen = () => {
                 setTimeout(() => {
                   activeDropZoneId.value = null
                 }, 10)
-                // handleDrop(group, x, y)
               }}
-
-              // onPress={() => {
-              //   if (selectedTrainingDayId) {
-              //     handleMuscleGroupChange(selectedTrainingDayId, group.id)
-              //   }
-              // }}
+              showPhantom
             />
-            // <TouchableOpacity
-            //   key={group.id}
-            //   onPress={() =>
-            //     // setFilteredMuscleGroupId(
-            //     //   filteredMuscleGroupId === group.id ? null : group.id,
-            //     // )
-            //     console.log('muscle group pressed')
-            //   }
-            //   className={'rounded-full bg-gray-300 px-4 py-2'}
-            // >
-            //   <Text className={'text-sm font-bold text-black'}>
-            //     {group.name}
-            //   </Text>
-            // </TouchableOpacity>
           ))}
         </View>
       )}
@@ -335,57 +358,47 @@ const ModalScreen = () => {
         </View>
       </View>
 
-      <View className='mt-2 flex flex-row items-center justify-between rounded-md bg-gray-400 p-2'>
+      <View className='mt-2 flex flex-row items-center justify-between rounded-md p-2'>
         <FlashList
           data={trainingDays}
           keyExtractor={(item) => item.id}
           extraData={{
             editingDayName,
             editingDayId,
-            selectedTrainingDayId,
             activeDropZoneId,
           }}
           renderItem={({ item, index }) => (
-            <DropZone
-              key={item.id}
-              zoneId={item.id}
-              activeDropZoneId={activeDropZoneId}
-              dragPos={dragPos}
-            >
-              <View className='flex justify-between'>
-                <View
-                  className={clsx('flex flex-row items-center justify-between')}
-                >
-                  {editingDayId === item.id ? (
-                    <>
-                      <TextInput
-                        placeholder='Name'
-                        value={editingDayName || ''}
-                        onChangeText={(text) => setEditingDayName(text)}
-                        style={{
-                          borderWidth: 1,
-                          padding: 5,
-                          marginVertical: 5,
-                        }}
-                      />
-                      <Button
-                        title='Save'
-                        onPress={() => handleSaveTrainingDayName(item.id)}
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <View>
-                        {/* {dragging ? (
-                          <>
-                            <Text>woww</Text>
-                          </>
-                        ) : (
-                          <></>
-                        )} */}
-                        <Text>
-                          {item.name ? item.name : 'Day ' + (index + 1)}:
-                          {item.id.slice(0, 5)}
+            <View className='my-4 flex justify-between px-4'>
+              <DropZone
+                className='rounded-lg'
+                key={item.id}
+                zoneId={item.id}
+                activeDropZoneId={activeDropZoneId}
+                dragPos={dragPos}
+              >
+                <View className='my-4 flex justify-between px-4'>
+                  <View className='flex flex-row items-center justify-between'>
+                    {editingDayId === item.id ? (
+                      <>
+                        <TextInput
+                          placeholder='Name'
+                          value={editingDayName || ''}
+                          onChangeText={(text) => setEditingDayName(text)}
+                          style={{
+                            borderWidth: 1,
+                            padding: 5,
+                            marginVertical: 5,
+                          }}
+                        />
+                        <Button
+                          title='Save'
+                          onPress={() => handleSaveTrainingDayName(item.id)}
+                        />
+                      </>
+                    ) : (
+                      <View className='flex w-full flex-row items-center justify-between'>
+                        <Text className='text-lg font-bold'>
+                          {item.name ? item.name : 'Day ' + (index + 1)}:{' '}
                         </Text>
 
                         <TouchableOpacity
@@ -397,34 +410,56 @@ const ModalScreen = () => {
                           <PencilIcon size={16} />
                         </TouchableOpacity>
                       </View>
-                    </>
-                  )}
+                    )}
 
-                  <Button
-                    title='-'
-                    onPress={() => {
-                      setTrainingDays(
-                        trainingDays.filter((day) => day.id !== item.id),
-                      )
-                    }}
-                  />
-                </View>
-                <View className=''>
-                  {/* show all muscle groups */}
-                  <View className='flex gap-2'>
-                    {item.muscleGroups?.map((groupId, i) => (
-                      <Text key={item.id + groupId + i}>
-                        {muscleGroups?.find((g) => g.id === groupId)?.name}
-                      </Text>
-                    ))}
+                    <Button
+                      title='-'
+                      onPress={() => {
+                        setTrainingDays(
+                          trainingDays.filter((day) => day.id !== item.id),
+                        )
+                      }}
+                    />
+                  </View>
+                  <View className=''>
+                    {/* show all muscle groups */}
+                    <View className='flex gap-2'>
+                      {item.muscleGroups?.map((groupId, i) => (
+                        <MuscleGroupDragButton
+                          key={'day' + groupId}
+                          dragPos={dragPos}
+                          activeDropZoneId={activeDropZoneId}
+                          group={
+                            muscleGroups?.find(
+                              (g) => g.id === groupId,
+                            ) as MuscleGroup
+                          }
+                          onDrop={(group, x, y) => {
+                            console.log('dropped', group, x, y)
+                            if (
+                              activeDropZoneId.value &&
+                              activeDropZoneId.value !== item.id
+                            ) {
+                              handleSwapMuscleGroupFromDayToDay(
+                                item.id,
+                                activeDropZoneId.value,
+                                group.id,
+                                i,
+                              )
+                            }
+
+                            // have to make sure this runs after the dropzone has updated
+                            setTimeout(() => {
+                              activeDropZoneId.value = null
+                            }, 10)
+                          }}
+                        />
+                      ))}
+                    </View>
                   </View>
                 </View>
-                {/* <Button
-                  title='+'
-                  onPress={() => setSelectedTrainingDayId(item.id)}
-                /> */}
-              </View>
-            </DropZone>
+              </DropZone>
+            </View>
           )}
           estimatedItemSize={50}
         />
@@ -437,51 +472,6 @@ const ModalScreen = () => {
       </TouchableOpacity>
       {muscleGroupsLoading && <Text>Loading muscle groups...</Text>}
       {muscleGroupsError && <Text>Error loading muscle groups...</Text>}
-      {/* <Modal
-        visible={!!selectedTrainingDayId}
-        transparent={true}
-        animationType='slide'
-      >
-        <View className='flex-1 justify-end'>
-          <View className='w-full rounded-t-md bg-white p-4'>
-            <Text className='text-lg font-bold'>Select Muscle Group</Text>
-            <Picker
-              selectedValue={selectedMuscleGroupId}
-              onValueChange={(value) => setSelectedMuscleGroupId(value)}
-              style={{ height: 200, width: '100%' }}
-            >
-              <Picker.Item label='Select Muscle Group' value={null} />
-              {muscleGroups?.map((group) => (
-                <Picker.Item
-                  key={group.id}
-                  label={group.name}
-                  value={group.id}
-                />
-              ))}
-            </Picker>
-            <View className='mt-4 flex-row justify-between'>
-              <Button
-                title='Cancel'
-                onPress={() => {
-                  setSelectedTrainingDayId(null)
-                  setSelectedMuscleGroupId(null)
-                }}
-              />
-              <Button
-                title='Add'
-                onPress={() => {
-                  if (selectedTrainingDayId && selectedMuscleGroupId) {
-                    handleMuscleGroupChange(
-                      selectedTrainingDayId,
-                      selectedMuscleGroupId,
-                    )
-                  }
-                }}
-              />
-            </View>
-          </View>
-        </View>
-      </Modal> */}
       <View className='mt-4 w-full'>
         <Text className='text-lg font-bold text-black'>
           Muscle Group Frequency:
