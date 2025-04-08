@@ -28,15 +28,25 @@ export default function DropZone({
     return x >= lx && x <= lx + width && y >= ly && y <= ly + height
   }
 
-  // Periodically measure the position of the view
+  // Use requestAnimationFrame to continuously measure the position of the view
   useEffect(() => {
-    const interval = setInterval(() => {
+    let isMounted = true
+
+    const measure = () => {
+      if (!isMounted) {
+        return
+      }
       viewRef.current?.measureInWindow((x, y, width, height) => {
         layout.value = { x, y, width, height }
       })
-    }, 100) // Measure every 100ms
+      requestAnimationFrame(measure) // Schedule the next frame
+    }
 
-    return () => clearInterval(interval) // Cleanup on unmount
+    measure() // Start measuring
+
+    return () => {
+      isMounted = false // Cleanup on unmount
+    }
   }, [layout])
 
   useAnimatedReaction(
@@ -56,6 +66,7 @@ export default function DropZone({
 
   const animatedStyle = useAnimatedStyle(() => {
     const isActive = activeDropZoneId.value === zoneId
+    console.log({ isActive })
     return {
       backgroundColor: isActive
         ? 'rgba(0, 128, 255, 0.5)'

@@ -1,3 +1,5 @@
+import { useCallback, useEffect, useRef } from 'react'
+
 import { Text, View } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
@@ -23,34 +25,57 @@ export default function MuscleGroupDragButton({
   group,
   dragPos,
   activeDropZoneId,
-  onDrag,
+  // onDrag,
   onDrop,
 }: {
   group: MuscleGroup
   dragPos: SharedValue<{ x: number; y: number }>
   activeDropZoneId: SharedValue<string | null>
-
-  onDrag: () => void
+  // onDrag: () => void
   onDrop: (group: MuscleGroup, x: number, y: number) => void
 }) {
   const pressed = useSharedValue<boolean>(false)
-  const droppingInside = useSharedValue<boolean>(false)
   const offsetX = useSharedValue<number>(0)
   const offsetY = useSharedValue<number>(0)
   const globalX = useSharedValue<number>(0)
   const globalY = useSharedValue<number>(0)
 
+  const buttonRef = useRef<View>(null)
+
+  // Function to measure the global position of the button
+  const measurePosition = useCallback(() => {
+    buttonRef.current?.measureInWindow((x, y, width, height) => {
+      globalX.value = x + width / 2 // Center X
+      globalY.value = y + height / 2 // Center Y
+    })
+  }, [globalX, globalY])
+
+  // Use requestAnimationFrame to continuously monitor the position
+  useEffect(() => {
+    let isMounted = true
+
+    const updatePosition = () => {
+      if (isMounted) {
+        measurePosition()
+        requestAnimationFrame(updatePosition) // Schedule the next frame
+      }
+    }
+
+    updatePosition() // Start monitoring
+
+    return () => {
+      isMounted = false // Stop monitoring on unmount
+    }
+  }, [measurePosition])
+
   const pan = Gesture.Pan()
-    .onBegin((event) => {
+    .onBegin(() => {
+      // activeDropZoneId.value = null
       pressed.value = true
-      droppingInside.value = false
       // TODO: get the center of the button instead of the center of the touch
-      globalX.value = event.absoluteX
-      globalY.value = event.absoluteY
-      runOnJS(onDrag)()
+      // runOnJS(onDrag)()
     })
     .onChange((event) => {
-      // console.log('onChange', event)
       offsetX.value = event.translationX
       offsetY.value = event.translationY
       dragPos.value = {
@@ -61,20 +86,18 @@ export default function MuscleGroupDragButton({
     .onFinalize(() => {
       pressed.value = false
 
-      // console.log('finalX', globalX.value + offsetX.value)
-      // console.log('finalY', globalY.value + offsetY.value)
-      runOnJS(onDrop)(group, globalX.value + offsetX.value, globalY.value)
+      const finalX = globalX.value + offsetX.value
+      const finalY = globalY.value + offsetY.value
 
-      dragPos.value = {
-        x: globalX.value + offsetX.value,
-        y: globalY.value + offsetY.value,
-      }
+      runOnJS(onDrop)(group, finalX, finalY)
+
+      dragPos.value = { x: finalX, y: finalY }
 
       if (activeDropZoneId.value) {
-        // fade out
-        droppingInside.value = true
+        offsetX.value = 0
+        offsetY.value = 0
       } else {
-        // spring back if not inside a drop zone
+        // Spring back if not inside a drop zone
         offsetX.value = withSpring(0)
         offsetY.value = withSpring(0)
       }
@@ -86,11 +109,10 @@ export default function MuscleGroupDragButton({
       { translateY: offsetY.value },
       { scale: withTiming(pressed.value ? 1.2 : 1) },
     ],
-    opacity: droppingInside.value ? 0 : pressed.value ? 0.8 : 1,
+    opacity: pressed.value ? 0.8 : 1,
   }))
 
   const phantomStyles = useAnimatedStyle(() => ({
-    // opacity: pressed.value ? 1 : 0,
     transform: [{ scale: withTiming(pressed.value ? 1 : 0.9) }],
   }))
 
@@ -106,7 +128,11 @@ export default function MuscleGroupDragButton({
 
       {/* Draggable Button */}
       <GestureDetector key={group.id} gesture={pan}>
-        <Animated.View style={[animatedStyles]} className='z-50'>
+        <Animated.View
+          ref={buttonRef}
+          style={[animatedStyles]}
+          className='z-50'
+        >
           {getButton(group)}
         </Animated.View>
       </GestureDetector>

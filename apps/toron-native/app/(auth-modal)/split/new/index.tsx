@@ -39,7 +39,7 @@ const ModalScreen = () => {
   // string | null
   // >(null)
 
-  const [dragging, setDragging] = useState(false)
+  // const [dragging, setDragging] = useState(false)
   const dragPos = useSharedValue({ x: -999, y: -999 })
   const activeDropZoneId = useSharedValue<string | null>(null)
 
@@ -275,17 +275,20 @@ const ModalScreen = () => {
               dragPos={dragPos}
               activeDropZoneId={activeDropZoneId}
               group={group}
-              onDrag={() => {
-                console.log('dragging')
-                setDragging(true)
-              }}
+              // onDrag={() => {
+              //   console.log('dragging')
+              //   setDragging(true)
+              // }}
               onDrop={(group, x, y) => {
-                setDragging(false)
+                // setDragging(false)
                 console.log('dropped', group, x, y)
                 if (activeDropZoneId.value) {
                   handleMuscleGroupChange(activeDropZoneId.value, group.id)
                 }
-                activeDropZoneId.value = null
+                // have to make sure this runs after the dropzone has updated
+                setTimeout(() => {
+                  activeDropZoneId.value = null
+                }, 10)
                 // handleDrop(group, x, y)
               }}
 
