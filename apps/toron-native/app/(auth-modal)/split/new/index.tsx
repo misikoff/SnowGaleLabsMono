@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
   View,
@@ -6,11 +6,11 @@ import {
   TextInput,
   Button,
   TouchableOpacity,
-  Modal,
+  // Modal,
 } from 'react-native'
 import * as Crypto from 'expo-crypto'
 import { useNavigation } from 'expo-router'
-import { Picker } from '@react-native-picker/picker'
+// import { Picker } from '@react-native-picker/picker'
 import { FlashList } from '@shopify/flash-list'
 import { useQuery } from '@tanstack/react-query'
 import { clsx } from 'clsx'
@@ -35,9 +35,9 @@ const ModalScreen = () => {
   const [selectedTrainingDayId, setSelectedTrainingDayId] = useState<
     string | null
   >(null)
-  const [selectedMuscleGroupId, setSelectedMuscleGroupId] = useState<
-    string | null
-  >(null)
+  // const [selectedMuscleGroupId, setSelectedMuscleGroupId] = useState<
+  // string | null
+  // >(null)
 
   const [dragging, setDragging] = useState(false)
   const dragPos = useSharedValue({ x: -999, y: -999 })
@@ -76,8 +76,8 @@ const ModalScreen = () => {
       ),
     )
     console.log('muscle group added to training day')
-    setSelectedTrainingDayId(null)
-    setSelectedMuscleGroupId(null)
+    // setSelectedTrainingDayId(null)
+    // setSelectedMuscleGroupId(null)
   }
 
   const handleEditTrainingDay = (id: string, name: string) => {
@@ -273,6 +273,7 @@ const ModalScreen = () => {
             <MuscleGroupDragButton
               key={group.id}
               dragPos={dragPos}
+              activeDropZoneId={activeDropZoneId}
               group={group}
               onDrag={() => {
                 console.log('dragging')
@@ -281,6 +282,10 @@ const ModalScreen = () => {
               onDrop={(group, x, y) => {
                 setDragging(false)
                 console.log('dropped', group, x, y)
+                if (activeDropZoneId.value) {
+                  handleMuscleGroupChange(activeDropZoneId.value, group.id)
+                }
+                activeDropZoneId.value = null
                 // handleDrop(group, x, y)
               }}
 
@@ -338,23 +343,15 @@ const ModalScreen = () => {
             activeDropZoneId,
           }}
           renderItem={({ item, index }) => (
-            <View
+            <DropZone
               key={item.id}
-              className='flex justify-between'
-              // onLayout={(event) => handleLayout(event, item.id)} // Capture layout
+              zoneId={item.id}
+              activeDropZoneId={activeDropZoneId}
+              dragPos={dragPos}
             >
-              <DropZone
-                zoneId={item.id}
-                activeDropZoneId={activeDropZoneId}
-                dragPos={dragPos}
-              >
+              <View className='flex justify-between'>
                 <View
-                  className={clsx(
-                    'flex flex-row items-center justify-between',
-                    // item.id === activeDropZoneId
-                    //     ? 'bg-sky-600'
-                    //     : 'bg-green-400',
-                  )}
+                  className={clsx('flex flex-row items-center justify-between')}
                 >
                   {editingDayId === item.id ? (
                     <>
@@ -409,22 +406,22 @@ const ModalScreen = () => {
                     }}
                   />
                 </View>
-              </DropZone>
-              <View className=''>
-                {/* show all muscle groups */}
-                <View className='flex gap-2'>
-                  {item.muscleGroups?.map((groupId) => (
-                    <Text key={groupId}>
-                      {muscleGroups?.find((g) => g.id === groupId)?.name}
-                    </Text>
-                  ))}
+                <View className=''>
+                  {/* show all muscle groups */}
+                  <View className='flex gap-2'>
+                    {item.muscleGroups?.map((groupId, i) => (
+                      <Text key={item.id + groupId + i}>
+                        {muscleGroups?.find((g) => g.id === groupId)?.name}
+                      </Text>
+                    ))}
+                  </View>
                 </View>
+                {/* <Button
+                  title='+'
+                  onPress={() => setSelectedTrainingDayId(item.id)}
+                /> */}
               </View>
-              <Button
-                title='+'
-                onPress={() => setSelectedTrainingDayId(item.id)}
-              />
-            </View>
+            </DropZone>
           )}
           estimatedItemSize={50}
         />
@@ -437,7 +434,7 @@ const ModalScreen = () => {
       </TouchableOpacity>
       {muscleGroupsLoading && <Text>Loading muscle groups...</Text>}
       {muscleGroupsError && <Text>Error loading muscle groups...</Text>}
-      <Modal
+      {/* <Modal
         visible={!!selectedTrainingDayId}
         transparent={true}
         animationType='slide'
@@ -481,7 +478,7 @@ const ModalScreen = () => {
             </View>
           </View>
         </View>
-      </Modal>
+      </Modal> */}
       <View className='mt-4 w-full'>
         <Text className='text-lg font-bold text-black'>
           Muscle Group Frequency:

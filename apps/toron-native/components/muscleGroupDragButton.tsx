@@ -1,5 +1,3 @@
-import { useEffect, useRef } from 'react'
-
 import { Text, View } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
@@ -24,15 +22,19 @@ function getButton(group: MuscleGroup) {
 export default function MuscleGroupDragButton({
   group,
   dragPos,
+  activeDropZoneId,
   onDrag,
   onDrop,
 }: {
   group: MuscleGroup
   dragPos: SharedValue<{ x: number; y: number }>
+  activeDropZoneId: SharedValue<string | null>
+
   onDrag: () => void
   onDrop: (group: MuscleGroup, x: number, y: number) => void
 }) {
   const pressed = useSharedValue<boolean>(false)
+  const droppingInside = useSharedValue<boolean>(false)
   const offsetX = useSharedValue<number>(0)
   const offsetY = useSharedValue<number>(0)
   const globalX = useSharedValue<number>(0)
@@ -41,6 +43,7 @@ export default function MuscleGroupDragButton({
   const pan = Gesture.Pan()
     .onBegin((event) => {
       pressed.value = true
+      droppingInside.value = false
       // TODO: get the center of the button instead of the center of the touch
       globalX.value = event.absoluteX
       globalY.value = event.absoluteY
@@ -58,15 +61,22 @@ export default function MuscleGroupDragButton({
     .onFinalize(() => {
       pressed.value = false
 
-      offsetX.value = withSpring(0)
-      offsetY.value = withSpring(0)
-
       // console.log('finalX', globalX.value + offsetX.value)
       // console.log('finalY', globalY.value + offsetY.value)
       runOnJS(onDrop)(group, globalX.value + offsetX.value, globalY.value)
+
       dragPos.value = {
         x: globalX.value + offsetX.value,
         y: globalY.value + offsetY.value,
+      }
+
+      if (activeDropZoneId.value) {
+        // fade out
+        droppingInside.value = true
+      } else {
+        // spring back if not inside a drop zone
+        offsetX.value = withSpring(0)
+        offsetY.value = withSpring(0)
       }
     })
 
@@ -76,7 +86,7 @@ export default function MuscleGroupDragButton({
       { translateY: offsetY.value },
       { scale: withTiming(pressed.value ? 1.2 : 1) },
     ],
-    opacity: pressed.value ? 0.8 : 1,
+    opacity: droppingInside.value ? 0 : pressed.value ? 0.8 : 1,
   }))
 
   const phantomStyles = useAnimatedStyle(() => ({

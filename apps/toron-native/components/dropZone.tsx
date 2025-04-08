@@ -1,66 +1,54 @@
 import { useEffect, useRef } from 'react'
 
-import { Text, View } from 'react-native'
+import { View } from 'react-native'
 import Animated, {
   useAnimatedReaction,
-  runOnJS,
   useSharedValue,
   SharedValue,
   useAnimatedStyle,
 } from 'react-native-reanimated'
 
-// import { dragPos, activeDropZoneId } from './shared'
-
 export default function DropZone({
   zoneId,
   dragPos,
   activeDropZoneId,
-  // onHoverChange,
   children,
 }: {
   zoneId: string
   dragPos: SharedValue<{ x: number; y: number }>
   activeDropZoneId: SharedValue<string | null>
-  // onHoverChange?: (isHovered: boolean) => void
   children: React.ReactNode
 }) {
   const layout = useSharedValue({ x: 0, y: 0, width: 0, height: 0 })
+  const viewRef = useRef<View>(null)
 
-  const isInside = (x, y) => {
+  const isInside = (x: number, y: number) => {
     'worklet'
     const { x: lx, y: ly, width, height } = layout.value
     return x >= lx && x <= lx + width && y >= ly && y <= ly + height
   }
 
-  const viewRef = useRef(null)
-
+  // Periodically measure the position of the view
   useEffect(() => {
-    // need to use setTimeout to wait for the view to be rendered
-    // and then measure it
-    setTimeout(() => {
+    const interval = setInterval(() => {
       viewRef.current?.measureInWindow((x, y, width, height) => {
         layout.value = { x, y, width, height }
       })
-    }, 100)
+    }, 100) // Measure every 100ms
+
+    return () => clearInterval(interval) // Cleanup on unmount
   }, [layout])
 
   useAnimatedReaction(
     () => dragPos.value,
     (pos) => {
       if (isInside(pos.x, pos.y)) {
-        console.log('dragPos', pos, layout.value)
-        console.log('inside', zoneId)
         if (activeDropZoneId.value !== zoneId) {
           activeDropZoneId.value = zoneId
-          // onHoverChange  && runOnJS(onHoverChange)(true)
         }
       } else {
-        // console.log('outside', zoneId)
-        // console.log('dragPos', pos, layout.value)
-
         if (activeDropZoneId.value === zoneId) {
           activeDropZoneId.value = null
-          //   onHoverChange && runOnJS(onHoverChange)(false)
         }
       }
     },
@@ -73,12 +61,11 @@ export default function DropZone({
         ? 'rgba(0, 128, 255, 0.5)'
         : 'rgba(0, 255, 128, 0.5)',
       borderColor: isActive ? 'blue' : 'green',
-      // borderWidth: isActive ? 2 : 1,
     }
   })
 
   return (
-    <Animated.View ref={viewRef} className='bg-red-800' style={animatedStyle}>
+    <Animated.View ref={viewRef} style={animatedStyle}>
       {children}
     </Animated.View>
   )
