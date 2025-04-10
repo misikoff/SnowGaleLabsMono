@@ -2,7 +2,8 @@ import { useState } from 'react'
 
 import { Alert, View, AppState, TextInput, Button, Text } from 'react-native'
 
-import { supabase } from '@/utils/supabase'
+import { getSupabase } from '@/utils/supabase'
+const supabase = getSupabase()
 
 // Tells Supabase Auth to continuously refresh the session automatically if
 // the app is in the foreground. When this is added, you will continue to receive
