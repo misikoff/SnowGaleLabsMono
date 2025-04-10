@@ -4,8 +4,7 @@ import { Ionicons } from '@expo/vector-icons'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
 
 import { useSupabaseUser } from '@/lib/dbFunctions'
-import { getSupabase } from '@/utils/supabase'
-const supabase = getSupabase()
+import { supabase } from '@/utils/supabase'
 
 export const LogoutButton = () => {
   const doLogout = async () => {

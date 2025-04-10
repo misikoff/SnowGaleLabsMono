@@ -1,7 +1,7 @@
 import { QueryData } from '@supabase/supabase-js'
 import { useQuery } from '@tanstack/react-query'
 
-import { getSupabase } from '@/utils/supabase'
+import { supabase } from '@/utils/supabase'
 
 import {
   Exercise,
@@ -15,7 +15,6 @@ import {
 } from '../../../packages/toron-db/schema'
 
 // Note: security depends on RLS preventing access to records with user ids that do not match the asset
-const supabase = getSupabase()
 
 function getFirstOrNull({
   data,
@@ -170,7 +169,6 @@ export async function createSplit(payload: {
   id?: Split['id']
   name: Split['name']
   rirTarget?: Split['rirTarget']
-  plannedRestDays?: Split['plannedRestDays']
   createdAt?: Split['createdAt']
   updatedAt?: Split['updatedAt']
 }) {
@@ -188,8 +186,7 @@ export async function createSplit(payload: {
 export async function updateSplit(payload: {
   id: Split['id']
   name?: Split['name']
-  rirTarget?: Split['rirTarget']
-  plannedRestDays?: Split['plannedRestDays']
+  updatedAt?: Split['updatedAt']
 }) {
   // update split in supabase
   const { data, error } = await supabase

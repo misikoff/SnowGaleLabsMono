@@ -7,8 +7,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import queryClient from '@/lib/queryClient'
-import { getSupabase } from '@/utils/supabase'
-const supabase = getSupabase()
+import { supabase } from '@/utils/supabase'
 
 const InitialLayout = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null)
@@ -30,7 +29,6 @@ const InitialLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter()
 
   useEffect(() => {
-    // console.log('User changed: ', isSignedIn)
     // console.log('in useEffect')
     // console.log({ isLoaded, isSignedIn, segments })
     // if (!isLoaded) {

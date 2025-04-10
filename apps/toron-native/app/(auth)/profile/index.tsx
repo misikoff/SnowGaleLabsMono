@@ -14,10 +14,9 @@ import {
 import { Ionicons } from '@expo/vector-icons'
 import { useQuery } from '@tanstack/react-query'
 
-import { getSupabase } from '@/utils/supabase'
+import { supabase } from '@/utils/supabase'
 
 import { LogoutButton } from '../_layout'
-const supabase = getSupabase()
 
 const DeleteAccountButton = () => {
   const doLogout = async () => {
