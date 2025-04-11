@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react'
 import { View, TextInput, Button } from 'react-native'
 import { Stack } from 'expo-router'
 
-import { supabase } from '@/utils/supabase'
+import { getSupabase } from '@/utils/supabase'
+const supabase = getSupabase()
 
 const PwReset = () => {
   const [emailAddress, setEmailAddress] = useState('')

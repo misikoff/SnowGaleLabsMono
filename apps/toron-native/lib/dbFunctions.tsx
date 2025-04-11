@@ -1,7 +1,7 @@
 import { QueryData } from '@supabase/supabase-js'
 import { useQuery } from '@tanstack/react-query'
 
-import { supabase } from '@/utils/supabase'
+import { getSupabase } from '@/utils/supabase'
 
 import {
   Exercise,
@@ -15,6 +15,7 @@ import {
 } from '../../../packages/toron-db/schema'
 
 // Note: security depends on RLS preventing access to records with user ids that do not match the asset
+const supabase = getSupabase()
 
 function getFirstOrNull({
   data,
