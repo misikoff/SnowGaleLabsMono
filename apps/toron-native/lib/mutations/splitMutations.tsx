@@ -15,7 +15,14 @@ export const useCreateSplitMutation = () => {
       await queryClient.cancelQueries({ queryKey: ['splits'] })
       const previousSplits = queryClient.getQueryData(['splits'])
       const newSplit = { ...vars }
-      queryClient.setQueryData(['splits'], (old: any) => [...old, newSplit])
+      // check if any splits exist
+      const existingSplits = queryClient.getQueryData(['splits']) as Split[]
+      if (existingSplits) {
+        queryClient.setQueryData(['splits'], (old: any) => [...old, newSplit])
+      } else {
+        console.log('none exist')
+        queryClient.setQueryData(['splits'], [newSplit])
+      }
       return { previousSplits }
     },
     onError: (err, vars, context) => {

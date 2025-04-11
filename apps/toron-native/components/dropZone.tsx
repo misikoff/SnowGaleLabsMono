@@ -68,7 +68,6 @@ export default function DropZone({
 
   const animatedStyle = useAnimatedStyle(() => {
     const isActive = activeDropZoneId.value === zoneId
-    console.log({ isActive })
     return {
       backgroundColor: isActive
         ? 'rgba(0, 128, 255, 0.5)'

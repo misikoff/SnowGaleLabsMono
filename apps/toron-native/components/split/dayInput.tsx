@@ -33,7 +33,6 @@ const SplitDayInput = ({
 }: {
   restDayType: 'Planned' | 'Dynamic'
   numTrainingDays: number
-
   trainingDays: {
     id: string
     name: string
@@ -49,7 +48,7 @@ const SplitDayInput = ({
   const [editingDayId, setEditingDayId] = useState<string | null>(null)
   const [editingDayName, setEditingDayName] = useState<string>('')
 
-  const dragPos = useSharedValue({ x: -999, y: -999 })
+  const dragPos = useSharedValue({ x: null, y: null })
   const activeDropZoneId = useSharedValue<string | null>(null)
 
   useEffect(() => {
@@ -181,15 +180,6 @@ const SplitDayInput = ({
     setEditingDayId(null)
     setEditingDayName('')
   }
-
-  useEffect(() => {
-    // start with 3 training days
-    setTrainingDays([
-      { id: Crypto.randomUUID(), name: '', order: 0 },
-      { id: Crypto.randomUUID(), name: '', order: 1 },
-      { id: Crypto.randomUUID(), name: '', order: 2 },
-    ])
-  }, [])
 
   // const muscleGroupFrequency = muscleGroups?.reduce(
   //   (acc, group) => {

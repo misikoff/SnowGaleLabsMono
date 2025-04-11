@@ -53,6 +53,85 @@ export const useCreateSessionMutation = () => {
   })
 }
 
+export const useUpdateSessionMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: updateSession,
+    // When mutate is called:
+    // TODO: better typing with a simple set or dummy set, but still may require casting
+    onMutate: async (vars) => {
+      if (!mutationSettings.optimisticUpdate) {
+        return
+      }
+      // // Cancel any outgoing refetches
+      // // (so they don't overwrite our optimistic update)
+      // await queryClient.cancelQueries({
+      //   queryKey: ['sessions', id],
+      // })
+      // // Snapshot the previous value
+      // const previousSession = queryClient.getQueryData(['session', id])
+      // const nextSession = produce(previousSession, (draft: any) => {
+      //   draft.completed = true
+      // })
+      // // Optimistically update to the new value
+      // queryClient.setQueryData(['session', id], nextSession)
+      // // setOpen(false)
+      // // Return a context object with the snapshotted value
+      // return { previousSession }
+
+      // Cancel any outgoing refetches
+      // (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({
+        queryKey: ['sessions'],
+      })
+
+      // Snapshot the previous value
+      const previousSessions = queryClient.getQueryData([
+        'sessions',
+      ]) as Session[]
+
+      const nextSession = previousSessions.map((s) => {
+        if (s.id === vars.id) {
+          return { ...s, ...vars }
+        } else {
+          return s
+        }
+      }) as any as Session
+
+      console.log({ nextSession })
+      // Optimistically update to the new value
+      sessionRefetcher(queryClient, nextSession, vars.id)
+    },
+    // // If the mutation fails,
+    // // use the context returned from onMutate to roll back
+    // onError: (err, updatedSession, context) => {
+    //   console.log('error')
+    //   console.log({ err })
+    //   console.log({ updatedSession, context })
+    //   queryClient.setQueryData(
+    //     ['session', updatedSession.id],
+    //     context?.previousSession,
+    //   )
+    // },
+    // onSuccess: () => {
+    //   console.log('success')
+    //   // need to do another mutation to add the first set to the set group
+    // },
+    // // Always refetch after error or success:
+    // onSettled: (x1, x2, vars) => {
+    //   console.log('settled')
+    //   invalidateSessionQueries(queryClient, vars.id)
+    // },
+    onSuccess: ({ x1, vars, x2 }) => {
+      console.log('session updated')
+    },
+    onSettled: ({ x1, x2, vars }) => {
+      console.log('session updated')
+      invalidateSessionQueries(queryClient, vars.id)
+    },
+  })
+}
+
 export const useUpdateSessionDateMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
