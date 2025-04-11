@@ -1,0 +1,1 @@
+ALTER TABLE "sessions" ADD COLUMN "is_rest_day" boolean DEFAULT false;

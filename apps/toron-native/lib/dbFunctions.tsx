@@ -321,6 +321,7 @@ export async function createSession(payload: {
   splitTemplateId?: Session['splitTemplateId']
   splitId?: Session['splitId']
   clonedFromSessionId?: Session['clonedFromSessionId']
+  isRestDay?: Session['isRestDay']
   order?: Session['order']
   date?: Session['date']
   createdAt?: Session['createdAt']

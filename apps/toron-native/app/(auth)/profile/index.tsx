@@ -1,13 +1,13 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 // import Modal3D from '@/components/modal3d'
 
 import {
   Alert,
-  Linking,
   Modal,
   Pressable,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
@@ -29,7 +29,7 @@ const DeleteAccountButton = () => {
   }
 
   return (
-    <Pressable
+    <TouchableOpacity
       onPress={() => {
         Alert.alert(
           'Delete Account?',
@@ -95,8 +95,11 @@ const DeleteAccountButton = () => {
       }}
       className='mr-3'
     >
-      <Ionicons name='skull' size={24} color={'#444'} />
-    </Pressable>
+      <View className='flex-row items-center gap-3 rounded-md bg-red-200 px-4 py-2'>
+        <Text className='text-lg font-bold'>Delete Account</Text>
+        <Ionicons name='skull' size={24} color={'#444'} />
+      </View>
+    </TouchableOpacity>
   )
 }
 
@@ -144,8 +147,8 @@ const FeedbackButton = () => {
         onPress={() => setModalVisible(true)}
         className='flex-row items-center gap-3 rounded-md bg-blue-200 px-4 py-2'
       >
-        <Ionicons name='mail' size={24} color={'#444'} />
         <Text className='text-lg font-bold'>Send Feedback</Text>
+        <Ionicons name='mail' size={24} color={'#444'} />
       </Pressable>
 
       <Modal
@@ -203,7 +206,8 @@ export default function Profile() {
 
   return (
     // <Modal3D modalContent={modalContent}>
-    <View className='mt-12 flex-1 items-start gap-5 p-5'>
+    // <ScrollView>
+    <View className='flex-1 items-start gap-2 p-5'>
       {/* Account Management Section */}
       <Text className='text-center text-lg font-bold text-gray-700'>
         Account Information
@@ -221,13 +225,19 @@ export default function Profile() {
       <Text className='mt-8 text-lg font-bold text-gray-700'>
         Account Management
       </Text>
-      <View className='flex-row items-center gap-3 rounded-md bg-red-200 px-4 py-2'>
-        <Text className='text-lg font-bold'>Log Out</Text>
-        <LogoutButton />
-      </View>
-      <View className='flex-row items-center gap-3 rounded-md bg-red-200 px-4 py-2'>
-        <Text className='text-lg font-bold'>Delete Account</Text>
-        <DeleteAccountButton />
+
+      <LogoutButton />
+      <DeleteAccountButton />
+
+      {/* Data Management Section */}
+      <Text className='mt-8 text-lg font-bold text-gray-700'>
+        Data Management
+      </Text>
+
+      {/* TODO: implement complete data export */}
+      <View className='flex-row items-center gap-3 rounded-md bg-blue-200 px-4 py-2'>
+        <Text className='text-lg font-bold'>Export Data</Text>
+        <Ionicons name='download' size={24} color={'#444'} />
       </View>
 
       {/* Feedback & Community Section */}
@@ -242,6 +252,7 @@ export default function Profile() {
       {/* TODO: add discord invite button */}
       {/* <DiscordButton /> */}
     </View>
+    // </ScrollView>
     // </Modal3D>
   )
 }

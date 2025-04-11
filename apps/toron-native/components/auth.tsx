@@ -23,12 +23,16 @@ export default function Auth() {
 
   async function signInWithEmail() {
     setLoading(true)
+    console.log('signInWithEmail', { email, password })
     const { error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
+      email,
+      password,
     })
 
+    console.log('done')
+
     if (error) {
+      console.log({ error })
       Alert.alert(error.message)
     }
     setLoading(false)
@@ -49,6 +53,22 @@ export default function Auth() {
     }
     if (!session) {
       Alert.alert('Please check your inbox for email verification!')
+    }
+    setLoading(false)
+  }
+
+  async function signInAsDefaultUser() {
+    setLoading(true)
+    const { error } = await supabase.auth.signInWithPassword({
+      email: 'tmisikoff+blue1@gmail.com',
+      password: '123123',
+    })
+
+    console.log('done')
+
+    if (error) {
+      console.log({ error })
+      Alert.alert(error.message)
     }
     setLoading(false)
   }
@@ -90,6 +110,13 @@ export default function Auth() {
           title='Sign up'
           disabled={loading}
           onPress={() => signUpWithEmail()}
+        />
+      </View>
+      <View className='mt-2 self-stretch py-1'>
+        <Button
+          title='Sign in as default user'
+          disabled={loading}
+          onPress={() => signInAsDefaultUser()}
         />
       </View>
     </View>
