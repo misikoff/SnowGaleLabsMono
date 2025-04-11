@@ -96,7 +96,10 @@ const DeleteAccountButton = () => {
       }}
       className='mr-3'
     >
-      <Ionicons name='skull' size={24} color={'#444'} />
+      <View className='flex-row items-center gap-3 rounded-md bg-red-200 px-4 py-2'>
+        <Text className='text-lg font-bold'>Delete Account</Text>
+        <Ionicons name='skull' size={24} color={'#444'} />
+      </View>
     </Pressable>
   )
 }
@@ -145,8 +148,8 @@ const FeedbackButton = () => {
         onPress={() => setModalVisible(true)}
         className='flex-row items-center gap-3 rounded-md bg-blue-200 px-4 py-2'
       >
-        <Ionicons name='mail' size={24} color={'#444'} />
         <Text className='text-lg font-bold'>Send Feedback</Text>
+        <Ionicons name='mail' size={24} color={'#444'} />
       </Pressable>
 
       <Modal
@@ -223,14 +226,9 @@ export default function Profile() {
       <Text className='mt-8 text-lg font-bold text-gray-700'>
         Account Management
       </Text>
-      <View className='flex-row items-center gap-3 rounded-md bg-red-200 px-4 py-2'>
-        <Text className='text-lg font-bold'>Log Out</Text>
-        <LogoutButton />
-      </View>
-      <View className='flex-row items-center gap-3 rounded-md bg-red-200 px-4 py-2'>
-        <Text className='text-lg font-bold'>Delete Account</Text>
-        <DeleteAccountButton />
-      </View>
+
+      <LogoutButton />
+      <DeleteAccountButton />
 
       {/* Data Management Section */}
       <Text className='mt-8 text-lg font-bold text-gray-700'>
@@ -240,6 +238,7 @@ export default function Profile() {
       {/* TODO: implement complete data export */}
       <View className='flex-row items-center gap-3 rounded-md bg-blue-200 px-4 py-2'>
         <Text className='text-lg font-bold'>Export Data</Text>
+        <Ionicons name='download' size={24} color={'#444'} />
       </View>
 
       {/* Feedback & Community Section */}

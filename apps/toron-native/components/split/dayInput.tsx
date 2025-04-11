@@ -18,6 +18,8 @@ import DragButton from '@/components/dragButton'
 import DropZone from '@/components/dropZone'
 import { getMuscleGroups } from '@/lib/dbFunctions'
 
+const defaultDragPos = { x: -999, y: -999 }
+
 function getButton(group: MuscleGroup) {
   return (
     <Text className='rounded-lg bg-blue-400 px-3 py-1 text-center font-bold text-white'>
@@ -48,8 +50,13 @@ const SplitDayInput = ({
   const [editingDayId, setEditingDayId] = useState<string | null>(null)
   const [editingDayName, setEditingDayName] = useState<string>('')
 
-  const dragPos = useSharedValue({ x: null, y: null })
+  const dragPos = useSharedValue(defaultDragPos)
   const activeDropZoneId = useSharedValue<string | null>(null)
+
+  const resetDragPos = () => {
+    dragPos.value = defaultDragPos
+    activeDropZoneId.value = null
+  }
 
   useEffect(() => {
     setTrainingDays((prev) => {
@@ -104,6 +111,7 @@ const SplitDayInput = ({
       ),
     )
     console.log('muscle group added to training day')
+    resetDragPos()
   }
 
   const handleRemovingMuscleGroup = (
@@ -125,6 +133,7 @@ const SplitDayInput = ({
       ),
     )
     console.log('muscle group removed from training day')
+    resetDragPos()
   }
 
   const handleSwapMuscleGroupFromDayToDay = (
@@ -168,6 +177,7 @@ const SplitDayInput = ({
       )
       setTrainingDays(newTrainingDays)
     }
+    resetDragPos()
   }
 
   const handleEditTrainingDay = (id: string, name: string) => {
@@ -277,8 +287,7 @@ const SplitDayInput = ({
                   }}
                 />
               </View>
-              <View className=''>
-                {/* show all muscle groups */}
+              {muscleGroups && (
                 <View className='flex gap-2'>
                   {item.muscleGroups?.map((groupId, i) => (
                     // TODO: fix z-index issues with other buttons and scroll container
@@ -304,11 +313,6 @@ const SplitDayInput = ({
                             i,
                           )
                         }
-
-                        // have to make sure this runs after the dropzone has updated
-                        setTimeout(() => {
-                          activeDropZoneId.value = null
-                        }, 10)
                       }}
                     >
                       {getButton(
@@ -319,7 +323,7 @@ const SplitDayInput = ({
                     </DragButton>
                   ))}
                 </View>
-              </View>
+              )}
             </DropZone>
           )
         })}
