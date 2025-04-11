@@ -169,6 +169,7 @@ export async function createSplit(payload: {
   id?: Split['id']
   name: Split['name']
   rirTarget?: Split['rirTarget']
+  plannedRestDays?: Split['plannedRestDays']
   createdAt?: Split['createdAt']
   updatedAt?: Split['updatedAt']
 }) {
@@ -186,6 +187,8 @@ export async function createSplit(payload: {
 export async function updateSplit(payload: {
   id: Split['id']
   name?: Split['name']
+  rirTarget?: Split['rirTarget']
+  plannedRestDays?: Split['plannedRestDays']
   updatedAt?: Split['updatedAt']
 }) {
   // update split in supabase
