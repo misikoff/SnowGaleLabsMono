@@ -22,13 +22,11 @@ export default function Auth() {
   const [loading, setLoading] = useState(false)
 
   async function signInWithEmail() {
-    // setLoading(true)
+    setLoading(true)
     console.log('signInWithEmail', { email, password })
-    // const session = (await supabase.auth.getSession()) || { blah: 'blah' }
-    // console.log('session', session)
     const { error } = await supabase.auth.signInWithPassword({
-      email: 'tmisikoff+blue1@gmail.com', // email,
-      password: '123123', //password,
+      email,
+      password,
     })
 
     console.log('done')
@@ -37,7 +35,7 @@ export default function Auth() {
       console.log({ error })
       Alert.alert(error.message)
     }
-    // setLoading(false)
+    setLoading(false)
   }
 
   async function signUpWithEmail() {
@@ -59,22 +57,38 @@ export default function Auth() {
     setLoading(false)
   }
 
+  async function signInAsDefaultUser() {
+    setLoading(true)
+    const { error } = await supabase.auth.signInWithPassword({
+      email: 'tmisikoff+blue1@gmail.com',
+      password: '123123',
+    })
+
+    console.log('done')
+
+    if (error) {
+      console.log({ error })
+      Alert.alert(error.message)
+    }
+    setLoading(false)
+  }
+
   return (
     <View className='mt-10 p-3'>
       <View className='mt-20 self-stretch py-1'>
         <Text>Email</Text>
-        {/* <TextInput
+        <TextInput
           // label='Email'
           // leftIcon={{ type: 'font-awesome', name: 'envelope' }}
           onChangeText={(text) => setEmail(text)}
           value={email}
           placeholder='email@address.com'
           autoCapitalize={'none'}
-        /> */}
+        />
       </View>
       <View className='self-stretch py-1'>
         <Text>Password</Text>
-        {/* <TextInput
+        <TextInput
           // label='Password'
           // leftIcon={{ type: 'font-awesome', name: 'lock' }}
           onChangeText={(text) => setPassword(text)}
@@ -82,11 +96,11 @@ export default function Auth() {
           secureTextEntry={true}
           placeholder='Password'
           autoCapitalize={'none'}
-        /> */}
+        />
       </View>
       <View className='mt-20 self-stretch py-1'>
         <Button
-          title='Sign in as tmisikoff+blue1@gmail.com'
+          title='Sign in'
           disabled={loading}
           onPress={() => signInWithEmail()}
         />
@@ -96,6 +110,13 @@ export default function Auth() {
           title='Sign up'
           disabled={loading}
           onPress={() => signUpWithEmail()}
+        />
+      </View>
+      <View className='mt-2 self-stretch py-1'>
+        <Button
+          title='Sign in as default user'
+          disabled={loading}
+          onPress={() => signInAsDefaultUser()}
         />
       </View>
     </View>

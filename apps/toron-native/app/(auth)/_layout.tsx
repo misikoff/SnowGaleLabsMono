@@ -1,4 +1,4 @@
-import { Pressable } from 'react-native'
+import { Text, TouchableOpacity, View } from 'react-native'
 import { Tabs } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
@@ -19,9 +19,12 @@ export const LogoutButton = () => {
   }
 
   return (
-    <Pressable onPress={doLogout} className='mr-3'>
-      <Ionicons name='log-out-outline' size={24} color={'#444'} />
-    </Pressable>
+    <TouchableOpacity onPress={doLogout} className='mr-3'>
+      <View className='flex-row items-center gap-3 rounded-md bg-red-200 px-4 py-2'>
+        <Text className='text-lg font-bold'>Log Out</Text>
+        <Ionicons name='log-out-outline' size={24} color={'#444'} />
+      </View>
+    </TouchableOpacity>
   )
 }
 

@@ -58,6 +58,13 @@ const SplitDayInput = ({
     activeDropZoneId.value = null
   }
 
+  // console.log({ trainingDays })
+  // console.log({
+  //   0: trainingDays[0].muscleGroups,
+  //   1: trainingDays[1].muscleGroups,
+  //   2: trainingDays[2].muscleGroups,
+  // })
+
   useEffect(() => {
     setTrainingDays((prev) => {
       if (numTrainingDays < prev.length) {
@@ -261,7 +268,8 @@ const SplitDayInput = ({
                 ) : (
                   <View className='flex items-center justify-between'>
                     <Text className='text-lg font-bold'>
-                      {item.name ? item.name : 'Day ' + (index + 1)}:{' '}
+                      {item.name ? item.name : 'Day ' + (index + 1)}: order:
+                      {item.order}
                     </Text>
                     {restDayType === 'Planned' &&
                       (item.muscleGroups?.length || 0) === 0 && (

@@ -1,14 +1,13 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 // import Modal3D from '@/components/modal3d'
 
 import {
   Alert,
-  Linking,
   Modal,
   Pressable,
-  ScrollView,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
@@ -30,7 +29,7 @@ const DeleteAccountButton = () => {
   }
 
   return (
-    <Pressable
+    <TouchableOpacity
       onPress={() => {
         Alert.alert(
           'Delete Account?',
@@ -100,7 +99,7 @@ const DeleteAccountButton = () => {
         <Text className='text-lg font-bold'>Delete Account</Text>
         <Ionicons name='skull' size={24} color={'#444'} />
       </View>
-    </Pressable>
+    </TouchableOpacity>
   )
 }
 
