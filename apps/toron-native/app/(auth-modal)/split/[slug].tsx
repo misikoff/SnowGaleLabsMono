@@ -133,7 +133,7 @@ export default function Page() {
     }[],
     splitName: string,
     rirTarget: number,
-    restDayType: 'Planned' | 'Dynamic',
+    plannedRestDays: boolean,
   ) => {
     console.log('update split')
 
@@ -154,8 +154,8 @@ export default function Page() {
     if (split?.rirTarget !== rirTarget) {
       changes.rirTarget = rirTarget
     }
-    if (split?.plannedRestDays !== (restDayType === 'Planned')) {
-      changes.plannedRestDays = restDayType === 'Planned'
+    if (split?.plannedRestDays !== plannedRestDays) {
+      changes.plannedRestDays = plannedRestDays
     }
 
     if (Object.keys(changes).length > 0) {
@@ -217,9 +217,7 @@ export default function Page() {
           .mutateAsync({
             id: day.id,
             splitTemplateId: splitId as string,
-            isRestDay:
-              restDayType === 'Planned' &&
-              (day.muscleGroups?.length || 0) === 0,
+            isRestDay: plannedRestDays && (day.muscleGroups?.length || 0) === 0,
             name: day.name,
             order: dayIndex,
           })
@@ -266,10 +264,10 @@ export default function Page() {
         }
         if (
           existingSession.isRestDay !==
-          (restDayType === 'Planned' && (day.muscleGroups?.length || 0) === 0)
+          (plannedRestDays && (day.muscleGroups?.length || 0) === 0)
         ) {
           sessionChanges.isRestDay =
-            restDayType === 'Planned' && (day.muscleGroups?.length || 0) === 0
+            plannedRestDays && (day.muscleGroups?.length || 0) === 0
         }
 
         if (Object.keys(sessionChanges).length > 0) {
@@ -361,13 +359,48 @@ export default function Page() {
       {!isEditing && (
         <>
           {/* <Link href='/(auth)/session'>Back</Link> */}
-          {splitLoading && <Text>Loading...</Text>}
-          {splitError && <Text>Error</Text>}
-          {split && (
-            <View>
-              <Text>{split.id}</Text>
-              <Text>{split.name}</Text>
-              <Text>{split.rirTarget}</Text>
+          {/* {splitLoading && <Text>Loading...</Text>} */}
+          {/* {splitError && <Text>Error</Text>} */}
+
+          {sessionsLoading && <Text>Loading training days...</Text>}
+          {sessionsError && <Text>Error loading training days</Text>}
+          {split && sessions && (
+            <View className='flex flex-1 items-center gap-2 p-4'>
+              <View className='w-full flex-row items-center justify-between gap-2'>
+                <Text className='text-lg font-bold text-black'>
+                  Split Name:
+                </Text>
+                <Text>{split.name}</Text>
+              </View>
+
+              <View className='h-10 w-full flex-row items-center justify-between'>
+                <Text className='text-lg font-bold'>RIR Target:</Text>
+                <View className='flex-row items-center gap-2'>
+                  <Text className='mt-1 w-8 text-center text-lg'>
+                    {split.rirTarget}
+                  </Text>
+                </View>
+              </View>
+
+              <View className='h-10 w-full flex-row items-center justify-between'>
+                <Text className='text-lg font-bold'>Rest Days:</Text>
+                <View className='flex-row items-center gap-2'>
+                  <Text className='mt-1 text-center text-lg'>
+                    {split.plannedRestDays ? 'Planned' : 'Dynamic'}
+                  </Text>
+                </View>
+              </View>
+
+              <View className='h-10 w-full flex-row items-center justify-between'>
+                <Text className='text-lg font-bold'>
+                  {split.plannedRestDays ? 'Cycle Length' : 'Training Days'}
+                </Text>
+
+                <Text className='mt-1 w-8 text-center text-lg'>
+                  {sessions.length}
+                </Text>
+              </View>
+
               {profile?.currentSplitId === split.id ? (
                 <>
                   <Text>Current Split</Text>
@@ -385,28 +418,15 @@ export default function Page() {
                 />
               )}
             </View>
-          )}
-          {sessionsLoading && <Text>Loading training days...</Text>}
-          {sessionsError && <Text>Error loading training days</Text>}
-          {sessions && (
-            <View>
-              <Text>Training Days:</Text>
-              {sessions.map((day) => (
-                <View key={day.id}>
-                  <Text>
-                    day:{day.order}: {day.name}
-                  </Text>
-                  {/* show exercises */}
-                  {day.sessionExercises.map((x) => (
-                    <View key={x.id}>
-                      <Text>
-                        order:{x.order}: {x.muscleGroup.name}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              ))}
-            </View>
+
+            //  {/* {trainingDays.length > 0 && (
+            //    <SplitDayInput
+            //      trainingDays={curTrainingDays}
+            //      setTrainingDays={setCurTrainingDays}
+            //      numTrainingDays={numTrainingDays}
+            //      restDayType={plannedRestDays}
+            //    />
+            //  )} */}
           )}
         </>
       )}

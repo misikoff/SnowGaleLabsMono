@@ -22,19 +22,19 @@ const ModalScreen = () => {
     }[],
     splitName: string,
     rirTarget: number,
-    restDayType: 'Planned' | 'Dynamic',
+    plannedRestDays: boolean,
   ) => {
     console.log('submit split')
     const splitId = Crypto.randomUUID()
 
-    console.log({ splitId, splitName, rirTarget, restDayType })
+    console.log({ splitId, splitName, rirTarget, plannedRestDays })
     await new Promise((resolve, reject) => {
       createSplitMutation.mutate(
         {
           id: splitId,
           name: splitName,
           rirTarget,
-          plannedRestDays: restDayType === 'Planned',
+          plannedRestDays,
         },
         {
           onSuccess: resolve,
@@ -60,8 +60,7 @@ const ModalScreen = () => {
         .mutateAsync({
           id: day.id,
           splitTemplateId: splitId,
-          isRestDay:
-            restDayType === 'Planned' && (day.muscleGroups?.length || 0) === 0,
+          isRestDay: plannedRestDays && (day.muscleGroups?.length || 0) === 0,
           name: day.name,
           order: dayIndex,
         })

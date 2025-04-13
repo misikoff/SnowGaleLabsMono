@@ -1,7 +1,6 @@
 import { useState } from 'react'
 
 import { Button, Text, TouchableOpacity, View } from 'react-native'
-import { useQueryClient } from '@tanstack/react-query'
 import { TextInput } from 'react-native-gesture-handler'
 
 import SplitDayInput from '@/components/split/dayInput'
@@ -17,7 +16,7 @@ export default function SplitEditor({
     id: string
     name: string
     rirTarget: number
-    restDayType: 'Planned' | 'Dynamic'
+    plannedRestDays: boolean
   } | null
   trainingDays: {
     id: string
@@ -34,7 +33,7 @@ export default function SplitEditor({
     }[],
     splitName: string,
     rirTarget: number,
-    restDayType: 'Planned' | 'Dynamic',
+    plannedRestDays: boolean,
   ) => Promise<void>
   onUpdateSplit?: (
     trainingDays: {
@@ -45,13 +44,13 @@ export default function SplitEditor({
     }[],
     splitName: string,
     rirTarget: number,
-    restDayType: 'Planned' | 'Dynamic',
+    plannedRestDays: boolean,
   ) => Promise<void>
 }) {
   const [splitName, setSplitName] = useState(split?.name || '')
   const [rirTarget, setRirTarget] = useState(split?.rirTarget || 1)
-  const [restDayType, setRestDayType] = useState<'Planned' | 'Dynamic'>(
-    split?.restDayType || 'Planned',
+  const [plannedRestDays, setPlannedRestDays] = useState<boolean>(
+    split?.plannedRestDays || true,
   )
   const [numTrainingDays, setNumTrainingDays] = useState(
     trainingDays.length || 0,
@@ -108,20 +107,20 @@ export default function SplitEditor({
         <View className='flex-row items-center gap-2'>
           <Button
             title='Planned'
-            onPress={() => setRestDayType('Planned')}
-            disabled={restDayType === 'Planned'}
+            onPress={() => setPlannedRestDays(true)}
+            disabled={plannedRestDays}
           />
           <Button
             title='Dynamic'
-            onPress={() => setRestDayType('Dynamic')}
-            disabled={restDayType === 'Dynamic'}
+            onPress={() => setPlannedRestDays(false)}
+            disabled={!plannedRestDays}
           />
         </View>
       </View>
 
       <View className='h-10 w-full flex-row items-center justify-between'>
         <Text className='text-lg font-bold'>
-          {restDayType === 'Planned' ? 'Cycle Length' : 'Training Days'}
+          {plannedRestDays ? 'Cycle Length' : 'Training Days'}
         </Text>
         <View className='flex-row items-center gap-2'>
           <Button
@@ -145,7 +144,7 @@ export default function SplitEditor({
           trainingDays={curTrainingDays}
           setTrainingDays={setCurTrainingDays}
           numTrainingDays={numTrainingDays}
-          restDayType={restDayType}
+          plannedRestDays={plannedRestDays}
         />
       )}
 
@@ -156,7 +155,7 @@ export default function SplitEditor({
               curTrainingDays,
               splitName,
               rirTarget,
-              restDayType,
+              plannedRestDays,
             ).catch((error) => {
               console.error('Error creating split:', error)
             })
@@ -165,7 +164,7 @@ export default function SplitEditor({
               curTrainingDays,
               splitName,
               rirTarget,
-              restDayType,
+              plannedRestDays,
             ).catch((error) => {
               console.error('Error updating split:', error)
             })

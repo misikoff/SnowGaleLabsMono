@@ -28,12 +28,12 @@ function getButton(group: MuscleGroup) {
   )
 }
 const SplitDayInput = ({
-  restDayType,
+  plannedRestDays,
   numTrainingDays,
   trainingDays,
   setTrainingDays,
 }: {
-  restDayType: 'Planned' | 'Dynamic'
+  plannedRestDays: boolean
   numTrainingDays: number
   trainingDays: {
     id: string
@@ -271,7 +271,7 @@ const SplitDayInput = ({
                       {item.name ? item.name : 'Day ' + (index + 1)}: order:
                       {item.order}
                     </Text>
-                    {restDayType === 'Planned' &&
+                    {plannedRestDays &&
                       (item.muscleGroups?.length || 0) === 0 && (
                         <Text className='text-lg font-bold text-gray-500'>
                           Rest Day
