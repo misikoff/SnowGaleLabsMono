@@ -20,8 +20,8 @@ function HomeScreen() {
 
   const {
     data: splits,
-    isLoading: splitsLoading,
-    isError: splitsError,
+    // isLoading: splitsLoading,
+    // isError: splitsError,
   } = useQuery({
     queryKey: ['splits'],
     queryFn: async () => getSplits(),
@@ -109,14 +109,6 @@ function HomeScreen() {
         title='Create Split'
         onPress={() => router.push('/(auth-modal)/split/new')}
       />
-      {/* <Button
-        title='Show Test Modal'
-        onPress={() => router.push('/(auth-modal)/test')}
-      />
-      <Button
-        title='Show Auth Modal Index'
-        onPress={() => router.push('/(auth-modal)')}
-      /> */}
     </View>
   )
 }

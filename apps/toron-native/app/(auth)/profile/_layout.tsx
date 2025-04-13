@@ -1,10 +1,11 @@
-import { View } from 'react-native'
 import { Slot } from 'expo-router'
 
-export default function SettingsLayout() {
+import BaseLayout from '@/components/baseLayout'
+
+export default function ProfileLayout() {
   return (
-    <View className='h-full'>
+    <BaseLayout>
       <Slot />
-    </View>
+    </BaseLayout>
   )
 }

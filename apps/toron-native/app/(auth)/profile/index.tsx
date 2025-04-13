@@ -197,8 +197,8 @@ const FeedbackButton = () => {
 export default function Profile() {
   const {
     data: user,
-    isLoading,
-    isError,
+    // isLoading,
+    // isError,
   } = useQuery({
     queryKey: ['user'],
     queryFn: async () => supabase.auth.getUser(),

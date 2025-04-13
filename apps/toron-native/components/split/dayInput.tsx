@@ -242,6 +242,7 @@ const SplitDayInput = ({
         {trainingDays.map((item, index) => {
           return (
             <DropZone
+              key={'day' + index + item.id}
               className='rounded-lg'
               zoneId={item.id}
               activeDropZoneId={activeDropZoneId}

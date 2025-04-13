@@ -1,10 +1,11 @@
-import { View } from 'react-native'
 import { Slot } from 'expo-router'
 
-export default function HistoryLayout() {
+import BaseLayout from '@/components/baseLayout'
+
+export default function LibraryLayout() {
   return (
-    <View className='h-full px-4 py-2'>
+    <BaseLayout>
       <Slot />
-    </View>
+    </BaseLayout>
   )
 }
