@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { produce } from 'immer'
 
-import { SessionExercise } from '@repo/toron-db/schema'
+import { Session, SessionExercise } from '@repo/toron-db/schema'
 
 import {
   createSessionExercise,
@@ -33,9 +33,9 @@ export const useCreateSessionExerciseMutation = () => {
       // // Snapshot the previous value
       const previousSession =
         queryClient.getQueryData(['session', vars.sessionId]) ||
-        queryClient
-          .getQueryData(['sessions'])
-          .find((s) => s.id === vars.sessionId)
+        (queryClient.getQueryData(['sessions']) as Session[]).find(
+          (s) => s.id === vars.sessionId,
+        )
       const nextSession = produce(previousSession, (draft: any) => {
         // fill in missing fields
         // TODO: this is a bit of a hack, but it works for now
@@ -189,29 +189,9 @@ export const useDeleteSessionExerciseMutation = () => {
       // // Snapshot the previous value
       const previousSession =
         queryClient.getQueryData(['session', vars.sessionId]) ||
-        queryClient
-          .getQueryData(['sessions'])
-          .find((s) => s.id === vars.sessionId)
-
-      console.log({ previousSession })
-
-      const nextSession = produce(previousSession, (draft) => {
-        draft.sessionExercises = draft.sessionExercises
-          .filter((curSetGroup) => {
-            return curSetGroup.id !== vars.id
-          })
-          .map((setGroup, index) => {
-            setGroup.order = index + 1
-            return setGroup
-          })
-      })
-      console.log({ nextSession })
-
-      // Optimistically update to the new value
-      sessionRefetcher(queryClient, nextSession, vars.sessionId)
-
-      // Return a context object with the snapshotted value
-      return { previousSession }
+        (queryClient.getQueryData(['sessions']) as Session[]).find(
+          (s) => s.id === vars.sessionId,
+        )
     },
     // If the mutation fails,
     // use the context returned from onMutate to roll back

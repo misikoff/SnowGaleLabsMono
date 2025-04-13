@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { Alert, View, TextInput, Button, Text, AppState } from 'react-native'
+import { Alert, View, TextInput, Button, Text } from 'react-native'
 
 import { supabase } from '@/utils/supabase'
 

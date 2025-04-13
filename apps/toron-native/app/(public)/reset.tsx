@@ -18,6 +18,10 @@ const PwReset = () => {
         const newPassword = prompt(
           'What would you like your new password to be?',
         )
+        if (!newPassword) {
+          alert('Please enter a new password.')
+          return
+        }
         const { data, error } = await supabase.auth.updateUser({
           password: newPassword,
         })
@@ -36,6 +40,11 @@ const PwReset = () => {
   const onRequestReset = async () => {
     const { data, error } =
       await supabase.auth.resetPasswordForEmail(emailAddress)
+    if (error) {
+      alert('There was an error sending the password reset email.')
+    }
+    console.log('data', data)
+    console.log('error', error)
   }
 
   return (

@@ -29,10 +29,10 @@ export const useCreateSplitMutation = () => {
       queryClient.setQueryData(['splits'], context?.previousSplits)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['splits'])
+      queryClient.invalidateQueries({ queryKey: ['splits'] })
     },
     onSettled: () => {
-      queryClient.invalidateQueries(['splits'])
+      queryClient.invalidateQueries({ queryKey: ['splits'] })
     },
   })
 }
@@ -58,10 +58,10 @@ export const useUpdateSplitMutation = () => {
       queryClient.setQueryData(['splits'], context?.previousSplits)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['splits'])
+      queryClient.invalidateQueries({ queryKey: ['splits'] })
     },
     onSettled: () => {
-      queryClient.invalidateQueries(['splits'])
+      queryClient.invalidateQueries({ queryKey: ['splits'] })
     },
   })
 }
@@ -91,12 +91,12 @@ export const useDeleteSplitMutation = () => {
       return { previousSplits }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['splits'])
-      queryClient.invalidateQueries(['profile'])
+      queryClient.invalidateQueries({ queryKey: ['splits'] })
+      queryClient.invalidateQueries({ queryKey: ['profile'] })
     },
     onSettled: () => {
-      queryClient.invalidateQueries(['splits'])
-      queryClient.invalidateQueries(['profile'])
+      queryClient.invalidateQueries({ queryKey: ['splits'] })
+      queryClient.invalidateQueries({ queryKey: ['profile'] })
     },
   })
 }

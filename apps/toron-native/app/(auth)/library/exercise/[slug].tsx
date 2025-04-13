@@ -1,15 +1,11 @@
-import { Pressable, ScrollView, Text, View } from 'react-native'
+import { ScrollView, Text, View } from 'react-native'
 import { Link, useLocalSearchParams } from 'expo-router'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowDownWideNarrow, ArrowUpWideNarrow } from 'lucide-react-native'
 
 import AddExerciseButton from '@/components/session/addExerciseButton'
 import CompleteSessionButton from '@/components/session/completeSessionButton'
-import SetGroupBlock from '@/components/session/setGroupBlock'
 import { getSession } from '@/lib/dbFunctions'
-import { useUpdateSetGroupOrderMutation } from '@/lib/mutations/sessionExerciseMutations'
-
-import { SetGroupWithExerciseAndSets } from '../../../../../../packages/toron-db/schema'
+// import { useUpdateSetGroupOrderMutation } from '@/lib/mutations/sessionExerciseMutations'
 
 export default function Page() {
   const { slug: sessionId } = useLocalSearchParams()
@@ -27,7 +23,7 @@ export default function Page() {
   })
   console.log({ session })
 
-  const updateSetGroupOrderMutation = useUpdateSetGroupOrderMutation()
+  // const updateSetGroupOrderMutation = useUpdateSetGroupOrderMutation()
 
   return (
     <ScrollView>

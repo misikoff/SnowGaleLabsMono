@@ -14,9 +14,9 @@ export default function SplitEditor({
 }: {
   split?: {
     id: string
-    name: string
-    rirTarget: number
-    plannedRestDays: boolean
+    name: string | null
+    rirTarget: number | null
+    plannedRestDays: boolean | null
   } | null
   trainingDays: {
     id: string

@@ -42,7 +42,7 @@ export default function Page() {
   const {
     data: profile,
     isLoading: profileLoading,
-    isError: profileError,
+    // isError: profileError,
   } = useQuery({
     queryKey: ['profile'],
     queryFn: async () => getProfile(),
@@ -50,8 +50,8 @@ export default function Page() {
 
   const {
     data: split,
-    isLoading: splitLoading,
-    isError: splitError,
+    // isLoading: splitLoading,
+    // isError: splitError,
   } = useQuery({
     queryKey: ['splits', splitId],
     queryFn: () =>

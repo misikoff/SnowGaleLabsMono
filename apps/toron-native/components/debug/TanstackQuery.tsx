@@ -1,9 +1,8 @@
 import { Button } from 'react-native'
-import { useQueryClient } from '@tanstack/react-query'
+
+import queryClient from '@/lib/queryClient'
 
 export default function DebugTanstackQueryButton() {
-  const queryClient = useQueryClient()
-
   return (
     <Button
       title='Check Tanstack Query'

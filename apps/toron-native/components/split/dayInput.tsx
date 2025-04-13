@@ -88,8 +88,8 @@ const SplitDayInput = ({
 
   const {
     data: muscleGroups,
-    isLoading: muscleGroupsLoading,
-    isError: muscleGroupsError,
+    // isLoading: muscleGroupsLoading,
+    // isError: muscleGroupsError,
   } = useQuery({
     queryKey: ['muscleGroups'],
     queryFn: async () => getMuscleGroups(),

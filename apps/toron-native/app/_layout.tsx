@@ -77,11 +77,10 @@ const InitialLayout = ({ children }: { children: React.ReactNode }) => {
       segments[0] === '(auth)' || segments[0] === '(auth-modal)'
 
     if (isSignedIn && !inTabsGroup) {
-      router.replace('/(auth)/train')
+      router.replace('/train')
     } else if (!isSignedIn && inTabsGroup) {
       router.replace('/login')
     }
-
     // @ts-expect-error: segments.length can be 0 when the app is opened for the first time
     else if (!isSignedIn && segments.length === 0) {
       router.replace('/login')
@@ -99,6 +98,7 @@ export default function HomeLayout() {
       <InitialLayout>
         <Stack>
           <Stack.Screen name='(auth)' options={{ headerShown: false }} />
+          <Stack.Screen name='(public)' options={{ headerShown: false }} />
           <Stack.Screen
             name='(auth-modal)'
             options={{
