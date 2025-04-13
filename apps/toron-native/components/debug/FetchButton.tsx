@@ -18,8 +18,28 @@ export default function DebugFetchButton({
         }
 
         fetch('https://google.com')
-          .then((res) => console.log('✅ Fetch working'))
-          .catch((err) => console.log('❌ Fetch failed', err))
+          .then((res) => {
+            // console.log('✅ auto Fetch working')
+            // log that it's working and include a timestamp
+            console.log(
+              '✅ Fetch working',
+              new Date().toLocaleString('en-US', {
+                timeZone: 'America/Chicago',
+                timeZoneName: 'short',
+              }),
+            )
+          })
+          .catch((err) => {
+            // console.log('❌ auto Fetch failed', err)
+            // log that it's failing and include a timestamp
+            console.log(
+              '❌ Fetch failed',
+              new Date().toLocaleString('en-US', {
+                timeZone: 'America/Chicago',
+                timeZoneName: 'short',
+              }),
+            )
+          })
       }}
     />
   )

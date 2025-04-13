@@ -9,6 +9,7 @@ import SplitEditor from '@/components/split/editor'
 import {
   createSessionExercise,
   deleteSessionExercise,
+  getMuscleGroups,
   getProfile,
   getSessions,
   getSplit,
@@ -69,6 +70,11 @@ export default function Page() {
     queryKey: ['sessions', splitId],
     queryFn: () => getSessions({ splitTemplateId: splitId as string }),
     enabled: !!splitId,
+  })
+
+  const { data: muscleGroups } = useQuery({
+    queryKey: ['muscleGroups'],
+    queryFn: async () => getMuscleGroups(),
   })
 
   useEffect(() => {
@@ -352,7 +358,7 @@ export default function Page() {
     <ScrollView>
       {/* toggle editing */}
       <Button
-        title={isEditing ? 'Done' : 'Edit'}
+        title={isEditing ? 'Cancel' : 'Edit'}
         onPress={() => setIsEditing((prev) => !prev)}
         disabled={!profile}
       />
@@ -418,15 +424,27 @@ export default function Page() {
                 />
               )}
             </View>
+          )}
 
-            //  {/* {trainingDays.length > 0 && (
-            //    <SplitDayInput
-            //      trainingDays={curTrainingDays}
-            //      setTrainingDays={setCurTrainingDays}
-            //      numTrainingDays={numTrainingDays}
-            //      restDayType={plannedRestDays}
-            //    />
-            //  )} */}
+          {trainingDays.length > 0 && (
+            <View className='mt-4 w-full'>
+              <Text className='text-lg font-bold'>Training Days</Text>
+              <View className='flex flex-row items-center justify-between gap-2'>
+                {trainingDays.map((day) => (
+                  <View key={day.id}>
+                    <Text className='text-lg font-bold'>{day.name}</Text>
+                    <Text className='text-lg font-bold'>
+                      {day.muscleGroups
+                        ?.map((gId) => {
+                          return muscleGroups?.find((item) => item.id === gId)
+                            ?.name
+                        })
+                        .join(', ')}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
           )}
         </>
       )}
