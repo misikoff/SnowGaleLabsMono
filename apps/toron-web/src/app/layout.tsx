@@ -1,24 +1,10 @@
 import { type Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import localFont from 'next/font/local'
 import clsx from 'clsx'
 
 import { Providers } from '@/app/providers'
-
 import '@/styles/tailwind.css'
-
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter',
-})
-
-const monaSans = localFont({
-  src: '../fonts/Mona-Sans.var.woff2',
-  display: 'swap',
-  variable: '--font-mona-sans',
-  weight: '200 900',
-})
+import Footer from '@/components/Footer'
+import Navbar from '@/components/Nabvar'
 
 export const metadata: Metadata = {
   title: 'Toron - Progressive Overload for Muscle & Strength',
@@ -39,12 +25,16 @@ export default function RootLayout({
   return (
     <html
       lang='en'
-      className={clsx('h-full antialiased', inter.variable, monaSans.variable)}
+      className={clsx('h-full antialiased')}
       suppressHydrationWarning
     >
-      <body className='flex min-h-full flex-col bg-white dark:bg-gray-950'>
-        <Providers>{children}</Providers>
-      </body>
+      <Providers>
+        <body className='flex min-h-full flex-col bg-white'>
+          <Navbar className='sticky top-0 z-50 shadow-md' />
+          <main className='flex-1'>{children}</main>
+          <Footer />
+        </body>
+      </Providers>
     </html>
   )
 }

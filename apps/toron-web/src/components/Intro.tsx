@@ -4,6 +4,8 @@ import { IconLink } from '@/components/IconLink'
 import { Logo } from '@/components/Logo'
 import { SignUpForm } from '@/components/SignUpForm'
 
+import AnimatedThing from './AnimatedThing'
+
 function BookIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
   return (
     <svg viewBox='0 0 16 16' aria-hidden='true' fill='currentColor' {...props}>
@@ -60,6 +62,7 @@ export function Intro() {
         fluff, no social feeds—just powerful insights to help you progress.
       </p>
       <SignUpForm />
+      <AnimatedThing />
       {/* <div className="mt-8 flex flex-wrap justify-center gap-x-1 gap-y-3 sm:gap-x-2 lg:justify-start">
         <IconLink href="#" icon={BookIcon} className="flex-none">
           Documentation

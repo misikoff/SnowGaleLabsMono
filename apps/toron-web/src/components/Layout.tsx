@@ -1,7 +1,7 @@
 import { useId } from 'react'
 
 import { Intro, IntroFooter } from '@/components/Intro'
-import { StarField } from '@/components/StarField'
+// import { StarField } from '@/components/StarField'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
 function Timeline() {
@@ -17,7 +17,7 @@ function Timeline() {
           <pattern id={id} width='6' height='8' patternUnits='userSpaceOnUse'>
             <path
               d='M0 0H6M0 8H6'
-              className='stroke-sky-900/10 xl:stroke-white/10 dark:stroke-white/10'
+              className='stroke-sky-900/10 xl:stroke-white/10'
               fill='none'
             />
           </pattern>
@@ -97,7 +97,7 @@ function FixedSidebar({
         <div className='mx-auto max-w-lg'>
           <div className='pt-20 pb-16 sm:pt-32 sm:pb-20 lg:py-20'>
             <div className='relative'>
-              <StarField className='top-14 -right-44' />
+              {/* <StarField className='top-14 -right-44' /> */}
               {main}
             </div>
           </div>

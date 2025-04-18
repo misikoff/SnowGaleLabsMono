@@ -14,13 +14,13 @@ type ImagePropsWithOptionalAlt = Omit<ImageProps, 'alt'> & { alt?: string }
 
 export const img = function Img(props: ImagePropsWithOptionalAlt) {
   return (
-    <div className='relative overflow-hidden rounded-xl bg-gray-50 dark:bg-gray-900'>
+    <div className='relative overflow-hidden rounded-xl bg-gray-50'>
       <Image
         alt=''
         sizes='(min-width: 1280px) 36rem, (min-width: 1024px) 45vw, (min-width: 640px) 32rem, 95vw'
         {...props}
       />
-      <div className='pointer-events-none absolute inset-0 rounded-xl ring-1 ring-gray-900/10 ring-inset dark:ring-white/10' />
+      <div className='pointer-events-none absolute inset-0 rounded-xl ring-1 ring-gray-900/10 ring-inset' />
     </div>
   )
 }
@@ -61,7 +61,7 @@ function ArticleHeader({ id, date }: { id: string; date: string | Date }) {
           <Link href={`#${id}`} className='inline-flex'>
             <FormattedDate
               date={date}
-              className='text-2xs/4 font-medium text-gray-500 xl:hidden dark:text-white/50'
+              className='text-2xs/4 font-medium text-gray-500 xl:hidden'
             />
           </Link>
         </div>
