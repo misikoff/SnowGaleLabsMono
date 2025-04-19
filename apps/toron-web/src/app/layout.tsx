@@ -28,13 +28,13 @@ export default function RootLayout({
       className={clsx('h-full antialiased')}
       suppressHydrationWarning
     >
-      <Providers>
-        <body className='flex min-h-full flex-col bg-white'>
+      <body className='flex min-h-full flex-col bg-white'>
+        <Providers>
           <Navbar className='sticky top-0 z-50 shadow-md' />
           <main className='flex-1'>{children}</main>
           <Footer />
-        </body>
-      </Providers>
+        </Providers>
+      </body>
     </html>
   )
 }

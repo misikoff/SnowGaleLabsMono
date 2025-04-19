@@ -2,6 +2,7 @@ import GlobeBall from '@/components/GlobeBall'
 import { IconLink } from '@/components/IconLink'
 import { Intro } from '@/components/Intro'
 import PixelGridCanvas from '@/components/PixelCanvas'
+import RestBento from '@/components/RestBento'
 import RestWidget from '@/components/RestWidget'
 
 export default function Home() {
@@ -82,17 +83,7 @@ export default function Home() {
           <h3>I am where the bento boxes go</h3>
           <div className='mt-8 grid w-full max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
             {/* Bento Box 1 */}
-            <div className='flex flex-col items-start justify-start rounded-lg bg-white p-6 shadow-md'>
-              <h4 className='text-center text-lg font-semibold'>
-                Dynamic or Scheduled Rest Days
-              </h4>
-              <p className='mt-2 mb-8 text-sm text-gray-600'>
-                Rest when you need it, not when you don{"'"}t. Toron
-                {"'"}s calendar is flexible, so small deviations don{"'"}t
-                derail your progress.
-              </p>
-              <RestWidget className='mt-8' />
-            </div>
+            <RestBento />
 
             {/* Bento Box 2 */}
             <div className='flex flex-col items-start justify-start rounded-lg bg-white p-6 shadow-md'>

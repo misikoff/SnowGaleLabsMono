@@ -44,17 +44,35 @@ export default function Reordering({
   }, [order])
 
   useEffect(() => {
-    const timeout = setTimeout(() => setOrder(shuffle(orderRef.current)), 1000)
-    return () => clearTimeout(timeout)
-  }, [order])
+    let timeout: NodeJS.Timeout
 
-  if (!isActive) {
-    return null
-  }
+    const shuffleAndAnimate = () => {
+      // this isn't working
+      if (!isActive) {
+        // if not active remove the rest days
+        setOrder(workouts)
+        return
+      } // Stop the animation if not active
+
+      const shuffledOrder = shuffle(orderRef.current)
+      setOrder(shuffledOrder)
+      orderRef.current = shuffledOrder // Update the ref to match the new state
+
+      // Schedule the next shuffle
+      if (isActive) {
+        timeout = setTimeout(shuffleAndAnimate, 1000)
+      }
+    }
+
+    // if (isActive) {
+    shuffleAndAnimate() // Start the animation loop
+    // }
+
+    return () => clearTimeout(timeout) // Cleanup timeout on unmount or when isActive changes
+  }, [isActive]) // Depend only on isActive
 
   return (
     <ul
-      // style={container}
       className={clsx(
         className,
         'flex h-full w-full flex-row justify-center gap-2',
@@ -84,12 +102,7 @@ export default function Reordering({
  * ==============   Utils   ================
  */
 function shuffle([...array]: string[]) {
-  console.log('array', array)
-  const restDayIndex = array.findIndex((item) => {
-    console.log({ item })
-    return item.isRestDay === true
-  })
-  console.log('restDayIndex', restDayIndex)
+  const restDayIndex = array.findIndex((item) => item.isRestDay === true)
 
   if (restDayIndex !== -1) {
     // Remove the rest day if it exists
@@ -111,16 +124,6 @@ const spring = {
   type: 'spring',
   damping: 20,
   stiffness: 300,
-}
-
-const container: React.CSSProperties = {
-  // listStyle: 'none',
-  // padding: 0,
-  // margin: 0,
-  // position: 'relative',
-  // flexDirection: 'row',
-  // justifyContent: 'center',
-  // alignItems: 'center',
 }
 
 const item: React.CSSProperties = {
