@@ -5,13 +5,19 @@ import { useEffect, useRef, useState } from 'react'
 import clsx from 'clsx'
 import { motion, AnimatePresence } from 'framer-motion'
 
-const restDay = {
+type Workout = {
+  name: string
+  isRestDay: boolean
+  color: string
+}
+
+const restDay: Workout = {
   name: 'Rest',
   isRestDay: true,
   color: '#ff0088',
 }
 
-const workouts = [
+const workouts: Workout[] = [
   {
     name: 'Push',
     isRestDay: false,
@@ -28,7 +34,8 @@ const workouts = [
     color: '#0d63f8',
   },
 ]
-
+// TODO handle animation issue with gap
+// gap causes the animation to be choppy as the element is added and removed
 export default function Reordering({
   className,
   isActive,
@@ -36,8 +43,8 @@ export default function Reordering({
   className?: string
   isActive?: boolean
 }) {
-  const [order, setOrder] = useState(workouts)
-  const orderRef = useRef(workouts)
+  const [order, setOrder] = useState<Workout[]>(workouts)
+  const orderRef = useRef<Workout[]>(workouts)
 
   useEffect(() => {
     orderRef.current = order
@@ -47,7 +54,6 @@ export default function Reordering({
     let timeout: NodeJS.Timeout
 
     const shuffleAndAnimate = () => {
-      // this isn't working
       if (!isActive) {
         // if not active remove the rest days
         setOrder(workouts)
@@ -64,31 +70,54 @@ export default function Reordering({
       }
     }
 
-    // if (isActive) {
-    shuffleAndAnimate() // Start the animation loop
-    // }
+    shuffleAndAnimate()
 
     return () => clearTimeout(timeout) // Cleanup timeout on unmount or when isActive changes
-  }, [isActive]) // Depend only on isActive
+  }, [isActive])
 
   return (
     <ul
       className={clsx(
         className,
-        'flex h-full w-full flex-row justify-center gap-2',
+        'flex w-full flex-row justify-center',
+        // 'gap-2',
       )}
     >
       <AnimatePresence>
-        {order.map((workout) => (
+        {order.map((workout, i) => (
+          // in order to avoid gap issue, issue on exit animation, use margins animate them
           <motion.li
-            className='flex h-8 w-1/5 items-center justify-center'
+            className={clsx(
+              'flex h-8 w-1/5 items-center justify-center rounded-lg',
+              // if not followed by a rest day, add a gap
+              // i < order.length - 1 && !order[i + 1].isRestDay && 'mr-2',
+              // if not preceded by a rest day, add a gap
+              // i > 0 && !order[i - 1].isRestDay && 'ml-2',
+            )}
             key={workout.name}
             layout
-            transition={spring}
-            initial={{ opacity: 0, y: -50, scale: 0.5 }} // Entry animation
-            animate={{ opacity: 1, y: 0, scale: 1 }} // Animate to visible state
-            exit={{ opacity: 0, width: 0 }} // Exit animation
-            style={{ ...item, backgroundColor: workout.color }}
+            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+            initial={{
+              opacity: 0,
+              y: -50,
+              scale: 0.5,
+              marginLeft: '0rem',
+              marginRight: '0rem',
+            }} // Entry animation
+            animate={{
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              marginLeft: '0.25rem',
+              marginRight: '0.25rem',
+            }} // Animate to visible state
+            exit={{
+              opacity: 0,
+              width: 0,
+              marginLeft: '0rem',
+              marginRight: '0rem',
+            }} // Exit animation
+            style={{ backgroundColor: workout.color }}
           >
             <span className='font-bold text-white'>{workout.name}</span>
           </motion.li>
@@ -101,7 +130,7 @@ export default function Reordering({
 /**
  * ==============   Utils   ================
  */
-function shuffle([...array]: string[]) {
+function shuffle([...array]: Workout[]) {
   const restDayIndex = array.findIndex((item) => item.isRestDay === true)
 
   if (restDayIndex !== -1) {
@@ -114,18 +143,4 @@ function shuffle([...array]: string[]) {
   }
 
   return array
-}
-
-/**
- * ==============   Styles   ================
- */
-
-const spring = {
-  type: 'spring',
-  damping: 20,
-  stiffness: 300,
-}
-
-const item: React.CSSProperties = {
-  borderRadius: '10px',
 }
