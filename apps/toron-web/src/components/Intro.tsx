@@ -50,7 +50,7 @@ export function Intro() {
           {/* <Logo className="inline-block h-8 w-auto" /> */}
         </Link>
       </div>
-      <h1 className='mt-14 font-display text-4xl/tight font-light text-white'>
+      <h1 className='font-display mt-14 text-4xl/tight font-light text-white'>
         Toron - Lift Log
         <br />
         <span className='text-sky-300'>for Muscle & Strength</span>

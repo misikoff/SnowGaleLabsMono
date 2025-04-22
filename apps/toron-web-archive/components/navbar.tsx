@@ -13,9 +13,9 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { clsx } from 'clsx'
 import { motion } from 'framer-motion'
 import { ChevronLeft } from 'lucide-react'
+import Logo from 'public/icon.png'
 
 import { Button } from '@/components/ui/button'
-import Logo from 'public/icon.png'
 
 type NavigationItem = {
   name: string

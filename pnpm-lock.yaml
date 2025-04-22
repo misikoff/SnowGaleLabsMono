@@ -316,6 +316,9 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
+      lucide-react:
+        specifier: ^0.456.0
+        version: 0.456.0(react@18.3.1)
       mdast-util-to-string:
         specifier: ^4.0.0
         version: 4.0.0
@@ -8827,7 +8830,7 @@ snapshots:
 
   '@babel/helper-wrap-function@7.25.9':
     dependencies:
-      '@babel/template': 7.25.9
+      '@babel/template': 7.27.0
       '@babel/traverse': 7.26.5
       '@babel/types': 7.27.0
     transitivePeerDependencies:

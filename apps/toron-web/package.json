@@ -20,6 +20,7 @@
     "cobe": "^0.6.3",
     "feed": "^4.2.2",
     "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.456.0",
     "mdast-util-to-string": "^4.0.0",
     "mdx-annotations": "^0.1.4",
     "motion": "^12.7.2",

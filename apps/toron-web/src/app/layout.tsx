@@ -4,7 +4,7 @@ import clsx from 'clsx'
 import { Providers } from '@/app/providers'
 import '@/styles/tailwind.css'
 import Footer from '@/components/Footer'
-import Navbar from '@/components/Nabvar'
+import Navbar from '@/components/Navbar'
 
 export const metadata: Metadata = {
   title: 'Toron - Progressive Overload for Muscle & Strength',

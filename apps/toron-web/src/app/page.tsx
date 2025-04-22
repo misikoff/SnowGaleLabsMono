@@ -1,8 +1,9 @@
+import Bento from '@/components/Bento'
 import GlobeBall from '@/components/GlobeBall'
 import { IconLink } from '@/components/IconLink'
 import { Intro } from '@/components/Intro'
+import OfflineWidget from '@/components/OfflineWidget'
 import PixelGridCanvas from '@/components/PixelCanvas'
-import RestBento from '@/components/RestBento'
 import RestWidget from '@/components/RestWidget'
 
 export default function Home() {
@@ -81,55 +82,31 @@ export default function Home() {
       <section className='flex w-full flex-col items-center justify-center p-8'>
         <div className='flex w-full flex-col items-center justify-center p-8'>
           <h3>I am where the bento boxes go</h3>
-          <div className='mt-8 grid w-full max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
-            {/* Bento Box 1 */}
-            <RestBento />
-
-            {/* Bento Box 2 */}
-            <div className='flex flex-col items-start justify-start rounded-lg bg-white p-6 shadow-md'>
-              <h4 className='text-lg font-semibold'>Streamlined Tracking</h4>
-              <p className='mt-2 text-sm text-gray-600'>
-                Only track what matters. Toron focuses on the data that drives
-                your training, so you can spend less time logging and stay
-                focused on the work.
-              </p>
+          <div className='mt-8 grid w-full grid-flow-dense grid-cols-1 grid-rows-[masonry] gap-6 sm:grid-cols-2'>
+            <div>
+              <Bento Widget={RestWidget}>
+                <h4 className='text-center text-lg font-semibold'>
+                  Dynamic or Scheduled Rest Days
+                </h4>
+                <p className='mt-2 mb-8 text-sm text-gray-600'>
+                  Rest when you need it, not when you don{"'"}t. Toron
+                  {"'"}s calendar is flexible, so small deviations don{"'"}t
+                  derail your progress.
+                </p>
+              </Bento>
             </div>
 
-            {/* Bento Box 3 */}
-            <div className='flex flex-col items-start justify-start rounded-lg bg-white p-6 shadow-md'>
-              <h4 className='text-lg font-semibold'>Split Building</h4>
-              <p className='mt-2 text-sm text-gray-600'>
-                Quickly create and adjust your training split with Toron{"'"}s
-                intuitive builder. Create your own routine or specify your
-                priorities and let Toron do the rest.
-              </p>
-            </div>
-
-            {/* Bento Box 4 */}
-            <div className='flex flex-col items-start justify-start rounded-lg bg-white p-6 shadow-md'>
-              <h4 className='text-lg font-semibold'>Bento Box 4</h4>
-              <p className='mt-2 text-sm text-gray-600'>
-                Add more bento boxes as needed to showcase additional features
-                or content.
-              </p>
-            </div>
-
-            {/* Bento Box 5 */}
-            <div className='flex flex-col items-start justify-start rounded-lg bg-white p-6 shadow-md'>
-              <h4 className='text-lg font-semibold'>Bento Box 5</h4>
-              <p className='mt-2 text-sm text-gray-600'>
-                Bento boxes can be used to organize content in a visually
-                appealing way.
-              </p>
-            </div>
-
-            {/* Bento Box 6 */}
-            <div className='flex flex-col items-start justify-start rounded-lg bg-white p-6 shadow-md'>
-              <h4 className='text-lg font-semibold'>Bento Box 6</h4>
-              <p className='mt-2 text-sm text-gray-600'>
-                Use Tailwind utilities to customize the layout and appearance of
-                each box.
-              </p>
+            <div>
+              <Bento Widget={OfflineWidget}>
+                <h4 className='text-center text-lg font-semibold'>
+                  Offline Logging
+                </h4>
+                <p className='mt-2 mb-8 text-sm text-gray-600'>
+                  Training doesn{"'"}t wait on Wi-Fi. Toron keeps your log
+                  intact when the signal drops and syncs it when you{"'"}re
+                  back. No warnings, no interruptions—just the work, recorded.
+                </p>
+              </Bento>
             </div>
           </div>
         </div>

@@ -7,7 +7,7 @@ import createGlobe, { Marker } from 'cobe'
 
 export default function GlobeBall({ className }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const markersRef = useRef([
+  const markersRef = useRef<Marker[]>([
     { location: [37.7595, -122.4367], size: 0.03 },
     { location: [40.7128, -74.006], size: 0.1 },
   ] as Marker[]) // Use a ref to store markers without triggering re-renders
@@ -67,7 +67,7 @@ export default function GlobeBall({ className }: { className?: string }) {
     }
 
     // Update the markers in the ref
-    markersRef.current = [...markersRef.current, newMarker]
+    markersRef.current = [...markersRef.current, newMarker] as Marker[]
   }
 
   return (

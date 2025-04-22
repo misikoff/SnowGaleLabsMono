@@ -13,7 +13,8 @@ export default function Navbar({ className }: { className?: string }) {
       )}
     >
       <div className='group flex items-center space-x-2'>
-        <Logo className='h-8 scale-x-[-1] fill-blue-400 transition-colors duration-500 ease-in-out group-hover:fill-amber-800' />
+        {/* scale-x-[-1] */}
+        <Logo className='h-8 fill-blue-400 transition-colors duration-500 ease-in-out group-hover:fill-amber-800' />
         <div
           className={clsx(
             sora.className,
