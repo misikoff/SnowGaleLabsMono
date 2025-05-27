@@ -51,6 +51,9 @@ const PixelGridCanvas = ({ className }: { className?: string }) => {
     // Draw function for the twinkling effect
     const draw = (time: number) => {
       console.log('Drawing frame', time)
+      if (!canvasRef.current) {
+        return
+      }
       ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
 
       for (let y = 0; y < canvasRef.current.height; y += spacing) {

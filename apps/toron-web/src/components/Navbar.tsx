@@ -1,4 +1,5 @@
 import { Sora } from 'next/font/google'
+import Link from 'next/link'
 import clsx from 'clsx'
 
 import { Logo } from './Logo'
@@ -25,15 +26,15 @@ export default function Navbar({ className }: { className?: string }) {
         </div>
       </div>
       <div className='space-x-4'>
-        <a href='/' className='hover:text-gray-400'>
+        <Link href='/' className='hover:text-gray-400'>
           Home
-        </a>
-        <a href='/about' className='hover:text-gray-400'>
+        </Link>
+        <Link href='/about' className='hover:text-gray-400'>
           About
-        </a>
-        <a href='/contact' className='hover:text-gray-400'>
+        </Link>
+        <Link href='/contact' className='hover:text-gray-400'>
           Contact
-        </a>
+        </Link>
       </div>
     </nav>
   )

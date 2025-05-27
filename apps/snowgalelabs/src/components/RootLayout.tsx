@@ -22,6 +22,8 @@ import { Logo, Logomark } from '@/components/Logo'
 import { Offices } from '@/components/Offices'
 import { SocialMedia } from '@/components/SocialMedia'
 
+import OwlLogo from './OwlLogo'
+
 const RootLayoutContext = createContext<{
   logoHovered: boolean
   setLogoHovered: React.Dispatch<React.SetStateAction<boolean>>
@@ -69,7 +71,9 @@ function Header({
           aria-label='Home'
           onMouseEnter={() => setLogoHovered(true)}
           onMouseLeave={() => setLogoHovered(false)}
+          className='flex gap-x-4'
         >
+          <OwlLogo className='-mt-5.5 h-12' />
           <Logomark
             className='h-8 sm:hidden'
             invert={invert}

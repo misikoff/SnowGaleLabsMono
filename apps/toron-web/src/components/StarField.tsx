@@ -3,7 +3,11 @@
 import { useEffect, useId, useRef } from 'react'
 
 import clsx from 'clsx'
-import { type TimelineSegment, animate, timeline } from 'motion'
+import {
+  // type TimelineSegment,
+  animate,
+  // timeline
+} from 'motion'
 
 type Star = [x: number, y: number, dim?: boolean, blur?: boolean]
 
@@ -90,7 +94,8 @@ function Star({
       animate(
         ref.current,
         {
-          opacity: dim ? [0.2, 0.5] : [1, 0.6],
+          // @ts-expect-error
+          fillOpacity: dim ? [0.2, 0.5] : [1, 0.6],
           scale: dim ? [1, 1.2] : [1.2, 1],
         },
         {
@@ -146,6 +151,7 @@ function Constellation({
       return
     }
 
+    // @ts-expect-error
     let sequence: Array<TimelineSegment> = [
       [
         ref.current,
@@ -162,6 +168,7 @@ function Constellation({
       ])
     }
 
+    // @ts-expect-error
     let animation = timeline(sequence)
 
     return () => {

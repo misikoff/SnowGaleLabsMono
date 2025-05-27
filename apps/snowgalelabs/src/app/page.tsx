@@ -5,7 +5,9 @@ import Link from 'next/link'
 import { ContactSection } from '@/components/ContactSection'
 import { Container } from '@/components/Container'
 import { FadeIn, FadeInStagger } from '@/components/FadeIn'
+import FoxLogo from '@/components/FoxLogo'
 import { List, ListItem } from '@/components/List'
+import OwlLogo from '@/components/OwlLogo'
 import { SectionIntro } from '@/components/SectionIntro'
 import { StylizedImage } from '@/components/StylizedImage'
 import { Testimonial } from '@/components/Testimonial'
@@ -161,18 +163,20 @@ export default async function Home() {
 
   return (
     <>
-      <Container className='mt-24 sm:mt-32 md:mt-56'>
-        <FadeIn className='max-w-3xl'>
-          <h1 className='font-display text-5xl font-medium tracking-tight [text-wrap:balance] text-neutral-950 sm:text-7xl'>
-            Revealing the Signal in the Storm
-          </h1>
-          <p className='mt-6 text-xl text-neutral-600'>
-            The world is full of noise -- numbers piling up, charts without
-            meaning, data with no direction. We build tools that cut through the
-            chaos, shaping raw information into something clear, sharp, and
-            useful. No fluff, no wasted motion -- just the right insights, at
-            the right time, in the right way.
-          </p>
+      <Container className='mt-24 inline-block w-full sm:mt-32 md:mt-56'>
+        <FadeIn className='flex w-full max-w-3xl flex-col items-center lg:flex-row'>
+          <div className=''>
+            <h1 className='font-display text-5xl font-medium tracking-tight [text-wrap:balance] text-neutral-950 sm:text-7xl'>
+              Revealing the Signal in the Storm
+            </h1>
+            <p className='mt-6 text-xl text-neutral-600'>
+              The world is full of noise -- numbers piling up, charts without
+              meaning, data with no direction. We build tools that cut through
+              the chaos, shaping raw information into something clear, sharp,
+              and useful.
+            </p>
+          </div>
+          <OwlLogo className='max-w-md p-8 lg:max-w-1/2' />
         </FadeIn>
       </Container>
 

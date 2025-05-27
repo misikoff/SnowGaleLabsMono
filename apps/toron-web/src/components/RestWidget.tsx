@@ -34,9 +34,8 @@ const workouts: Workout[] = [
     color: '#0d63f8',
   },
 ]
-// TODO handle animation issue with gap
-// gap causes the animation to be choppy as the element is added and removed
-export default function Reordering({
+
+export default function RestWidget({
   className,
   isActive,
 }: {
@@ -103,20 +102,20 @@ export default function Reordering({
               scale: 0.5,
               marginLeft: '0rem',
               marginRight: '0rem',
-            }} // Entry animation
+            }}
             animate={{
               opacity: 1,
               y: 0,
               scale: 1,
               marginLeft: '0.25rem',
               marginRight: '0.25rem',
-            }} // Animate to visible state
+            }}
             exit={{
               opacity: 0,
               width: 0,
               marginLeft: '0rem',
               marginRight: '0rem',
-            }} // Exit animation
+            }}
             style={{ backgroundColor: workout.color }}
           >
             <span className='font-bold text-white'>{workout.name}</span>

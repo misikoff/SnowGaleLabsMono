@@ -12,7 +12,7 @@ export default function Bento({
   className?: string
   children: React.ReactNode
   // react component with className and isActive prop
-  Widget: React.ComponentType<{ className?: string; isActive?: boolean }>
+  Widget?: React.ComponentType<{ className?: string; isActive?: boolean }>
 }) {
   const [isActive, setIsActive] = useState(false)
 
@@ -20,13 +20,13 @@ export default function Bento({
     <div
       className={clsx(
         className,
-        'group flex flex-col items-start justify-start rounded-lg bg-white p-6 shadow-md transition-colors hover:shadow-xl',
+        'group flex flex-col items-start justify-start rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-xl',
       )}
       onMouseEnter={() => setIsActive(true)} // Activate RestWidget on mouse enter
       onMouseLeave={() => setIsActive(false)} // Deactivate RestWidget on mouse leave
     >
       {children}
-      <Widget className='mt-8' isActive={isActive} />
+      {Widget && <Widget className='mt-4' isActive={isActive} />}
     </div>
   )
 }
