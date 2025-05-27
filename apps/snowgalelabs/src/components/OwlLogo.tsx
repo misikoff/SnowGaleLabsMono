@@ -50,14 +50,14 @@ export default function OwlLogo({ className }: { className?: string }) {
         />
         {/* left eye */}
         <path
-          className='transition-colors duration-300 ease-in-out group-hover:fill-blue-400'
+          className='transition-colors duration-300 ease-in-out group-hover:fill-[#7bb2d7]'
           d='M4004 7441 c-86 -31 -125 -67 -175 -161 -33 -62 -34 -211 -1 -282 28
 -63 95 -134 157 -166 42 -23 62 -27 130 -26 66 0 90 5 137 27 101 49 158 138
 166 263 16 247 -196 424 -414 345z'
         />
         {/* right eye */}
         <path
-          className='transition-colors duration-300 ease-in-out group-hover:fill-blue-400'
+          className='transition-all duration-300 ease-in-out group-hover:fill-[#7bb2d7]'
           d='M5470 7451 c-167 -55 -259 -202 -230 -368 20 -120 81 -203 177 -246
 112 -49 220 -42 314 20 85 56 136 178 125 297 -17 178 -129 295 -291 302 -38
 2 -81 0 -95 -5z'

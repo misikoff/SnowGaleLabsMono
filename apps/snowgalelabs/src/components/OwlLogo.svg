@@ -1,13 +1,17 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
  "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+ <!-- viewBox="270 150 540 718" -->
+<!-- viewBox="0.000000 0.000000 1024.000000 1024.000000" -->
+
 <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+ viewBox="100 120 824 774"
  width="1024.000000pt" height="1024.000000pt"
- viewBox="270 150 540 718"
  preserveAspectRatio="xMidYMid meet">
+<rect x="0" y="0" width="1000%" height="1000%" fill="#e5f0f7"/>
 
 <g transform="translate(0.000000,1024.000000) scale(0.100000,-0.100000)"
-fill="#000000" stroke="none">
+fill="black" stroke="none">
 <path d="M3403 8709 c-53 -16 -100 -70 -123 -145 -23 -74 -27 -191 -9 -276 14
 -70 88 -222 134 -275 l36 -42 -47 -58 c-107 -130 -225 -335 -289 -501 -81
 -209 -116 -385 -135 -672 -18 -279 -24 -311 -83 -470 -127 -337 -157 -496
