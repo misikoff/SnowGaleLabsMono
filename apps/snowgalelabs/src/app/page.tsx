@@ -11,7 +11,7 @@ import OwlLogo from '@/components/OwlLogo'
 import { SectionIntro } from '@/components/SectionIntro'
 import { StylizedImage } from '@/components/StylizedImage'
 import { Testimonial } from '@/components/Testimonial'
-import PokemonTitleScreenChassis from '@/components/flyoverScreen/chassis'
+import FlyoverScreen from '@/components/flyoverScreen/chassis'
 import imageLaptop from '@/images/laptop.jpg'
 import { type Project, type MDXEntry, loadProjects } from '@/lib/mdx'
 
@@ -63,7 +63,6 @@ function Projects({ projects }: { projects: Array<MDXEntry<Project>> }) {
           heatmaps, and refine your approach with clear, actionable insights.
         </p>
       </SectionIntro>
-      <PokemonTitleScreenChassis className='mt-16' />
 
       <Container className='mt-16'>
         <FadeInStagger className='grid grid-cols-1 gap-8 lg:grid-cols-3'>
@@ -182,6 +181,7 @@ export default async function Home() {
           <OwlLogo className='max-w-md p-8 lg:max-w-1/2' />
         </FadeIn>
       </Container>
+      <FlyoverScreen className='mt-8' />
 
       {/* <Clients /> */}
 

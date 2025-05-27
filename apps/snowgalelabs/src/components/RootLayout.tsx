@@ -74,16 +74,12 @@ function Header({
           className='flex gap-x-4'
         >
           <OwlLogo className='-mt-5.5 h-12' />
-          <Logomark
+          {/* <Logomark
             className='h-8 sm:hidden'
             invert={invert}
             filled={logoHovered}
-          />
-          <Logo
-            className='hidden h-8 sm:block'
-            invert={invert}
-            filled={logoHovered}
-          />
+          /> */}
+          <Logo className='block h-8' invert={invert} filled={logoHovered} />
         </Link>
         <div className='flex items-center gap-x-8'>
           {/* <Button href="/contact" invert={invert}>
