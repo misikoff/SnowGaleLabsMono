@@ -90,9 +90,8 @@ export default function FlyoverScreen({ className }: { className?: string }) {
 
   return (
     <div
-      className={`${className} flex flex-col items-center justify-center gap-4 p-4`}
+      className={`${className} flex flex-col items-center justify-center gap-4 bg-amber-200 p-4`}
     >
-      {/* <div className='text-4xl font-bold text-black'>Flyover Screen</div> */}
       <div className='overflow-hidden rounded-lg border border-gray-400 bg-white shadow-lg'>
         <div className='relative h-64 w-96 max-w-screen'>
           <Image src={imageLaptop} alt='snowy background' />
@@ -116,6 +115,7 @@ export default function FlyoverScreen({ className }: { className?: string }) {
           </div>
         </div>
       </div>
+      <p>hello wow</p>
     </div>
   )
 }
