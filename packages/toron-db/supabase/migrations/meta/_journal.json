@@ -302,6 +302,13 @@
       "when": 1744126188421,
       "tag": "0042_ambiguous_rocket_raccoon",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1748615768721,
+      "tag": "0043_tricky_secret_warriors",
+      "breakpoints": true
     }
   ]
 }

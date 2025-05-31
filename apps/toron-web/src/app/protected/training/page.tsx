@@ -1,8 +1,9 @@
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 import { LogoutButton } from '@/components/logout-button'
 import { createClient } from '@/lib/supabase/server'
+
+import Chassis from './chassis'
 
 export default async function ProtectedPage() {
   const supabase = await createClient()
@@ -13,17 +14,14 @@ export default async function ProtectedPage() {
   }
 
   return (
-    <div className='flex h-svh w-full items-center justify-center gap-2'>
-      <p>
+    <div className='mt-16 flex w-full flex-col items-center justify-center gap-2'>
+      {/* <p>
         Hello <span>{data.user.email}</span>
       </p>
-      <LogoutButton />
-      <Link
-        href='/protected/training'
-        className='text-blue-500 hover:underline'
-      >
-        Go to Training
-      </Link>
+      <LogoutButton /> */}
+      {/* workouts will appear here along with a button to add more exercises */}
+      {/*  */}
+      <Chassis />
     </div>
   )
 }
