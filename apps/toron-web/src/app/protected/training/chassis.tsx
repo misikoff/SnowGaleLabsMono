@@ -139,7 +139,20 @@ export default function Chassis() {
   // Sort mini exercises descending by date (assumes date property exists)
   const sortedMiniExercises = (miniExercises ?? [])
     .slice()
-    .sort((a: any, b: any) => (a.date ?? '').localeCompare(b.date ?? ''))
+    .sort((a: any, b: any) => (b.date ?? '').localeCompare(a.date ?? ''))
+
+  // Group mini exercises by date
+  const groupedByDate: Record<string, any[]> = {}
+  for (const ex of sortedMiniExercises) {
+    if (!groupedByDate[ex.date]) {
+      groupedByDate[ex.date] = []
+    }
+    groupedByDate[ex.date].push(ex)
+  }
+  const groupedDates = Object.keys(groupedByDate).sort((a, b) =>
+    // b.localeCompare(a),
+    a.localeCompare(b),
+  )
 
   // Ref for the scroll container
   const scrollRef = useRef<HTMLUListElement>(null)
@@ -171,31 +184,42 @@ export default function Chassis() {
             className='max-h-72 space-y-1 overflow-scroll'
             style={{ display: 'flex', flexDirection: 'column' }}
           >
-            {sortedMiniExercises.map((ex: any) => (
-              <li
-                key={ex.id}
-                className='flex items-center justify-between border-b py-1 text-sm'
-              >
-                <span>
-                  <span className='font-mono'>{ex.date}</span>
-                  {muscleGroups?.find((mg) => mg.id === ex.muscleGroupId) && (
-                    <span className='ml-2 text-gray-700'>
-                      {
-                        muscleGroups?.find((mg) => mg.id === ex.muscleGroupId)!
-                          .name
-                      }
-                    </span>
-                  )}
-                </span>
-                <button
-                  className='ml-4 rounded bg-red-500 px-2 py-1 text-xs text-white hover:bg-red-700'
-                  onClick={() => {
-                    setExerciseToDelete(ex)
-                    setShowDeleteModal(true)
-                  }}
-                >
-                  Delete
-                </button>
+            {groupedDates.map((date) => (
+              <li key={date}>
+                <div className='mt-2 mb-1 font-mono font-semibold text-blue-900'>
+                  {date}
+                </div>
+                <ul>
+                  {groupedByDate[date].map((ex: any) => (
+                    <li
+                      key={ex.id}
+                      className='flex items-center justify-between border-b py-1 text-sm'
+                    >
+                      <span>
+                        {muscleGroups?.find(
+                          (mg) => mg.id === ex.muscleGroupId,
+                        ) && (
+                          <span className='text-gray-700'>
+                            {
+                              muscleGroups?.find(
+                                (mg) => mg.id === ex.muscleGroupId,
+                              )!.name
+                            }
+                          </span>
+                        )}
+                      </span>
+                      <button
+                        className='ml-4 rounded bg-red-500 px-2 py-1 text-xs text-white hover:bg-red-700'
+                        onClick={() => {
+                          setExerciseToDelete(ex)
+                          setShowDeleteModal(true)
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </li>
+                  ))}
+                </ul>
               </li>
             ))}
           </ul>

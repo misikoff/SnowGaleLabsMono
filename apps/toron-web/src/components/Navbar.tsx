@@ -33,7 +33,7 @@ export default async function Navbar({ className }: { className?: string }) {
         </div>
       </div>
       <div className='flex items-center space-x-4'>
-        <Link href='/' className='hover:text-gray-400'>
+        {/* <Link href='/' className='hover:text-gray-400'>
           Home
         </Link>
         <Link href='/about' className='hover:text-gray-400'>
@@ -41,7 +41,7 @@ export default async function Navbar({ className }: { className?: string }) {
         </Link>
         <Link href='/contact' className='hover:text-gray-400'>
           Contact
-        </Link>
+        </Link> */}
         {error || !data?.user ? <></> : <LogoutButton />}
       </div>
     </nav>
