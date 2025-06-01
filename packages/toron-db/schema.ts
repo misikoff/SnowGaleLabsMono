@@ -285,6 +285,29 @@ export const feedback = pgTable(
   ],
 )
 
+// project minotaur
+export const miniExercises = pgTable(
+  'mini_exercises',
+  {
+    id,
+    userId,
+    muscleGroupId: uuid().references(() => muscleGroups.id, {
+      onDelete: 'set null',
+    }),
+    date: date().notNull().defaultNow(),
+    //
+    createdAt: timestamp().notNull().defaultNow(),
+    updatedAt: timestamp()
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => [
+    index('miniExercisesUserIdIndex').on(table.userId),
+    usersOnlyPolicy,
+  ],
+)
+
 export type User = typeof users.$inferSelect
 export type Profile = typeof profiles.$inferSelect
 export type Exercise = typeof exercises.$inferSelect
@@ -295,3 +318,6 @@ export type MuscleGroup = typeof muscleGroups.$inferSelect
 export type Split = typeof splits.$inferSelect
 export type SessionExercise = typeof sessionExercises.$inferSelect
 export type Feedback = typeof feedback.$inferSelect
+
+// project minotaur
+export type MiniExercise = typeof miniExercises.$inferSelect
