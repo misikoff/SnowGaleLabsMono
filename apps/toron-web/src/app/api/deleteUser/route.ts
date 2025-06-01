@@ -21,7 +21,7 @@ export async function DELETE() {
 
   try {
     // Verify the JWT using the Supabase JWT secret
-    const decoded = jwt.verify(token, process.env.SUPABASE_JWT_SECRET || '')
+    const decoded = jwt.verify(token, process.env.SUPABASE_JWT_SECRET!)
 
     const userId = decoded.sub
     console.log('userId', userId)
