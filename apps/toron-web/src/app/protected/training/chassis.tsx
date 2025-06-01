@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 import { produce } from 'immer'
+import { XIcon } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
@@ -180,7 +181,7 @@ export default function Chassis() {
             <div className='text-red-600'>Error loading muscle groups</div>
           )}
         </div>
-        <div className='mt-6 w-full max-w-md rounded-lg border p-4 shadow-lg'>
+        <div className='w-full max-w-md rounded-lg border p-4 shadow-lg'>
           <h2 className='mb-2 font-semibold'>Exercises</h2>
           {isLoadingMiniExercises && <div>Loading mini exercises...</div>}
           {sortedMiniExercises.length === 0 && !isLoadingMiniExercises && (
@@ -216,13 +217,13 @@ export default function Chassis() {
                         )}
                       </span>
                       <button
-                        className='ml-4 rounded bg-red-500 px-2 py-1 text-xs text-white hover:bg-red-700'
+                        className='ml-4 rounded bg-zinc-400 px-2 py-1 text-xs text-white hover:bg-red-700'
                         onClick={() => {
                           setExerciseToDelete(ex)
                           setShowDeleteModal(true)
                         }}
                       >
-                        Delete
+                        <XIcon className='h-4 w-4' />
                       </button>
                     </li>
                   ))}
@@ -234,7 +235,7 @@ export default function Chassis() {
             className='mt-4 rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700'
             onClick={() => setShowCreateModal(true)}
           >
-            Create Mini Exercise
+            Add Exercise
           </button>
         </div>
       </div>
@@ -254,11 +255,13 @@ export default function Chassis() {
                 onChange={(e) => setSelectedGroup(e.target.value)}
               >
                 <option value=''>Select muscle group</option>
-                {muscleGroups?.map((group: any) => (
-                  <option key={group.id} value={group.id}>
-                    {group.name}
-                  </option>
-                ))}
+                {muscleGroups
+                  ?.sort((a, b) => a.name.localeCompare(b.name))
+                  .map((group: any) => (
+                    <option key={group.id} value={group.id}>
+                      {group.name}
+                    </option>
+                  ))}
               </select>
 
               <div className='mt-6 flex justify-end gap-2'>
@@ -290,7 +293,7 @@ export default function Chassis() {
           <div className='min-w-[300px] rounded bg-white p-6 text-black shadow-lg'>
             <h3 className='mb-4 text-lg font-semibold'>Confirm Delete</h3>
             <p>
-              Are you sure you want to delete the mini exercise on{' '}
+              Are you sure you want to delete this exercise:{' '}
               <span className='font-mono'>{exerciseToDelete.date}</span>{' '}
               {muscleGroups?.find(
                 (mg) => mg.id === exerciseToDelete.muscleGroupId,

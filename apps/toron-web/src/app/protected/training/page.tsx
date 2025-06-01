@@ -14,7 +14,7 @@ export default async function ProtectedPage() {
   }
 
   return (
-    <div className='mt-16 flex w-full flex-col items-center justify-center gap-2'>
+    <div className='flex w-full flex-col items-center justify-center gap-2'>
       {/* <p>
         Hello <span>{data.user.email}</span>
       </p>

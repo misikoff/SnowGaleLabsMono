@@ -1,3 +1,7 @@
+'use client'
+
+import { usePathname } from 'next/navigation'
+
 import { IconLink } from '@/components/IconLink'
 
 function XIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
@@ -132,6 +136,11 @@ function GitHubIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
 }
 
 export default function Footer() {
+  const pathname = usePathname()
+  if (pathname.startsWith('/protected')) {
+    return null
+  }
+
   return (
     <div className='flex w-full flex-col items-center justify-center bg-black p-8'>
       <p className='flex items-baseline gap-x-2 text-[0.8125rem]/6 text-gray-500'>
