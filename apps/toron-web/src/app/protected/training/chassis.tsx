@@ -175,21 +175,23 @@ export default function Chassis() {
   return (
     <div className='flex h-full w-full flex-col'>
       <div className='flex w-full flex-1 flex-col items-center justify-center'>
-        <div className='mt-4 flex flex-col gap-4'>
-          {isLoading && <div>Loading muscle groups...</div>}
-          {error && (
-            <div className='text-red-600'>Error loading muscle groups</div>
-          )}
-        </div>
-        <div className='w-full max-w-md rounded-lg border p-4 shadow-lg'>
-          <h2 className='mb-2 font-semibold'>Exercises</h2>
-          {isLoadingMiniExercises && <div>Loading mini exercises...</div>}
+        {(isLoading || error) && (
+          <div className='mt-4 flex flex-col gap-4'>
+            {isLoading && <div>Loading muscle groups...</div>}
+            {error && (
+              <div className='text-red-600'>Error loading muscle groups</div>
+            )}
+          </div>
+        )}
+        <div className='h-full w-full max-w-md rounded-lg border p-4 text-black shadow-lg'>
+          <h2 className='mb-2 font-semibold'>Exercise History</h2>
+          {isLoadingMiniExercises && <div>Loading exercises...</div>}
           {sortedMiniExercises.length === 0 && !isLoadingMiniExercises && (
-            <div className='text-gray-500'>No mini exercises found.</div>
+            <div className='text-gray-500'>No exercises found.</div>
           )}
           <ul
             ref={scrollRef}
-            className='max-h-72 space-y-1 overflow-scroll'
+            className='max-h-96 space-y-1 overflow-scroll'
             style={{ display: 'flex', flexDirection: 'column' }}
           >
             {groupedDates.map((date) => (
@@ -243,7 +245,7 @@ export default function Chassis() {
       {showCreateModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40'>
           <div className='min-w-[300px] rounded bg-white p-6 text-black shadow-lg'>
-            <h3 className='mb-4 text-lg font-semibold'>Create Mini Exercise</h3>
+            <h3 className='mb-4 text-lg font-semibold'>Add Exercise</h3>
             <div>
               <div>
                 <span className='font-semibold'>Current Date:</span>{' '}

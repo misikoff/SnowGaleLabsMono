@@ -1,5 +1,5 @@
 import Bento from '@/components/Bento'
-import GlobeBall from '@/components/GlobeBall'
+// import GlobeBall from '@/components/GlobeBall'
 import { IconLink } from '@/components/IconLink'
 import IntensityWidget from '@/components/IntensityWidget'
 import { Intro } from '@/components/Intro'
@@ -46,50 +46,50 @@ export default function Home() {
           {/* <span className='text-blue-400'>Toron</span> */}
         </div>
       </section>
-      <section className='flex w-full flex-row'>
-        <div className='max-w-1/2 min-w-1/2 p-4 lg:mx-6 lg:w-1/2'>
+      <section className='flex w-full flex-row items-center justify-center'>
+        <div className='max-w-1/2 p-4 lg:mx-6 lg:w-1/2'>
           {/* <h3 className='text-lg font-bold text-blue-400'>
             Strength Operations
           </h3> */}
           {/* <div className='relative h-32 w-32'>
             <PixelGridCanvas />
           </div> */}
-          <div className='max-w-lg'>
-            <p>
-              Most fitness apps push you to do more—more weight, more volume,
-              more grind—without asking the one question that matters:{' '}
-              <em>is it working?</em> They flood you with numbers, but blur the
-              signal. They{"'"}re rigid when you need flexibility, vague when
-              you need clarity.
-            </p>
-            <p>
-              <br />
-              <strong>
-                <span className='text-blue-400'>Toron</span> changes that.
-              </strong>
-              <br />
-            </p>
-            <p>
-              <br />
-              Built for lifters who train with intent, Toron brings focus back
-              to the fundamentals: effective reps, smart progression, and
-              recovery that actually supports growth. It doesn{"'"}t push you to
-              do more for its own sake—it helps you do what matters. No noise.
-              No fluff. Just a clear path to strength that lasts.
-            </p>
-          </div>
+          {/* <div className='max-w-lg'> */}
+          <p>
+            Most fitness apps push you to do more—more weight, more volume, more
+            grind—without asking the one question that matters:{' '}
+            <em>is it working?</em> They flood you with numbers, but blur the
+            signal. They{"'"}re rigid when you need flexibility, vague when you
+            need clarity.
+          </p>
+          <p>
+            <br />
+            <strong>
+              <span className='text-blue-400'>Toron</span> changes that.
+            </strong>
+            <br />
+          </p>
+          <p>
+            <br />
+            Built for lifters who train with intent, Toron brings focus back to
+            the fundamentals: effective reps, smart progression, and recovery
+            that actually supports growth. It doesn{"'"}t push you to do more
+            for its own sake—it helps you do what matters. No noise. No fluff.
+            Just a clear path to strength that lasts.
+          </p>
+          {/* </div> */}
 
           {/* <PixelGridCanvas className='h-64 w-64 bg-red-300' /> */}
         </div>
         {/* <div className='relative flex h-64 w-full flex-col items-center bg-slate-400'> */}
         {/* <div className='absolute right-0 overflow-hidden'> */}
-        <div className='lg:w-1/2'>
+        {/* <div className='lg:w-1/2'>
           <GlobeBall className='' />
-        </div>
+        </div> */}
       </section>
       <section className='relative flex w-full flex-col items-center justify-center bg-slate-300 p-8'>
         <div className='flex w-full flex-col items-center justify-center p-8'>
-          <div className='mt-8 grid w-full grid-flow-dense grid-cols-1 grid-rows-[masonry] gap-6 sm:grid-cols-2'>
+          <div className='mt-8 grid w-full max-w-md grid-flow-dense grid-cols-1 gap-6'>
             <div>
               <Bento Widget={RestWidget}>
                 <h4 className='text-center text-lg font-semibold'>
@@ -139,8 +139,8 @@ export default function Home() {
         </div>
         <div className='absolute right-0 -bottom-12 left-0 h-12 w-full rounded-b-3xl bg-slate-300' />
       </section>
-      <section className='mt-6 flex w-full flex-col items-center justify-center bg-black p-8'>
-        <div className='flex w-full flex-col items-center justify-center bg-black p-8'>
+      <section className='mt-6 flex w-full flex-col items-center justify-center bg-slate-950 p-8'>
+        <div className='flex w-full flex-col items-center justify-center bg-slate-950 p-8'>
           <div className='flex flex-col items-center justify-center text-center lg:items-start lg:text-left'>
             <h2 className='font-display mt-14 text-4xl/tight font-light text-white'>
               Join the Movement
@@ -149,11 +149,14 @@ export default function Home() {
               Sign up for early access and be part of the Toron community. Your
               feedback will shape the future of training.
             </p>
+            <div className='mt-6 flex w-full max-w-md flex-col items-center justify-center gap-4 lg:flex-row lg:items-start'>
+              <SignUpForm />
+            </div>
           </div>
         </div>
         {/* <Intro /> */}
       </section>
-      <section className='my-8'>
+      {/* <section className='my-8'>
         <div
           className='relative -mx-6 bg-gray-50 sm:mx-0 sm:rounded-2xl'
           style={{
@@ -175,7 +178,7 @@ export default function Home() {
             </p>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   )
 }

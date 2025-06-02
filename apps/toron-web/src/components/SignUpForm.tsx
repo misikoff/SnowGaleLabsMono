@@ -9,7 +9,7 @@ export function SignUpForm() {
 
   return (
     <form
-      className='relative isolate mt-8 flex items-center pr-1'
+      className='relative isolate mt-8 flex w-full items-center pr-1'
       onSubmit={(e) => {
         e.preventDefault()
 
