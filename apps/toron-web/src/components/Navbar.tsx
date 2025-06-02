@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 
 import { Logo } from './Logo'
 import { LogoutButton } from './logout-button'
+import { Button } from './ui/button'
 
 const sora = Sora({ subsets: ['latin'] })
 export default async function Navbar({ className }: { className?: string }) {
@@ -42,7 +43,13 @@ export default async function Navbar({ className }: { className?: string }) {
         <Link href='/contact' className='hover:text-gray-400'>
           Contact
         </Link> */}
-        {error || !data?.user ? <></> : <LogoutButton />}
+        {error || !data?.user ? (
+          <Link href='auth/login' className=''>
+            <Button>Login</Button>
+          </Link>
+        ) : (
+          <LogoutButton />
+        )}
       </div>
     </nav>
   )
