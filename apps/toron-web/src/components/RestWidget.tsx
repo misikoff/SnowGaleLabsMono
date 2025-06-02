@@ -44,6 +44,7 @@ export default function RestWidget({
 }) {
   const [order, setOrder] = useState<Workout[]>(workouts)
   const orderRef = useRef<Workout[]>(workouts)
+  const lastRestDayIndexRef = useRef<number | undefined>(undefined)
 
   useEffect(() => {
     orderRef.current = order
@@ -54,16 +55,19 @@ export default function RestWidget({
 
     const shuffleAndAnimate = () => {
       if (!isActive) {
-        // if not active remove the rest days
         setOrder(workouts)
+        lastRestDayIndexRef.current = undefined
         return
-      } // Stop the animation if not active
+      }
 
-      const shuffledOrder = shuffle(orderRef.current)
+      const { array: shuffledOrder, restDayIndex } = shuffle(
+        orderRef.current,
+        lastRestDayIndexRef.current,
+      )
       setOrder(shuffledOrder)
-      orderRef.current = shuffledOrder // Update the ref to match the new state
+      orderRef.current = shuffledOrder
+      lastRestDayIndexRef.current = restDayIndex
 
-      // Schedule the next shuffle
       if (isActive) {
         timeout = setTimeout(shuffleAndAnimate, 1000)
       }
@@ -71,7 +75,7 @@ export default function RestWidget({
 
     shuffleAndAnimate()
 
-    return () => clearTimeout(timeout) // Cleanup timeout on unmount or when isActive changes
+    return () => clearTimeout(timeout)
   }, [isActive])
 
   return (
@@ -129,17 +133,24 @@ export default function RestWidget({
 /**
  * ==============   Utils   ================
  */
-function shuffle([...array]: Workout[]) {
+function shuffle([...array]: Workout[], lastRestDayIndex?: number) {
   const restDayIndex = array.findIndex((item) => item.isRestDay === true)
 
   if (restDayIndex !== -1) {
     // Remove the rest day if it exists
     array = array.filter((item) => !item.isRestDay)
-  } else {
-    // Add the rest day to a random position, including the end of the array
-    const randomIndex = Math.floor(Math.random() * (array.length + 1)) // +1 to include the end
-    array.splice(randomIndex, 0, restDay)
   }
 
-  return array
+  // Add the rest day to a random position, not the same as the last one
+  let randomIndex: number
+  do {
+    randomIndex = Math.floor(Math.random() * (array.length + 1))
+  } while (
+    typeof lastRestDayIndex === 'number' &&
+    array.length > 0 &&
+    randomIndex === lastRestDayIndex
+  )
+  array.splice(randomIndex, 0, restDay)
+
+  return { array, restDayIndex: randomIndex }
 }

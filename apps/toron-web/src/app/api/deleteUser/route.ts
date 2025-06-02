@@ -2,12 +2,12 @@ import { headers } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 import jwt from 'jsonwebtoken'
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || '',
-)
-
 export async function DELETE() {
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  )
+
   const headersList = await headers()
   const authorization = headersList.get('authorization')
   console.log('authorization', authorization)
@@ -21,7 +21,7 @@ export async function DELETE() {
 
   try {
     // Verify the JWT using the Supabase JWT secret
-    const decoded = jwt.verify(token, process.env.SUPABASE_JWT_SECRET || '')
+    const decoded = jwt.verify(token, process.env.SUPABASE_JWT_SECRET!)
 
     const userId = decoded.sub
     console.log('userId', userId)

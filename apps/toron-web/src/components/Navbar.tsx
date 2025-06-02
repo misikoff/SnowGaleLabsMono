@@ -2,10 +2,18 @@ import { Sora } from 'next/font/google'
 import Link from 'next/link'
 import clsx from 'clsx'
 
+import { createClient } from '@/lib/supabase/server'
+
 import { Logo } from './Logo'
+import { LogoutButton } from './logout-button'
+import { Button } from './ui/button'
 
 const sora = Sora({ subsets: ['latin'] })
-export default function Navbar({ className }: { className?: string }) {
+export default async function Navbar({ className }: { className?: string }) {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase.auth.getUser()
+
   return (
     <nav
       className={clsx(
@@ -25,8 +33,8 @@ export default function Navbar({ className }: { className?: string }) {
           Toron
         </div>
       </div>
-      <div className='space-x-4'>
-        <Link href='/' className='hover:text-gray-400'>
+      <div className='flex items-center space-x-4'>
+        {/* <Link href='/' className='hover:text-gray-400'>
           Home
         </Link>
         <Link href='/about' className='hover:text-gray-400'>
@@ -34,7 +42,14 @@ export default function Navbar({ className }: { className?: string }) {
         </Link>
         <Link href='/contact' className='hover:text-gray-400'>
           Contact
-        </Link>
+        </Link> */}
+        {error || !data?.user ? (
+          <Link href='auth/login' className=''>
+            <Button>Login</Button>
+          </Link>
+        ) : (
+          <LogoutButton />
+        )}
       </div>
     </nav>
   )
