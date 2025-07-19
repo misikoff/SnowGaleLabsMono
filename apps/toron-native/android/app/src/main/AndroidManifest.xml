@@ -25,7 +25,6 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="toron"/>
-        <data android:scheme="com.anonymous.Toron"/>
         <data android:scheme="exp+toron"/>
       </intent-filter>
     </activity>
