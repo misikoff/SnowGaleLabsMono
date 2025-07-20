@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { produce } from 'immer'
 
 import { Session } from '../../../../packages/toron-db/schema'
-import { createSession, deleteSession, updateSession } from '../dbFunctions'
+import { createSession, createSleekSession, deleteSession, updateSession } from '../dbFunctions'
 import { mutationSettings } from './mutationSettings'
 import { invalidateSessionQueries, sessionRefetcher } from './refetcher'
 // TODO: add debug variable to turn on/off console logs
@@ -292,6 +292,51 @@ export const useCompleteSessionMutation = () => {
     // Always refetch after error or success:
     onSettled: (x1, x2, vars) => {
       console.log('settled')
+      invalidateSessionQueries(queryClient, vars.id)
+    },
+  })
+}
+
+export const useCreateSleekSessionMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: createSleekSession,
+    onMutate: async (obj) => {
+      if (!mutationSettings.optimisticUpdate) {
+        return
+      }
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({
+        queryKey: ['sessions'],
+      })
+
+      // Snapshot the previous value
+      const previousSessions = queryClient.getQueryData(['sessions'])
+
+      const nextSessions = produce(previousSessions, (draft: Session[]) => {
+        draft = draft || []
+        draft.push({
+          ...obj,
+          isSleek: true,
+          sessionExercises: [],
+        } as any as Session)
+      })
+      
+      // Optimistically update to the new value
+      queryClient.setQueryData(['sessions'], nextSessions)
+
+      // Return a context object with the snapshotted value
+      return { previousSessions }
+    },
+    onSuccess: () => {
+      console.log('sleek session created')
+    },
+    onError: (error, variables, context) => {
+      console.error('error creating sleek session', error)
+      queryClient.setQueryData(['sessions'], context?.previousSessions)
+    },
+    onSettled: (x1, x2, vars) => {
+      console.log('sleek session settled')
       invalidateSessionQueries(queryClient, vars.id)
     },
   })

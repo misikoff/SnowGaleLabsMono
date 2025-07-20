@@ -5,12 +5,14 @@ import { Link, router, useFocusEffect } from 'expo-router'
 import { useQuery } from '@tanstack/react-query'
 
 import AddSessionButton from '@/components/session/addSessionButton'
+import AddSleekSessionButton from '@/components/session/addSleekSessionButton'
 import {
   useSupabaseUser,
   getProfile,
   getSplit,
   getSessionsForCalendar,
   getSessions,
+  getSessionMetadata,
   updateProfile,
 } from '@/lib/dbFunctions'
 
@@ -66,6 +68,15 @@ export default function Tab() {
     queryFn: () => getSessionsForCalendar(),
   })
 
+  const {
+    data: activeSessionMetadata,
+    isLoading: activeSessionLoading,
+  } = useQuery({
+    queryKey: ['sessionMetadata', profile?.activeSessionId],
+    queryFn: () => getSessionMetadata({ sessionId: profile?.activeSessionId! }),
+    enabled: !!profile?.activeSessionId,
+  })
+
   useFocusEffect(
     useCallback(() => {
       // Refetch sessions when the screen comes into focus
@@ -104,13 +115,17 @@ export default function Tab() {
 
   // Shared memoized onCreate function
   const handleOnCreate = useCallback(
-    async (newSessionId: string) => {
+    async (newSessionId: string, isSleek?: boolean) => {
       if (profile) {
         await updateProfile({
           id: profile.id,
           activeSessionId: newSessionId,
         }).then(() => {
-          router.navigate(`/(auth)/train/session/${newSessionId}`)
+          if (isSleek) {
+            router.navigate(`/(auth)/train/sleek/${newSessionId}`)
+          } else {
+            router.navigate(`/(auth)/train/session/${newSessionId}`)
+          }
         })
       }
     },
@@ -142,10 +157,16 @@ export default function Tab() {
         </>
       )}
       {profile?.activeSessionId ? (
-        <Link href={`/(auth)/train/session/${profile.activeSessionId}`}>
+        <Link 
+          href={
+            activeSessionMetadata?.isSleek 
+              ? `/(auth)/train/sleek/${profile.activeSessionId}`
+              : `/(auth)/train/session/${profile.activeSessionId}`
+          }
+        >
           <View className='rounded-md bg-blue-600 px-3 py-2 text-center'>
             <Text className='text-center text-xl font-bold text-white'>
-              Resume Active Session
+              Resume Active {activeSessionMetadata?.isSleek ? 'Sleek ' : ''}Session
             </Text>
           </View>
         </Link>
@@ -191,6 +212,17 @@ export default function Tab() {
               </Text>
             </View>
           </AddSessionButton>
+
+          <AddSleekSessionButton
+            date={new Date().toISOString()}
+            onCreate={handleOnCreate}
+          >
+            <View className='rounded-md bg-purple-600 px-3 py-2 text-center'>
+              <Text className='text-center text-xl font-bold text-white'>
+                Start a Sleek Session
+              </Text>
+            </View>
+          </AddSleekSessionButton>
         </>
       )}
     </View>

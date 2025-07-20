@@ -63,6 +63,7 @@ export async function getSession(payload: { sessionId: Session['id'] }) {
       id,
       name,
       date,
+      isSleek:is_sleek,
       sessionExercises:session_exercises (
         id,
         order,
@@ -498,6 +499,65 @@ export async function getQuotes() {
   // console.log({ quotes: data })
 
   return data.map((d) => toCamelCase(d)) as Quote[]
+}
+
+export async function getSessionMetadata(payload: { sessionId: Session['id'] }) {
+  const { data, error } = await supabase
+    .from('sessions')
+    .select('id, name, isSleek:is_sleek')
+    .eq('id', payload.sessionId)
+    .single()
+
+  if (error) {
+    console.error('Error fetching session metadata:', error)
+    return null
+  }
+
+  return toCamelCase(data) as Pick<Session, 'id' | 'name' | 'isSleek'>
+}
+
+// Sleek Session Functions
+export async function createSleekSession(payload: {
+  id?: Session['id']
+  name?: Session['name']
+  date?: Session['date']
+}) {
+  const { data, error } = await supabase
+    .from('sessions')
+    .insert(toSnakeCase({ ...payload, isSleek: true }))
+    .select('id')
+  console.log({ data, error })
+
+  return getFirstOrNull({ data, key: 'id' })
+}
+
+export async function addMuscleGroupToSleekSession(payload: {
+  id?: SessionExercise['id']
+  sessionId: SessionExercise['sessionId']
+  muscleGroupId: SessionExercise['muscleGroupId']
+  order: SessionExercise['order']
+}) {
+  const { data, error } = await supabase
+    .from('session_exercises')
+    .insert(toSnakeCase(payload))
+    .select('id')
+  console.log({ data, error })
+
+  return getFirstOrNull({ data, key: 'id' })
+}
+
+export async function removeMuscleGroupFromSleekSession(payload: {
+  sessionExerciseId: SessionExercise['id']
+  sessionId: Session['id']
+}) {
+  const { data, error } = await supabase
+    .from('session_exercises')
+    .delete()
+    .eq('id', payload.sessionExerciseId)
+    .eq('session_id', payload.sessionId)
+  console.log({ data, error })
+
+  return data
 }
 
 export function useSupabaseUser() {
