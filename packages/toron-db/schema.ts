@@ -208,6 +208,7 @@ export const sessions = pgTable(
     // for use with templates only
     order: smallint(),
     completed: boolean().default(false),
+    isSleek: boolean().default(false),
     date: date().notNull().defaultNow(),
     createdAt: timestamp().notNull().defaultNow(),
     updatedAt: timestamp()

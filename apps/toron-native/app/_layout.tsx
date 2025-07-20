@@ -12,22 +12,23 @@ import { supabase } from '@/utils/supabase'
 
 const InitialLayout = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null)
+  const [isLoaded, setIsLoaded] = useState(false)
+  const segments = useSegments()
+  const router = useRouter()
 
   useEffect(() => {
     let mounted = true
-
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (mounted) {
         setSession(session)
+        setIsLoaded(true)
       }
     })
-
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
       if (mounted) {
         setSession(session)
       }
     })
-
     return () => {
       mounted = false
       data.subscription.unsubscribe()
@@ -35,58 +36,46 @@ const InitialLayout = ({ children }: { children: React.ReactNode }) => {
   }, [])
 
   useEffect(() => {
-    // Tells Supabase Auth to continuously refresh the session automatically if
-    // the app is in the foreground. When this is added, you will continue to receive
-    // `onAuthStateChange` events with the `TOKEN_REFRESHED` or `SIGNED_OUT` event
-    // if the user's session is terminated. This should only be registered once.
     const handleAppStateChange = (state: string) => {
       if (state === 'active') {
-        console.log('Starting auto-refresh')
-        supabase.auth.startAutoRefresh().catch((error) => {
-          console.error('Error starting auto-refresh', error)
-        })
+        supabase.auth.startAutoRefresh().catch(() => {})
       } else {
-        console.log('Stopping auto-refresh')
-        supabase.auth.stopAutoRefresh().catch((error) => {
-          console.error('Error stopping auto-refresh', error)
-        })
+        supabase.auth.stopAutoRefresh().catch(() => {})
       }
     }
-
-    // Add the event listener
     const subscription = AppState.addEventListener(
       'change',
       handleAppStateChange,
     )
-    // Start the auto-refresh when the app is active
-
-    // Cleanup the event listener on unmount
     return () => {
       subscription.remove()
     }
   }, [])
 
-  const isSignedIn = session && session.user
-  const isLoaded = session !== null
-
-  const segments = useSegments()
-  const router = useRouter()
-
   useEffect(() => {
+    if (!isLoaded) {
+      return
+    }
+    const isSignedIn = session && session.user
     const inTabsGroup =
-      segments[0] === '(auth)' || segments[0] === '(auth-modal)'
-
+      Array.isArray(segments) &&
+      (segments[0] === '(auth)' || segments[0] === '(auth-modal)')
     if (isSignedIn && !inTabsGroup) {
       router.replace('/train')
     } else if (!isSignedIn && inTabsGroup) {
       router.replace('/login')
-    }
-    // @ts-expect-error: segments.length can be 0 when the app is opened for the first time
-    else if (!isSignedIn && segments.length === 0) {
+    } else if (
+      !isSignedIn &&
+      Array.isArray(segments) &&
+      segments.length === 0
+    ) {
       router.replace('/login')
     }
-  }, [isLoaded, isSignedIn, router, segments])
+  }, [isLoaded, session, router, segments])
 
+  if (!isLoaded) {
+    return null
+  }
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )

@@ -309,6 +309,13 @@
       "when": 1748615768721,
       "tag": "0043_tricky_secret_warriors",
       "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1753013587385,
+      "tag": "0044_ancient_shooting_star",
+      "breakpoints": true
     }
   ]
 }
